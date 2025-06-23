@@ -1,7 +1,7 @@
-// src/components/Layout/Layout.tsx
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import styles from "./Layout.module.css";
 import { ElementInfoPanel } from "../AtomModel/ElementInfoPanel";
 import {
@@ -27,6 +27,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   } = useAppStore();
 
   const element = useCurrentElement();
+  const pathname = usePathname();
 
   const clickOutsideTracker = useRef<{ x: number; y: number } | null>(null);
 
@@ -85,7 +86,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <SideMenu />
       <main className={styles.main}> {children}</main>
 
-      <BottomMenu />
+      {pathname !== "/periodic-table" && <BottomMenu />}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {isPanelVisible && (
