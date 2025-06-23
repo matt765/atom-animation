@@ -1,8 +1,7 @@
-// src/store/appStore.ts
 import { create } from "zustand";
 import { ElementConfig, elements } from "../components/AtomModel/elementsData";
 
-import type { SetStateAction } from "react"; // Dodano import SetStateAction
+import type { SetStateAction } from "react";
 
 interface AppState {
   // Stan
@@ -13,9 +12,9 @@ interface AppState {
   refreshCounter: number;
 
   // Akcje
-  setSelectedElement: (update: SetStateAction<string>) => void; // Poprawiony typ akcji
+  setSelectedElement: (update: SetStateAction<string>) => void;
   setSliderValue: (value: number) => void;
-  showInfoPanel: (position: { x: number; y: number }) => void;
+  showInfoPanel: (position?: { x: number; y: number }) => void; // Zmieniono na opcjonalny
   hideInfoPanel: () => void;
   setPanelPosition: (position: { x: number; y: number }) => void;
   triggerRefresh: () => void;
@@ -39,7 +38,11 @@ export const useAppStore = create<AppState>((set) => ({
     })),
   setSliderValue: (value) => set({ sliderValue: value }),
   showInfoPanel: (position) =>
-    set({ isPanelVisible: true, panelPosition: position }),
+    set((state) => ({
+      isPanelVisible: true,
+      // Jeśli pozycja jest podana, zaktualizuj ją. W przeciwnym razie, użyj istniejącej.
+      panelPosition: position !== undefined ? position : state.panelPosition,
+    })),
   hideInfoPanel: () => set({ isPanelVisible: false }),
   setPanelPosition: (position) => set({ panelPosition: position }),
   triggerRefresh: () =>
@@ -48,10 +51,7 @@ export const useAppStore = create<AppState>((set) => ({
 
 // Selektor, który zwraca cały obiekt aktualnie wybranego pierwiastka
 export const useCurrentElement = (): ElementConfig => {
-  // Zmieniono zwracany typ na ElementConfig
   const selectedName = useAppStore((state) => state.selectedElementName);
-  // Upewnij się, że 'elements' to tablica typu ElementConfig[]
-  // i dodaj zabezpieczenie na wypadek nieznalezienia pierwiastka.
   const element = elements.find((el) => el.name === selectedName);
   return element || elements[0];
 };

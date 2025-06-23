@@ -1,60 +1,310 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import { useAppStore } from "@/store/appStore";
 import { elements, ElementConfig } from "@/components/AtomModel/elementsData";
 import styles from "./PeriodicTable.module.css";
 
+type ElementCategory =
+  | "alkali-metal"
+  | "alkaline-earth-metal"
+  | "lanthanide"
+  | "actinide"
+  | "transition-metal"
+  | "post-transition-metal"
+  | "metalloid"
+  | "reactive-nonmetal"
+  | "noble-gas"
+  | "unknown";
+
+const getElementCategory = (element: ElementConfig): ElementCategory => {
+  const { protons, group } = element;
+  if (protons >= 57 && protons <= 71) return "lanthanide";
+  if (protons >= 89 && protons <= 103) return "actinide";
+  if (group === 1) return protons === 1 ? "reactive-nonmetal" : "alkali-metal";
+  if (group === 2) return "alkaline-earth-metal";
+  if (group >= 3 && group <= 12) return "transition-metal";
+  if (group === 18) return "noble-gas";
+
+  const metalloids: number[] = [5, 14, 32, 33, 51, 52, 84];
+  if (metalloids.includes(protons)) return "metalloid";
+
+  const postTransitionMetals: number[] = [
+    13, 31, 49, 50, 81, 82, 83, 113, 114, 115, 116,
+  ];
+  if (postTransitionMetals.includes(protons)) return "post-transition-metal";
+
+  const reactiveNonmetals: number[] = [
+    1, 6, 7, 8, 9, 15, 16, 17, 34, 35, 53, 85, 117,
+  ];
+  if (reactiveNonmetals.includes(protons)) return "reactive-nonmetal";
+
+  return "unknown";
+};
+
+const legendData: { name: string; class: ElementCategory }[] = [
+  { name: "Alkali Metal", class: "alkali-metal" },
+  { name: "Alkaline Earth Metal", class: "alkaline-earth-metal" },
+  { name: "Transition Metal", class: "transition-metal" },
+  { name: "Post-transition Metal", class: "post-transition-metal" },
+  { name: "Metalloid", class: "metalloid" },
+  { name: "Reactive Nonmetal", class: "reactive-nonmetal" },
+  { name: "Noble Gas", class: "noble-gas" },
+  { name: "Lanthanide", class: "lanthanide" },
+  { name: "Actinide", class: "actinide" },
+  { name: "Unknown", class: "unknown" },
+];
+
+const LegendAndExample = () => (
+  <div className={styles.legendAndExampleContainer}>
+    <div className={styles.legendContainer}>
+      {legendData.slice(0, 5).map((item) => (
+        <div key={item.name} className={styles.legendItem}>
+          <div className={`${styles.legendSwatch} ${styles[item.class]}`} />
+          <span>{item.name}</span>
+        </div>
+      ))}
+    </div>
+    <div className={styles.legendContainer}>
+      {legendData.slice(5).map((item) => (
+        <div key={item.name} className={styles.legendItem}>
+          <div className={`${styles.legendSwatch} ${styles[item.class]}`} />
+          <span>{item.name}</span>
+        </div>
+      ))}
+    </div>
+    <div className={styles.exampleTile}>
+      <div className={styles.exampleContent}>
+        <div className={styles.exampleNumber}>78</div>
+        <div className={styles.exampleSymbol}>Pt</div>
+        <div className={styles.exampleName}>Platinum</div>
+        <div className={styles.exampleWeight}>195.1</div>
+      </div>
+      <div className={styles.exampleLabel} style={{ top: "5%", left: "105%" }}>
+        Atomic Number
+      </div>
+      <div className={styles.exampleLabel} style={{ top: "35%", left: "105%" }}>
+        Symbol
+      </div>
+      <div className={styles.exampleLabel} style={{ top: "60%", left: "105%" }}>
+        Name
+      </div>
+      <div className={styles.exampleLabel} style={{ top: "85%", left: "105%" }}>
+        Atomic Mass
+      </div>
+    </div>
+  </div>
+);
+
 const getGridPosition = (element: ElementConfig) => {
   if (element.group > 0) {
-    return {
-      gridRow: element.period,
-      gridColumn: element.group,
-    };
+    return { gridRow: element.period, gridColumn: element.group };
   }
-
   const atomicNumber = element.protons;
-
   if (atomicNumber >= 58 && atomicNumber <= 71) {
-    return {
-      gridRow: 9,
-      gridColumn: atomicNumber - 58 + 3,
-    };
+    return { gridRow: 9, gridColumn: atomicNumber - 58 + 3 };
   }
-
   if (atomicNumber >= 90 && atomicNumber <= 103) {
-    return {
-      gridRow: 10,
-      gridColumn: atomicNumber - 90 + 3,
-    };
+    return { gridRow: 10, gridColumn: atomicNumber - 90 + 3 };
   }
-
   return {};
 };
 
 export const PeriodicTable = () => {
-  const { selectedElementName, setSelectedElement } = useAppStore();
-  const router = useRouter();
+  const {
+    selectedElementName,
+    isPanelVisible,
+    setSelectedElement,
+    showInfoPanel,
+    hideInfoPanel,
+    setPanelPosition,
+  } = useAppStore();
 
-  const handleElementClick = (elementName: string) => {
-    setSelectedElement(elementName);
-    router.push("/");
+  const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const actionStateRef = useRef({
+    isPointerDown: false,
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    target: null as EventTarget | null,
+  });
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const table = tableRef.current;
+    if (!container || !table) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const tableWidth = table.scrollWidth;
+    const tableHeight = table.scrollHeight;
+
+    const scaleX = containerRect.width / tableWidth;
+    const scaleY = containerRect.height / tableHeight;
+    const initialScale = Math.min(scaleX, scaleY) * 0.75;
+
+    const initialX = (containerRect.width - tableWidth * initialScale) / 2;
+    const initialY = (containerRect.height - tableHeight * initialScale) / 2;
+
+    setViewState({ x: initialX, y: initialY, scale: initialScale });
+  }, []);
+
+  const handleElementClick = useCallback(
+    (newElementName: string) => {
+      if (isPanelVisible && selectedElementName === newElementName) {
+        hideInfoPanel();
+        setPanelPosition({ x: 0, y: 0 });
+      } else {
+        setPanelPosition({ x: 0, y: 0 });
+        setSelectedElement(newElementName);
+        showInfoPanel();
+      }
+    },
+    [
+      isPanelVisible,
+      selectedElementName,
+      hideInfoPanel,
+      setPanelPosition,
+      setSelectedElement,
+      showInfoPanel,
+    ]
+  );
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!actionStateRef.current.isPointerDown) return;
+
+      if (!actionStateRef.current.isDragging) {
+        const dist = Math.hypot(
+          e.clientX - actionStateRef.current.startX,
+          e.clientY - actionStateRef.current.startY
+        );
+        if (dist > 5) {
+          actionStateRef.current.isDragging = true;
+          if (containerRef.current)
+            containerRef.current.classList.add(styles.isDragging);
+        }
+      }
+
+      if (actionStateRef.current.isDragging) {
+        const deltaX = e.clientX - actionStateRef.current.lastX;
+        const deltaY = e.clientY - actionStateRef.current.lastY;
+        actionStateRef.current.lastX = e.clientX;
+        actionStateRef.current.lastY = e.clientY;
+        setViewState((prev) => ({
+          ...prev,
+          x: prev.x + deltaX,
+          y: prev.y + deltaY,
+        }));
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (!actionStateRef.current.isPointerDown) return;
+
+      if (!actionStateRef.current.isDragging) {
+        const clickedElementDiv = (
+          actionStateRef.current.target as HTMLElement
+        )?.closest("[data-element-name]");
+        if (clickedElementDiv) {
+          const elementName =
+            clickedElementDiv.getAttribute("data-element-name");
+          if (elementName) {
+            handleElementClick(elementName);
+          }
+        }
+      }
+      actionStateRef.current.isPointerDown = false;
+      actionStateRef.current.isDragging = false;
+      if (containerRef.current)
+        containerRef.current.classList.remove(styles.isDragging);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [handleElementClick]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    const target = e.target as HTMLElement;
+    if (target.closest(`.${styles.legendAndExampleContainer}`)) {
+      return;
+    }
+    e.preventDefault();
+    actionStateRef.current.isPointerDown = true;
+    actionStateRef.current.startX = e.clientX;
+    actionStateRef.current.startY = e.clientY;
+    actionStateRef.current.lastX = e.clientX;
+    actionStateRef.current.lastY = e.clientY;
+    actionStateRef.current.target = e.target;
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!containerRef.current) return;
+    e.preventDefault();
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const scaleFactor = 1.1;
+    const newScale =
+      e.deltaY < 0
+        ? viewState.scale * scaleFactor
+        : viewState.scale / scaleFactor;
+    const clampedScale = Math.max(0.2, Math.min(newScale, 3));
+
+    const contentMouseX = (mouseX - viewState.x) / viewState.scale;
+    const contentMouseY = (mouseY - viewState.y) / viewState.scale;
+
+    const newX = mouseX - contentMouseX * clampedScale;
+    const newY = mouseY - contentMouseY * clampedScale;
+
+    setViewState({ x: newX, y: newY, scale: clampedScale });
   };
 
   return (
-    <div className={styles.tableContainer}>
-      <div className={styles.table}>
+    <div
+      ref={containerRef}
+      className={styles.tableViewport}
+      onMouseDown={handleMouseDown}
+      onWheel={handleWheel}
+    >
+      <div
+        ref={tableRef}
+        className={styles.table}
+        data-is-periodic-grid="true"
+        style={{
+          transform: `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`,
+        }}
+      >
+        <LegendAndExample />
         {elements.map((element) => {
           const isActive = element.name === selectedElementName;
+          const categoryClass = getElementCategory(element);
           const gridPosition = getGridPosition(element);
-
           return (
             <div
               key={element.name}
-              className={`${styles.element} ${isActive ? styles.active : ""}`}
+              data-element-name={element.name}
+              className={`${styles.element} ${styles[categoryClass]} ${
+                isActive ? styles.active : ""
+              }`}
               style={gridPosition}
-              onClick={() => handleElementClick(element.name)}
               title={element.name}
             >
               <div className={styles.atomicNumber}>{element.protons}</div>

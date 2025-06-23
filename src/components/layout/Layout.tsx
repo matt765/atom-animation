@@ -28,19 +28,21 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const element = useCurrentElement();
   const pathname = usePathname();
+  const isPeriodicTable = pathname === "/periodic-table";
 
   const clickOutsideTracker = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
-    if (!isPanelVisible) return;
+    if (!isPanelVisible || isPeriodicTable) return;
+
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const target = e.target as HTMLElement;
       const onInfoPanel = target.closest('[class*="ElementInfoPanel_panel"]');
-      const onControlsPanel = target.closest(`.${styles.secondRow}`);
-      if (!onInfoPanel && !onControlsPanel) {
-        clickOutsideTracker.current = { x: e.clientX, y: e.clientY };
+      if (onInfoPanel) {
+        return;
       }
+      clickOutsideTracker.current = { x: e.clientX, y: e.clientY };
     };
     const handleMouseUp = (e: MouseEvent) => {
       if (e.button !== 0) return;
@@ -49,7 +51,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           (e.clientX - clickOutsideTracker.current.x) ** 2 +
             (e.clientY - clickOutsideTracker.current.y) ** 2
         );
-        if (dist < 5) hideInfoPanel();
+        if (dist < 5) {
+          hideInfoPanel();
+          setPanelPosition({ x: 0, y: 0 });
+        }
       }
       clickOutsideTracker.current = null;
     };
@@ -59,7 +64,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isPanelVisible, hideInfoPanel, styles.secondRow]);
+  }, [isPanelVisible, hideInfoPanel, setPanelPosition, pathname]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -78,6 +83,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const handleRefresh = () => {
     triggerRefresh();
     hideInfoPanel();
+    setPanelPosition({ x: 0, y: 0 });
   };
 
   return (
@@ -86,11 +92,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <SideMenu />
       <main className={styles.main}> {children}</main>
 
-      {pathname !== "/periodic-table" && <BottomMenu />}
+      {!isPeriodicTable && <BottomMenu />}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {isPanelVisible && (
-          <ElementInfoPanel element={element} position={panelPosition} />
+          <ElementInfoPanel
+            element={element}
+            position={panelPosition}
+            isCentered={isPeriodicTable}
+            isOnPeriodicTableView={isPeriodicTable}
+          />
         )}
       </DndContext>
     </div>

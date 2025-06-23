@@ -6,10 +6,14 @@ import styles from "./ElementInfoPanel.module.css";
 import { ElementConfig } from "./elementsData";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import {  useRouter } from "next/navigation";
+import { useAppStore } from "@/store/appStore";
 
 type ElementInfoPanelProps = {
   element: ElementConfig;
   position: { x: number; y: number };
+  isCentered?: boolean;
+  isOnPeriodicTableView?: boolean;
 };
 
 const formatValue = (
@@ -26,8 +30,12 @@ const formatValue = (
 export const ElementInfoPanel = ({
   element,
   position,
+  isCentered = false,
+  isOnPeriodicTableView = false,
 }: ElementInfoPanelProps) => {
   const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+  const { setSelectedElement, hideInfoPanel, setPanelPosition } = useAppStore();
 
   useEffect(() => {
     setIsMounted(true);
@@ -35,33 +43,73 @@ export const ElementInfoPanel = ({
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: `draggable-panel-${element.name}`,
+    disabled: isCentered,
   });
 
-  const style = {
-    top: `${position.y}px`,
-    left: `${position.x}px`,
-    transform: transform ? CSS.Translate.toString(transform) : undefined,
+  const dndTransform = transform ? CSS.Translate.toString(transform) : "";
+
+  const style: React.CSSProperties = isCentered
+    ? {}
+    : {
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        transform: dndTransform,
+      };
+
+  const handleShowIn3D = () => {
+    setSelectedElement(element.name);
+    hideInfoPanel();
+    setPanelPosition({ x: 0, y: 0 });
+    router.push("/");
+  };
+
+  const handleClose = () => {
+    hideInfoPanel();
+    setPanelPosition({ x: 0, y: 0 });
   };
 
   const panelContent = (
     <div
       ref={setNodeRef}
-      className={styles.panel}
+      className={`${styles.panel} ${isCentered ? styles.centered : ""} ${
+        isOnPeriodicTableView ? styles.dark : ""
+      }`}
       style={style}
       onMouseDown={(e) => {
-        if (!(e.target as HTMLElement).closest(`.${styles.header}`)) {
+        if (
+          !(e.target as HTMLElement).closest(`.${styles.header}`) ||
+          isCentered
+        ) {
           e.stopPropagation();
         }
       }}
     >
-      <div className={styles.header} {...listeners} {...attributes}>
+      {isCentered && (
+        <button
+          onClick={handleClose}
+          className={styles.closeButton}
+          aria-label="Close panel"
+        >
+          &times;
+        </button>
+      )}
+      <div
+        className={`${styles.header} ${
+          isOnPeriodicTableView ? styles.headerPeriodic : ""
+        }`}
+        {...(isCentered ? {} : listeners)}
+        {...(isCentered ? {} : attributes)}
+      >
         <h3 className={styles.title}>{element.title}</h3>
       </div>
-      <div className={styles.content}>
+      <div
+        className={`${styles.content} ${
+          isOnPeriodicTableView ? styles.contentPeriodic : ""
+        }`}
+      >
         <p className={styles.description}>{element.description}</p>
         <div className={styles.divider}></div>
         <div className={styles.propertiesGrid}>
-          {/* Row 1 */}
           <div className={styles.property}>
             <span className={styles.label}>ATOMIC NO.</span>
             <span className={styles.value}>{element.protons}</span>
@@ -82,16 +130,12 @@ export const ElementInfoPanel = ({
             <span className={styles.label}>PERIOD</span>
             <span className={styles.value}>{element.period}</span>
           </div>
-
-          {/* Row 2 */}
-          <div className={`${styles.property} ${styles.fullRow}`}>
+          <div className={styles.property}>
             <span className={styles.label}>E. CONFIGURATION</span>
             <span className={styles.value}>
               {element.electronConfiguration}
             </span>
           </div>
-
-          {/* Row 3 */}
           <div className={styles.property}>
             <span className={styles.label}>STATE (STP)</span>
             <span className={styles.value}>{element.stateAtSTP}</span>
@@ -110,6 +154,17 @@ export const ElementInfoPanel = ({
           </div>
         </div>
       </div>
+      {isOnPeriodicTableView && (
+        <div
+          className={`${styles.footer} ${
+            isOnPeriodicTableView ? styles.footerPeriodic : ""
+          }`}
+        >
+          <button onClick={handleShowIn3D} className={styles.show3dButton}>
+            Show in 3D
+          </button>
+        </div>
+      )}
     </div>
   );
 

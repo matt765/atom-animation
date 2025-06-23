@@ -2,8 +2,6 @@
   position: fixed;
   z-index: 100;
   width: 30rem;
-
-
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.15);
@@ -17,15 +15,59 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
+}
+
+.panel.centered {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: max-content;
+}
+
+.dark {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  z-index: 10;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  color: #94a3b8;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: #ffffff;
 }
 
 .header {
-  padding: 1rem 2rem;
-  background-color: rgb(23, 26, 30, 0.4);
+  padding: 1rem 3.5rem 1rem 2rem;
+  background-color: rgb(32, 35, 39);
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
   cursor: move;
   touch-action: none;
   user-select: none;
+}
+
+.headerPeriodic {
+  background-color: rgb(23, 27, 31);
+}
+
+.panel.centered .header {
+  cursor: default;
 }
 
 .title {
@@ -37,8 +79,12 @@
 }
 
 .content {
- padding: 1rem 2rem;
+  padding: 1rem 2rem;
   overflow-y: auto;
+}
+
+.contentPeriodic {
+  background-color: rgb(30, 35, 42);
 }
 
 .description {
@@ -84,10 +130,37 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
   }
   to {
     opacity: 1;
-    transform: scale(1);
   }
+}
+
+.footer {
+  padding: 0.75rem 2rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+  background-color: rgba(23, 26, 30, 0.4);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.footerPeriodic {
+  background-color: rgb(30, 35, 42);
+}
+
+.show3dButton {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.show3dButton:hover {
+  background-color: #2563eb;
 }
