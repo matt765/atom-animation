@@ -146,10 +146,11 @@ export const ElementInfoPanel = ({
           </div>
         )}
 
-        {element.isIsotope && element.name !== "Unknown" && (
-          <>
+        {element.isIsotope &&
+          element.name !== "Unknown" &&
+          element.charge === 0 && (
             <div className={styles.stabilityInfo}>
-              <span className={styles.label}>STABILITY</span>
+              <span className={styles.label}>CORE STABILITY</span>
               <span
                 className={`${styles.value} ${
                   element.isStable ? styles.stable : styles.unstable
@@ -158,16 +159,17 @@ export const ElementInfoPanel = ({
                 {element.isStable ? "Stable" : "Unstable"}
               </span>
             </div>
-            <div className={styles.isotopeInfo}>
-              <span className={styles.label}>MOST COMMON ISOTOPE</span>
-              <span className={styles.value}>
-                {`${element.name}-${element.protons + element.defaultNeutrons}`}
-                <span className={styles.detailValue}>
-                  ({element.defaultNeutrons} Neutrons)
-                </span>
+          )}
+        {element.isIsotope && element.name !== "Unknown" && (
+          <div className={styles.isotopeInfo}>
+            <span className={styles.label}>MOST COMMON ISOTOPE</span>
+            <span className={styles.value}>
+              {`${element.name}-${element.protons + element.defaultNeutrons}`}
+              <span className={styles.detailValue}>
+                ({element.defaultNeutrons} Neutrons)
               </span>
-            </div>
-          </>
+            </span>
+          </div>
         )}
 
         {!isCustomParticle && element.name !== "Unknown" && (

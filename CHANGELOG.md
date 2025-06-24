@@ -18,4 +18,9 @@
 ## 1.0.2 (23-06-2025)
 
 - reorganize elements data
+- redesign element info popup
+- reorganize folder structure
+- extract layout and bottom menu components
+- add periodic table
+- add particle controls
 
