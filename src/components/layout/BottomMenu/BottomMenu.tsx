@@ -1,4 +1,3 @@
-// src/components/layout/BottomMenu/BottomMenu.tsx
 "use client";
 
 import React, { useRef, useEffect } from "react";
@@ -7,11 +6,30 @@ import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
 import { CONFIG } from "../../AtomModel/AtomModel";
 import { useAppStore, useCurrentElement } from "../../../store/appStore";
 import { elements } from "../../AtomModel/elementsData";
+import { ParticleControl } from "./ParticleControl";
+
+const PARTICLE_LIMIT = 300;
+
+// Funkcja pomocnicza do formatowania ładunku jonu
+const formatCharge = (charge: number): string => {
+  if (charge === 0) return "";
+  const sign = charge > 0 ? "+" : "−"; // Używamy znaku minus, nie dywizu/łącznika
+  const absCharge = Math.abs(charge);
+  if (absCharge === 1) return sign;
+  return `${absCharge}${sign}`;
+};
 
 export const BottomMenu = () => {
-  const { sliderValue, setSliderValue, setSelectedElement } = useAppStore();
+  const {
+    sliderValue,
+    setSliderValue,
+    protons,
+    neutrons,
+    electrons,
+    setParticles,
+    setSelectedElement,
+  } = useAppStore();
   const element = useCurrentElement();
-  const isSelectFocused = useRef(false);
   const speedSliderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,7 +49,6 @@ export const BottomMenu = () => {
     return () => slider?.removeEventListener("input", updateSliderFill);
   }, [sliderValue]);
 
-  const electronCount = element.shells.reduce((a, b) => a + b, 0);
   const isLongConfig = element.electronConfiguration.split(" ").length >= 5;
 
   return (
@@ -42,11 +59,20 @@ export const BottomMenu = () => {
             isLongConfig ? styles.wideDisplay : ""
           }`}
         >
-          <div className={styles.atomicNumber}>{element.protons}</div>
+          <div className={styles.atomicNumber}>
+            {element.protons > 0 ? element.protons : ""}
+          </div>
           <div className={styles.electronConfiguration}>
             {element.electronConfiguration}
           </div>
-          <div className={styles.elementSymbol}>{element.symbol}</div>
+          <div className={styles.elementSymbol}>
+            {element.symbol}
+            {element.charge !== 0 && (
+              <sup className={styles.chargeIndicator}>
+                {formatCharge(element.charge)}
+              </sup>
+            )}
+          </div>
           <div className={styles.elementName}>{element.name}</div>
           <div className={styles.atomicWeight}>{element.atomicWeight}</div>
         </div>
@@ -57,7 +83,6 @@ export const BottomMenu = () => {
             elements={elements}
             selectedElementName={element.name}
             setSelectedElement={setSelectedElement}
-            isSelectFocused={isSelectFocused}
           />
           <div className={styles.controlGroup} id="speed-control-group">
             <label htmlFor="speed">Speed:</label>
@@ -73,27 +98,27 @@ export const BottomMenu = () => {
           </div>
         </div>
         <div className={styles.legend}>
-          <div className={styles.legendItem}>
-            <div
-              className={styles.colorIndicator}
-              style={{ backgroundColor: CONFIG.protonColor }}
-            />
-            <span>{`Protons (${element.protons})`}</span>
-          </div>
-          <div className={styles.legendItem}>
-            <div
-              className={styles.colorIndicator}
-              style={{ backgroundColor: CONFIG.neutronColor }}
-            />
-            <span>{`Neutrons (${element.neutrons})`}</span>
-          </div>
-          <div className={styles.legendItem}>
-            <div
-              className={styles.colorIndicator}
-              style={{ backgroundColor: CONFIG.electronColor }}
-            />
-            <span>{`Electrons (${electronCount})`}</span>
-          </div>
+          <ParticleControl
+            name="Protons"
+            count={protons}
+            color={CONFIG.protonColor}
+            max={PARTICLE_LIMIT}
+            onCountChange={(newCount) => setParticles({ protons: newCount })}
+          />
+          <ParticleControl
+            name="Neutrons"
+            count={neutrons}
+            color={CONFIG.neutronColor}
+            max={PARTICLE_LIMIT}
+            onCountChange={(newCount) => setParticles({ neutrons: newCount })}
+          />
+          <ParticleControl
+            name="Electrons"
+            count={electrons}
+            color={CONFIG.electronColor}
+            max={PARTICLE_LIMIT}
+            onCountChange={(newCount) => setParticles({ electrons: newCount })}
+          />
         </div>
       </div>
     </div>

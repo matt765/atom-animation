@@ -3,6 +3,7 @@
 import React, { useRef, useMemo } from "react";
 import styles from "./ElementSelect.module.css";
 import { Select, SelectOption } from "../../common/Select/Select";
+import { useAppStore } from "../../../store/appStore";
 
 export interface ElementData {
   name: string;
@@ -18,16 +19,15 @@ interface ElementSelectProps {
   elements: ElementData[];
   selectedElementName: string;
   setSelectedElement: React.Dispatch<React.SetStateAction<string>>;
-  isSelectFocused: React.MutableRefObject<boolean>;
 }
 
 export const ElementSelect = ({
   elements,
   selectedElementName,
   setSelectedElement,
-  isSelectFocused,
 }: ElementSelectProps) => {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { setInputFocus } = useAppStore();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleNextElement = () => {
     setSelectedElement((currentElementName) => {
@@ -76,8 +76,8 @@ export const ElementSelect = ({
         options={elementOptions}
         value={selectedElementName}
         onChange={setSelectedElement}
-        onFocus={() => (isSelectFocused.current = true)}
-        onBlur={() => (isSelectFocused.current = false)}
+        onFocus={() => setInputFocus(true)}
+        onBlur={() => setInputFocus(false)}
       />
       <div className={styles.navButtonGroup}>
         <button
@@ -87,7 +87,7 @@ export const ElementSelect = ({
           onMouseLeave={stopChangingElement}
           title="Previous element"
         >
-          ▼
+          ▲
         </button>
         <button
           className={styles.elementNavButton}
@@ -96,7 +96,7 @@ export const ElementSelect = ({
           onMouseLeave={stopChangingElement}
           title="Next element"
         >
-          ▲
+          ▼
         </button>
       </div>
     </div>

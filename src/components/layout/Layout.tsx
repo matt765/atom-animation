@@ -38,10 +38,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const target = e.target as HTMLElement;
+
+      // Sprawdź, czy kliknięcie było na panelu info LUB na dolnym menu
       const onInfoPanel = target.closest('[class*="ElementInfoPanel_panel"]');
-      if (onInfoPanel) {
+      const onBottomMenu = target.closest('[class*="BottomMenu_bottomMenu"]');
+
+      // Jeśli kliknięto na którykolwiek z tych elementów, przerwij funkcję
+      if (onInfoPanel || onBottomMenu) {
         return;
       }
+
       clickOutsideTracker.current = { x: e.clientX, y: e.clientY };
     };
     const handleMouseUp = (e: MouseEvent) => {

@@ -164,3 +164,74 @@
 .show3dButton:hover {
   background-color: #2563eb;
 }
+.description {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.stabilityInfo,
+.isotopeInfo {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.stabilityInfo .label,
+.isotopeInfo .label {
+  margin-bottom: 0.35rem;
+}
+
+.stabilityInfo,
+.isotopeInfo,
+.ionInfo {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.stabilityInfo .label,
+.isotopeInfo .label,
+.ionInfo .label {
+  margin-bottom: 0.35rem;
+}
+
+.stabilityInfo .value,
+.isotopeInfo .value,
+.ionInfo .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.isotopeInfo .value,
+.ionInfo .value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.detailValue {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.stable {
+  color: #4ade80; /* Zielony */
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.unstable {
+  color: #f87171; /* Czerwony */
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}

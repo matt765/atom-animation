@@ -1,4 +1,3 @@
-/* src/components/layout/BottomMenu/BottomMenu.module.scss */
 .bottomMenu {
   position: absolute;
   bottom: 2rem;
@@ -38,6 +37,8 @@
   gap: 2rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  justify-content: space-between;
+  width: 100%;
 }
 
 .legend {
@@ -45,21 +46,6 @@
   justify-content: center;
   gap: 2rem;
   padding-top: 0.3rem;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.025em;
-  transition: all 0.3s ease;
-}
-
-.legendItem:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.2);
 }
 
 .colorIndicator {
@@ -74,16 +60,6 @@
 
 .colorIndicator:hover {
   transform: scale(1.15);
-  border-color: rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5),
-    0 0 0 2px rgba(255, 255, 255, 0.2) inset;
-}
-
-.controlGroup {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: relative;
 }
 
 .rightPanel label {
@@ -99,13 +75,10 @@
   --slider-fill-percentage: 50%;
   --track-bg: #1e293b;
   --fill-bg: linear-gradient(90deg, #2fb7c9, #165263);
-  --thumb-size: 18px;
-  --thumb-bg: #f0f9ff;
-  --thumb-glow-color: #38bdf8;
   -webkit-appearance: none;
   appearance: none;
   width: 160px;
-  height: var(--thumb-size);
+  height: 18px;
   background: transparent;
   cursor: pointer;
   padding: 0;
@@ -139,7 +112,7 @@
   border-radius: 50%;
   border: none;
   box-shadow: 0 0 0 4px #3bc3e2;
-  margin-top: -6px;
+  margin-top: -5px;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
@@ -225,6 +198,8 @@
 
 .elementSymbol {
   grid-area: symbol;
+  position: relative; /* Kluczowe: tworzy kontekst pozycjonowania dla potomka */
+  display: inline-block; /* Sprawia, że blok ma szerokość tylko taką, jak jego treść (symbol) */
   justify-self: center;
   align-self: center;
   font-size: 2.5rem;
@@ -232,12 +207,21 @@
   margin-bottom: 0.4rem;
   font-weight: 700;
   line-height: 1;
-  background-color: white;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+}
+
+.chargeIndicator {
+  position: absolute; /* Pozycjonowany względem .elementSymbol */
+  top: 0;
+  left: 100%; /* Zaczyna się DOKŁADNIE tam, gdzie kończy się kontener symbolu */
+  margin-left: 0.15em; /* Mały odstęp od symbolu */
+  font-size: 1.25rem; 
+  font-weight: 600;
+  color: #a5f3fc;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  line-height: 1; /* Zapobiega dodatkowym przesunięciom pionowym */
 }
 
 .elementName {
@@ -262,11 +246,139 @@
   margin-top: 4px;
 }
 
+/* --- Style dla kontrolek --- */
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.navButtonGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.elementNavButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  background: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  position: relative;
+  overflow: hidden;
+  transition: 0.2s;
+  border-radius: 7px;
+}
+
+.elementNavButton:hover {
+  border-color: rgba(56, 210, 248, 0.4);
+  z-index: 1;
+}
+
+.elementNavButton:active {
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* --- Style dla kontrolek cząstek --- */
+
+.particleControl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.particleName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  width: 70px; /* Stała szerokość dla wyrównania */
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.particleInput {
+  width: 45px;
+  height: 2.2rem;
+  text-align: center;
+  background-color: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-left: none;
+  border-right: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0;
+  -moz-appearance: textfield;
+  transition: 0.2s;
+}
+
+.particleInput:focus {
+  outline: none;
+  border-top-color: rgba(56, 210, 248, 0.4);
+  border-bottom-color: rgba(56, 210, 248, 0.4);
+}
+
+.particleInput::-webkit-outer-spin-button,
+.particleInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.particleButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  background: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: 0.2s;
+}
+
+.particleButton:hover {
+  border-color: rgba(56, 210, 248, 0.4);
+  z-index: 1;
+}
+
+.particleButton:active {
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.particleButton:first-of-type {
+  border-radius: 7px 0 0 7px;
+}
+
+.particleButton:last-of-type {
+  border-radius: 0 7px 7px 0;
+}
+
 @media (max-width: 1200px) {
-  .secondRow {
+  .rightPanel {
     flex-direction: column;
     gap: 1.5rem;
-    bottom: 1rem;
   }
 }
 

@@ -1,4 +1,3 @@
-// src/components/AtomModel/AtomModel.tsx
 "use client";
 
 import React, { useRef, useMemo, useEffect } from "react";
@@ -13,6 +12,7 @@ import { useAppStore, useCurrentElement } from "../../store/appStore";
 const KeyboardRotator = ({
   modelGroupRef,
   rotationState,
+  isInputFocused,
 }: {
   modelGroupRef: React.RefObject<THREE.Group>;
   rotationState: React.RefObject<{
@@ -21,7 +21,55 @@ const KeyboardRotator = ({
     left: boolean;
     right: boolean;
   }>;
+  isInputFocused: boolean;
 }) => {
+  useEffect(() => {
+    const handleKey = (event: KeyboardEvent, isDown: boolean) => {
+      // Jeśli jakiekolwiek pole jest aktywne, ignoruj WSZYSTKIE strzałki
+      if (isInputFocused) {
+        // Reset rotation state when an input is focused to stop movement
+        if (isDown) {
+          rotationState.current.up = false;
+          rotationState.current.down = false;
+          rotationState.current.left = false;
+          rotationState.current.right = false;
+        }
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowUp":
+          event.preventDefault();
+          rotationState.current.up = isDown;
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          rotationState.current.down = isDown;
+          break;
+        case "ArrowLeft":
+          event.preventDefault();
+          rotationState.current.left = isDown;
+          break;
+        case "ArrowRight":
+          event.preventDefault();
+          rotationState.current.right = isDown;
+          break;
+        default:
+          return;
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => handleKey(e, true);
+    const handleKeyUp = (e: KeyboardEvent) => handleKey(e, false);
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [isInputFocused, rotationState]);
+
   useFrame((_, delta) => {
     if (!modelGroupRef.current) return;
     const rotationSpeed = 2;
@@ -38,6 +86,7 @@ const KeyboardRotator = ({
       modelGroupRef.current.rotation.y += rotationSpeed * delta;
     }
   });
+
   return null;
 };
 
@@ -197,8 +246,8 @@ const OrbitRing = ({ radius }: { radius: number }) => (
 
 export const AtomModel = () => {
   const element = useCurrentElement();
-  const { sliderValue, refreshCounter, showInfoPanel } = useAppStore();
-  const isSelectFocused = useRef(false);
+  const { sliderValue, refreshCounter, showInfoPanel, isInputFocused } =
+    useAppStore();
 
   const modelGroupRef = useRef<THREE.Group>(null!);
   const controlsRef = useRef<OrbitControlsImpl>(null!);
@@ -224,45 +273,6 @@ export const AtomModel = () => {
       }
     }
   }, [refreshCounter]);
-
-  useEffect(() => {
-    const handleKey = (event: KeyboardEvent, isDown: boolean) => {
-      if (
-        isSelectFocused.current &&
-        (event.key === "ArrowUp" || event.key === "ArrowDown")
-      ) {
-        return;
-      }
-      switch (event.key) {
-        case "ArrowUp":
-          event.preventDefault();
-          rotationState.current.up = isDown;
-          break;
-        case "ArrowDown":
-          event.preventDefault();
-          rotationState.current.down = isDown;
-          break;
-        case "ArrowLeft":
-          event.preventDefault();
-          rotationState.current.left = isDown;
-          break;
-        case "ArrowRight":
-          event.preventDefault();
-          rotationState.current.right = isDown;
-          break;
-        default:
-          return;
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => handleKey(e, true);
-    const handleKeyUp = (e: KeyboardEvent) => handleKey(e, false);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -337,6 +347,7 @@ export const AtomModel = () => {
         <KeyboardRotator
           modelGroupRef={modelGroupRef}
           rotationState={rotationState}
+          isInputFocused={isInputFocused}
         />
       </Canvas>
     </div>
