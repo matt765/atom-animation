@@ -148,6 +148,7 @@ export const PeriodicTable = () => {
     showInfoPanel,
     hideInfoPanel,
     setPanelPosition,
+    periodicTableRefreshCounter,
   } = useAppStore();
 
   const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
@@ -163,7 +164,7 @@ export const PeriodicTable = () => {
     target: null as EventTarget | null,
   });
 
-  useLayoutEffect(() => {
+  const resetView = useCallback(() => {
     const container = containerRef.current;
     const table = tableRef.current;
     if (!container || !table) return;
@@ -182,22 +183,26 @@ export const PeriodicTable = () => {
     setViewState({ x: initialX, y: initialY, scale: initialScale });
   }, []);
 
- // Plik: src/components/PeriodicTable/PeriodicTable.tsx
+  useLayoutEffect(() => {
+    resetView();
+  }, [resetView]);
+
+  useEffect(() => {
+    if (periodicTableRefreshCounter > 0) {
+      resetView();
+    }
+  }, [periodicTableRefreshCounter, resetView]);
 
   const handleElementClick = useCallback(
     (newElementName: string) => {
       const isPanelAlreadyVisible = isPanelVisible;
 
       if (isPanelAlreadyVisible && selectedElementName === newElementName) {
-        // Jeśli kliknięto ten sam aktywny pierwiastek, zamknij panel
         hideInfoPanel();
       } else {
-        // Jeśli panel jest otwierany po raz pierwszy, zresetuj jego pozycję
         if (!isPanelAlreadyVisible) {
           setPanelPosition({ x: 0, y: 0 });
         }
-        // W przeciwnym razie (panel jest już otwarty i klikamy inny pierwiastek),
-        // NIE resetuj pozycji, tylko podmień zawartość i upewnij się, że jest widoczny.
         setSelectedElement(newElementName);
         showInfoPanel();
       }

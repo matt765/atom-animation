@@ -138,6 +138,8 @@
 
 .footer {
   padding: 0.75rem 2rem;
+  padding-top: 1.25rem;
+  padding-bottom:  1.5rem;
   border-top: 1px solid rgba(148, 163, 184, 0.15);
   background-color: rgba(23, 26, 30, 0.4);
   display: flex;
@@ -146,35 +148,6 @@
 
 .footerPeriodic {
   background-color: rgb(30, 35, 42);
-}
-
-.show3dButton {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.show3dButton:hover {
-  background-color: #2563eb;
-}
-
-.stabilityInfo,
-.isotopeInfo,
-.ionInfo {
-  display: flex;
-  flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .stabilityInfo .label,

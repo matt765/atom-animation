@@ -8,7 +8,7 @@ export type ExtendedElementConfig = ElementConfig & {
   isStable: boolean;
   charge: number;
   defaultNeutrons: number;
-  electrons: number; // POPRAWKA: Dodajemy brakującą właściwość
+  electrons: number;
 };
 
 // Obiekt zastępczy dla niestandardowych lub nieznanych kombinacji cząstek
@@ -63,6 +63,7 @@ interface AppState {
   isPanelVisible: boolean;
   panelPosition: { x: number; y: number };
   refreshCounter: number;
+  periodicTableRefreshCounter: number;
   isInputFocused: boolean;
 
   setParticles: (particles: {
@@ -78,6 +79,7 @@ interface AppState {
   hideInfoPanel: () => void;
   setPanelPosition: (position: { x: number; y: number }) => void;
   triggerRefresh: () => void;
+  triggerPeriodicTableRefresh: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -89,6 +91,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   isPanelVisible: false,
   panelPosition: { x: 0, y: 0 },
   refreshCounter: 0,
+  periodicTableRefreshCounter: 0,
   isInputFocused: false,
 
   setParticles: (particles) => {
@@ -126,6 +129,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   setPanelPosition: (position) => set({ panelPosition: position }),
   triggerRefresh: () =>
     set((state) => ({ refreshCounter: state.refreshCounter + 1 })),
+  triggerPeriodicTableRefresh: () =>
+    set((state) => ({
+      periodicTableRefreshCounter: state.periodicTableRefreshCounter + 1,
+    })),
 }));
 
 // Ten hook jest "mózgiem" aplikacji, dynamicznie tworzącym obiekt pierwiastka
@@ -141,7 +148,7 @@ export const useCurrentElement = (): ExtendedElementConfig => {
       ...UNKNOWN_ELEMENT,
       protons,
       neutrons,
-      electrons, // POPRAWKA: Dodajemy elektrony do zwracanego obiektu
+      electrons,
       atomicWeight: (protons + neutrons).toString(),
       shells: calculateShells(electrons),
       isIsotope: true,
@@ -158,7 +165,7 @@ export const useCurrentElement = (): ExtendedElementConfig => {
     ...baseElement,
     protons,
     neutrons,
-    electrons, // POPRAWKA: Dodajemy elektrony do zwracanego obiektu
+    electrons,
     atomicWeight: (protons + neutrons).toString(),
     shells: calculateShells(electrons),
     isIsotope,

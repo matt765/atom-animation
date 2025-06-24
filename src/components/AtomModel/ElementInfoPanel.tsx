@@ -8,6 +8,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
 import { useAppStore, ExtendedElementConfig } from "@/store/appStore";
 import { elements } from "@/components/AtomModel/elementsData";
+import { OutlinedButton } from "../common/OutlinedButton/OutlinedButton";
 
 type ElementInfoPanelProps = {
   element: ExtendedElementConfig;
@@ -49,7 +50,6 @@ export const ElementInfoPanel = ({
 
   useEffect(() => {
     setIsMounted(true);
-    // Reset state when element changes or panel appears/disappears
     setIsPositionedByJs(!isCentered);
   }, [isCentered]);
 
@@ -66,7 +66,6 @@ export const ElementInfoPanel = ({
     [setNodeRef]
   );
 
-  // Effect to handle the transition from CSS-centered to JS-positioned
   useEffect(() => {
     if (isDragging && !isPositionedByJs && panelRef.current) {
       const rect = panelRef.current.getBoundingClientRect();
@@ -84,7 +83,7 @@ export const ElementInfoPanel = ({
         transform: dndTransform,
         position: "fixed",
       }
-    : {}; // Let CSS handle centering initially
+    : {};
 
   const handleShowIn3D = () => {
     const elementName =
@@ -251,9 +250,7 @@ export const ElementInfoPanel = ({
             isOnPeriodicTableView ? styles.footerPeriodic : ""
           }`}
         >
-          <button onClick={handleShowIn3D} className={styles.show3dButton}>
-            Show in 3D
-          </button>
+          <OutlinedButton onClick={handleShowIn3D}>Show in 3D</OutlinedButton>
         </div>
       )}
     </div>

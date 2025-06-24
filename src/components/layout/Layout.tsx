@@ -24,6 +24,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     hideInfoPanel,
     setPanelPosition,
     triggerRefresh,
+    triggerPeriodicTableRefresh,
   } = useAppStore();
 
   const element = useCurrentElement();
@@ -33,17 +34,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const clickOutsideTracker = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
+    hideInfoPanel();
+    setPanelPosition({ x: 0, y: 0 });
+  }, [pathname, hideInfoPanel, setPanelPosition]);
+
+  useEffect(() => {
     if (!isPanelVisible || isPeriodicTable) return;
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const target = e.target as HTMLElement;
 
-      // Sprawdź, czy kliknięcie było na panelu info LUB na dolnym menu
       const onInfoPanel = target.closest('[class*="ElementInfoPanel_panel"]');
       const onBottomMenu = target.closest('[class*="BottomMenu_bottomMenu"]');
 
-      // Jeśli kliknięto na którykolwiek z tych elementów, przerwij funkcję
       if (onInfoPanel || onBottomMenu) {
         return;
       }
@@ -70,7 +74,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isPanelVisible, hideInfoPanel, setPanelPosition, pathname]);
+  }, [isPanelVisible, hideInfoPanel, setPanelPosition, isPeriodicTable]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -87,7 +91,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleRefresh = () => {
-    triggerRefresh();
+    if (isPeriodicTable) {
+      triggerPeriodicTableRefresh();
+    } else {
+      triggerRefresh();
+    }
     hideInfoPanel();
     setPanelPosition({ x: 0, y: 0 });
   };
