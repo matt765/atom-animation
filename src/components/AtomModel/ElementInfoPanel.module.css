@@ -1,5 +1,4 @@
 .panel {
-  position: fixed;
   z-index: 100;
   width: 30rem;
   background: rgba(255, 255, 255, 0.03);
@@ -19,6 +18,7 @@
 }
 
 .panel.centered {
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -67,7 +67,7 @@
 }
 
 .panel.centered .header {
-  cursor: default;
+  cursor: move;
 }
 
 .title {
@@ -163,29 +163,6 @@
 
 .show3dButton:hover {
   background-color: #2563eb;
-}
-.description {
-  margin: 0 0 1.25rem 0;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #cbd5e1;
-  font-weight: 400;
-}
-
-.stabilityInfo,
-.isotopeInfo {
-  display: flex;
-  flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.stabilityInfo .label,
-.isotopeInfo .label {
-  margin-bottom: 0.35rem;
 }
 
 .stabilityInfo,

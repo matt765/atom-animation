@@ -15,7 +15,7 @@
 - adjust element display
 - add custom select
 
-## 1.0.2 (23-06-2025)
+## 1.0.2 (24-06-2025)
 
 - reorganize elements data
 - redesign element info popup

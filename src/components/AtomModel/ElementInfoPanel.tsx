@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import styles from "./ElementInfoPanel.module.css";
 import { useDraggable } from "@dnd-kit/core";
@@ -43,25 +43,48 @@ export const ElementInfoPanel = ({
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const { setSelectedElement, hideInfoPanel, setPanelPosition } = useAppStore();
+  const panelRef = useRef<HTMLDivElement | null>(null);
+
+  const [isPositionedByJs, setIsPositionedByJs] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    // Reset state when element changes or panel appears/disappears
+    setIsPositionedByJs(!isCentered);
+  }, [isCentered]);
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: `draggable-panel-${element.name}`,
-    disabled: isCentered,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `draggable-panel-${element.name}`,
+    });
+
+  const combinedRef = useCallback(
+    (node: HTMLDivElement) => {
+      setNodeRef(node);
+      panelRef.current = node;
+    },
+    [setNodeRef]
+  );
+
+  // Effect to handle the transition from CSS-centered to JS-positioned
+  useEffect(() => {
+    if (isDragging && !isPositionedByJs && panelRef.current) {
+      const rect = panelRef.current.getBoundingClientRect();
+      setPanelPosition({ x: rect.left, y: rect.top });
+      setIsPositionedByJs(true);
+    }
+  }, [isDragging, isPositionedByJs, setPanelPosition]);
 
   const dndTransform = transform ? CSS.Translate.toString(transform) : "";
 
-  const style: React.CSSProperties = isCentered
-    ? {}
-    : {
+  const style: React.CSSProperties = isPositionedByJs
+    ? {
         top: `${position.y}px`,
         left: `${position.x}px`,
         transform: dndTransform,
-      };
+        position: "fixed",
+      }
+    : {}; // Let CSS handle centering initially
 
   const handleShowIn3D = () => {
     const elementName =
@@ -103,13 +126,13 @@ export const ElementInfoPanel = ({
 
   const panelContent = (
     <div
-      ref={setNodeRef}
-      className={`${styles.panel} ${isCentered ? styles.centered : ""} ${
+      ref={combinedRef}
+      className={`${styles.panel} ${!isPositionedByJs ? styles.centered : ""} ${
         isOnPeriodicTableView ? styles.dark : ""
       }`}
       style={style}
     >
-      {isCentered && (
+      {isOnPeriodicTableView && (
         <button
           onClick={handleClose}
           className={styles.closeButton}
@@ -122,8 +145,8 @@ export const ElementInfoPanel = ({
         className={`${styles.header} ${
           isOnPeriodicTableView ? styles.headerPeriodic : ""
         }`}
-        {...(isCentered ? {} : listeners)}
-        {...(isCentered ? {} : attributes)}
+        {...listeners}
+        {...attributes}
       >
         <h3 className={styles.title}>{getTitle()}</h3>
       </div>
@@ -176,7 +199,6 @@ export const ElementInfoPanel = ({
           <>
             <div className={styles.divider}></div>
             <div className={styles.propertiesGrid}>
-              {/* ... pełna siatka 8 statystyk ... */}
               <div className={styles.property}>
                 <span className={styles.label}>ATOMIC NO.</span>
                 <span className={styles.value}>{element.protons}</span>

@@ -23,6 +23,32 @@ type ElementCategory =
   | "noble-gas"
   | "unknown";
 
+const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
+  "alkali-metal": "#5a4a42",
+  "alkaline-earth-metal": "#5a5242",
+  "transition-metal": "#634f5c",
+  lanthanide: "#425a52",
+  actinide: "#425a5a",
+  "post-transition-metal": "#4c596f",
+  metalloid: "#425a47",
+  "reactive-nonmetal": "#475868",
+  "noble-gas": "#5c4f63",
+  unknown: "#444444",
+};
+
+const legendData: { name: string; class: ElementCategory }[] = [
+  { name: "Alkali Metal", class: "alkali-metal" },
+  { name: "Alkaline Earth Metal", class: "alkaline-earth-metal" },
+  { name: "Transition Metal", class: "transition-metal" },
+  { name: "Post-transition Metal", class: "post-transition-metal" },
+  { name: "Metalloid", class: "metalloid" },
+  { name: "Reactive Nonmetal", class: "reactive-nonmetal" },
+  { name: "Noble Gas", class: "noble-gas" },
+  { name: "Lanthanide", class: "lanthanide" },
+  { name: "Actinide", class: "actinide" },
+  { name: "Unknown", class: "unknown" },
+];
+
 const getElementCategory = (element: ElementConfig): ElementCategory => {
   const { protons, group } = element;
   if (protons >= 57 && protons <= 71) return "lanthanide";
@@ -48,25 +74,15 @@ const getElementCategory = (element: ElementConfig): ElementCategory => {
   return "unknown";
 };
 
-const legendData: { name: string; class: ElementCategory }[] = [
-  { name: "Alkali Metal", class: "alkali-metal" },
-  { name: "Alkaline Earth Metal", class: "alkaline-earth-metal" },
-  { name: "Transition Metal", class: "transition-metal" },
-  { name: "Post-transition Metal", class: "post-transition-metal" },
-  { name: "Metalloid", class: "metalloid" },
-  { name: "Reactive Nonmetal", class: "reactive-nonmetal" },
-  { name: "Noble Gas", class: "noble-gas" },
-  { name: "Lanthanide", class: "lanthanide" },
-  { name: "Actinide", class: "actinide" },
-  { name: "Unknown", class: "unknown" },
-];
-
 const LegendAndExample = () => (
   <div className={styles.legendAndExampleContainer}>
     <div className={styles.legendContainer}>
       {legendData.slice(0, 5).map((item) => (
         <div key={item.name} className={styles.legendItem}>
-          <div className={`${styles.legendSwatch} ${styles[item.class]}`} />
+          <div
+            className={styles.legendSwatch}
+            style={{ backgroundColor: ELEMENT_CATEGORY_COLORS[item.class] }}
+          />
           <span>{item.name}</span>
         </div>
       ))}
@@ -74,12 +90,20 @@ const LegendAndExample = () => (
     <div className={styles.legendContainer}>
       {legendData.slice(5).map((item) => (
         <div key={item.name} className={styles.legendItem}>
-          <div className={`${styles.legendSwatch} ${styles[item.class]}`} />
+          <div
+            className={styles.legendSwatch}
+            style={{ backgroundColor: ELEMENT_CATEGORY_COLORS[item.class] }}
+          />
           <span>{item.name}</span>
         </div>
       ))}
     </div>
-    <div className={styles.exampleTile}>
+    <div
+      className={styles.exampleTile}
+      style={{
+        backgroundColor: ELEMENT_CATEGORY_COLORS["transition-metal"],
+      }}
+    >
       <div className={styles.exampleContent}>
         <div className={styles.exampleNumber}>78</div>
         <div className={styles.exampleSymbol}>Pt</div>
@@ -158,13 +182,22 @@ export const PeriodicTable = () => {
     setViewState({ x: initialX, y: initialY, scale: initialScale });
   }, []);
 
+ // Plik: src/components/PeriodicTable/PeriodicTable.tsx
+
   const handleElementClick = useCallback(
     (newElementName: string) => {
-      if (isPanelVisible && selectedElementName === newElementName) {
+      const isPanelAlreadyVisible = isPanelVisible;
+
+      if (isPanelAlreadyVisible && selectedElementName === newElementName) {
+        // Jeśli kliknięto ten sam aktywny pierwiastek, zamknij panel
         hideInfoPanel();
-        setPanelPosition({ x: 0, y: 0 });
       } else {
-        setPanelPosition({ x: 0, y: 0 });
+        // Jeśli panel jest otwierany po raz pierwszy, zresetuj jego pozycję
+        if (!isPanelAlreadyVisible) {
+          setPanelPosition({ x: 0, y: 0 });
+        }
+        // W przeciwnym razie (panel jest już otwarty i klikamy inny pierwiastek),
+        // NIE resetuj pozycji, tylko podmień zawartość i upewnij się, że jest widoczny.
         setSelectedElement(newElementName);
         showInfoPanel();
       }
@@ -301,10 +334,11 @@ export const PeriodicTable = () => {
             <div
               key={element.name}
               data-element-name={element.name}
-              className={`${styles.element} ${styles[categoryClass]} ${
-                isActive ? styles.active : ""
-              }`}
-              style={gridPosition}
+              className={`${styles.element} ${isActive ? styles.active : ""}`}
+              style={{
+                ...gridPosition,
+                backgroundColor: ELEMENT_CATEGORY_COLORS[categoryClass],
+              }}
               title={element.name}
             >
               <div className={styles.atomicNumber}>{element.protons}</div>
