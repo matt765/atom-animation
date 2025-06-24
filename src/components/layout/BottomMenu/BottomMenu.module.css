@@ -198,8 +198,8 @@
 
 .elementSymbol {
   grid-area: symbol;
-  position: relative; /* Kluczowe: tworzy kontekst pozycjonowania dla potomka */
-  display: inline-block; /* Sprawia, że blok ma szerokość tylko taką, jak jego treść (symbol) */
+  position: relative;
+  display: inline-block;
   justify-self: center;
   align-self: center;
   font-size: 2.5rem;
@@ -213,15 +213,15 @@
 }
 
 .chargeIndicator {
-  position: absolute; /* Pozycjonowany względem .elementSymbol */
+  position: absolute;
   top: 0;
-  left: 100%; /* Zaczyna się DOKŁADNIE tam, gdzie kończy się kontener symbolu */
-  margin-left: 0.15em; /* Mały odstęp od symbolu */
+  left: 100%;
+  margin-left: 0.15em;
   font-size: 1.25rem;
   font-weight: 600;
   color: #a5f3fc;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  line-height: 1; /* Zapobiega dodatkowym przesunięciom pionowym */
+  line-height: 1;
 }
 
 .elementName {
@@ -246,8 +246,6 @@
   margin-top: 4px;
 }
 
-/* --- Style dla kontrolek --- */
-
 .controlGroup {
   display: flex;
   align-items: center;
@@ -255,13 +253,18 @@
   position: relative;
 }
 
-.shakeButton {
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
   width: 2.2rem;
   height: 2.2rem;
   padding: 0;
   background: rgb(255, 255, 255, 0.02);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  color: white;
+  color: rgba(255, 255, 255, 0.7); /* Ustawiamy domyślny kolor ikony */
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -272,54 +275,17 @@
   border-radius: 7px;
 }
 
-.shakeButton:hover {
+.actionButton:hover {
   border-color: rgba(56, 210, 248, 0.4);
   background: rgb(255, 255, 255, 0.05);
+  color: white; /* Zmieniamy kolor ikony na biały po najechaniu */
 }
 
-.shakeButton:active {
+.actionButton:active {
   transform: scale(0.95);
   box-shadow: 0 1px 4px rgba(56, 189, 248, 0.6),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
-
-.navButtonGroup {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.elementNavButton {
-  width: 2.2rem;
-  height: 2.2rem;
-  padding: 0;
-  background: rgb(255, 255, 255, 0.02);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
-  position: relative;
-  overflow: hidden;
-  transition: 0.2s;
-  border-radius: 7px;
-}
-
-.elementNavButton:hover {
-  border-color: rgba(56, 210, 248, 0.4);
-  z-index: 1;
-}
-
-.elementNavButton:active {
-  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-}
-
-/* --- Style dla kontrolek cząstek --- */
 
 .particleControl {
   display: flex;
@@ -331,7 +297,7 @@
   font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.025em;
-  width: 70px; /* Stała szerokość dla wyrównania */
+  width: 70px;
   flex-shrink: 0;
 }
 

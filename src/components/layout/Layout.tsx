@@ -13,7 +13,6 @@ import {
 } from "@dnd-kit/core";
 
 import { useAppStore, useCurrentElement } from "../../store/appStore";
-import { RefreshButton } from "./RefreshButton/RefreshButton";
 import { BottomMenu } from "./BottomMenu/BottomMenu";
 import { SideMenu } from "./SideMenu/SideMenu";
 
@@ -23,8 +22,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     panelPosition,
     hideInfoPanel,
     setPanelPosition,
-    triggerRefresh,
-    triggerPeriodicTableRefresh,
+    resetActionCounters,
   } = useAppStore();
 
   const element = useCurrentElement();
@@ -36,7 +34,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     hideInfoPanel();
     setPanelPosition({ x: 0, y: 0 });
-  }, [pathname, hideInfoPanel, setPanelPosition]);
+    resetActionCounters();
+  }, [pathname, hideInfoPanel, setPanelPosition, resetActionCounters]);
 
   useEffect(() => {
     if (!isPanelVisible || isPeriodicTable) return;
@@ -72,6 +71,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     window.addEventListener("mouseup", handleMouseUp);
     return () => {
       window.removeEventListener("mousedown", handleMouseDown);
+      // POPRAWKA TUTAJ: Zmieniono "keyup" na "mouseup"
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isPanelVisible, hideInfoPanel, setPanelPosition, isPeriodicTable]);
@@ -90,19 +90,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const handleRefresh = () => {
-    if (isPeriodicTable) {
-      triggerPeriodicTableRefresh();
-    } else {
-      triggerRefresh();
-    }
-    hideInfoPanel();
-    setPanelPosition({ x: 0, y: 0 });
-  };
-
   return (
     <div className={styles.mainContainer}>
-      <RefreshButton onClick={handleRefresh} />
       <SideMenu />
       <main className={styles.main}> {children}</main>
 

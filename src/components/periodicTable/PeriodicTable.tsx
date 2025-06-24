@@ -148,7 +148,6 @@ export const PeriodicTable = () => {
     showInfoPanel,
     hideInfoPanel,
     setPanelPosition,
-    periodicTableRefreshCounter,
   } = useAppStore();
 
   const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
@@ -186,12 +185,6 @@ export const PeriodicTable = () => {
   useLayoutEffect(() => {
     resetView();
   }, [resetView]);
-
-  useEffect(() => {
-    if (periodicTableRefreshCounter > 0) {
-      resetView();
-    }
-  }, [periodicTableRefreshCounter, resetView]);
 
   const handleElementClick = useCallback(
     (newElementName: string) => {

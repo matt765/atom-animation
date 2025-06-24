@@ -59,7 +59,6 @@ interface AppState {
   isPanelVisible: boolean;
   panelPosition: { x: number; y: number };
   refreshCounter: number;
-  periodicTableRefreshCounter: number;
   shakeCounter: number;
   isInputFocused: boolean;
 
@@ -76,8 +75,9 @@ interface AppState {
   hideInfoPanel: () => void;
   setPanelPosition: (position: { x: number; y: number }) => void;
   triggerRefresh: () => void;
-  triggerPeriodicTableRefresh: () => void;
   triggerShake: () => void;
+  resetActionCounters: () => void;
+  resetToDefaults: () => void; // NOWA AKCJA
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -85,11 +85,10 @@ export const useAppStore = create<AppState>((set, get) => ({
   protons: 6,
   neutrons: 6,
   electrons: 6,
-  sliderValue: 50,
+  sliderValue: 25, // ZMNIEJSZONA WARTOŚĆ DOMYŚLNA
   isPanelVisible: false,
   panelPosition: { x: 0, y: 0 },
   refreshCounter: 0,
-  periodicTableRefreshCounter: 0,
   shakeCounter: 0,
   isInputFocused: false,
 
@@ -128,12 +127,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   setPanelPosition: (position) => set({ panelPosition: position }),
   triggerRefresh: () =>
     set((state) => ({ refreshCounter: state.refreshCounter + 1 })),
-  triggerPeriodicTableRefresh: () =>
-    set((state) => ({
-      periodicTableRefreshCounter: state.periodicTableRefreshCounter + 1,
-    })),
   triggerShake: () =>
     set((state) => ({ shakeCounter: state.shakeCounter + 1 })),
+  resetActionCounters: () => set({ refreshCounter: 0, shakeCounter: 0 }),
+
+  // IMPLEMENTACJA NOWEJ AKCJI
+  resetToDefaults: () => {
+    const { protons } = get();
+    const element =
+      elements.find((el) => el.protons === protons) || UNKNOWN_ELEMENT;
+    set({
+      neutrons: element.neutrons, // Domyślna liczba neutronów
+      electrons: element.protons, // Domyślna liczba elektronów (równa liczbie protonów)
+      sliderValue: 25, // Domyślna wartość suwaka
+    });
+  },
 }));
 
 export const useCurrentElement = (): ExtendedElementConfig => {

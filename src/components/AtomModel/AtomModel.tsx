@@ -9,7 +9,6 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import styles from "./AtomModel.module.css";
 import { useAppStore, useCurrentElement } from "../../store/appStore";
 
-// Komponent do obsługi rotacji z klawiatury (bez zmian)
 const KeyboardRotator = ({
   modelGroupRef,
   rotationState,
@@ -35,7 +34,6 @@ const KeyboardRotator = ({
         }
         return;
       }
-
       switch (event.key) {
         case "ArrowUp":
           event.preventDefault();
@@ -59,10 +57,8 @@ const KeyboardRotator = ({
     };
     const handleKeyDown = (e: KeyboardEvent) => handleKey(e, true);
     const handleKeyUp = (e: KeyboardEvent) => handleKey(e, false);
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
@@ -72,25 +68,20 @@ const KeyboardRotator = ({
   useFrame((_, delta) => {
     if (!modelGroupRef.current) return;
     const rotationSpeed = 2;
-    if (rotationState.current.up) {
+    if (rotationState.current.up)
       modelGroupRef.current.rotation.x -= rotationSpeed * delta;
-    }
-    if (rotationState.current.down) {
+    if (rotationState.current.down)
       modelGroupRef.current.rotation.x += rotationSpeed * delta;
-    }
-    if (rotationState.current.left) {
+    if (rotationState.current.left)
       modelGroupRef.current.rotation.y -= rotationSpeed * delta;
-    }
-    if (rotationState.current.right) {
+    if (rotationState.current.right)
       modelGroupRef.current.rotation.y += rotationSpeed * delta;
-    }
   });
 
   return null;
 };
 
-// ZMODYFIKOWANY Komponent aktualizujący scenę
-const SceneUpdater = ({
+const ScenePhysics = ({
   modelGroupRef,
   linearVelocity,
   rotationAxis,
@@ -103,15 +94,11 @@ const SceneUpdater = ({
 }) => {
   useFrame((_, delta) => {
     if (!modelGroupRef.current) return;
-
-    // Zastosowanie rotacji wokół stałej osi
     if (Math.abs(rotationSpeed.current) > 0.01) {
       const angleThisFrame = rotationSpeed.current * delta;
       modelGroupRef.current.rotateOnAxis(rotationAxis.current, angleThisFrame);
-      rotationSpeed.current *= 0.99; // Wygaszanie prędkości
+      rotationSpeed.current *= 0.99;
     }
-
-    // Zastosowanie i wygaszanie ruchu liniowego (bez zmian)
     if (linearVelocity.current.lengthSq() > 0.0001) {
       modelGroupRef.current.position.add(
         linearVelocity.current.clone().multiplyScalar(delta)
@@ -125,7 +112,6 @@ const SceneUpdater = ({
   return null;
 };
 
-// ... (stałe CONFIG, komponenty Nucleus, Electron, OrbitRing bez zmian) ...
 export const CONFIG = {
   modelScale: 1.35,
   initialRotation: new THREE.Euler(Math.PI / 4, Math.PI / 0.6, 0),
@@ -151,6 +137,7 @@ export const CONFIG = {
   speedConstant: 1.5 * Math.PI,
   sliderMidpoint: 50,
 };
+
 const Nucleus = ({
   protons,
   neutrons,
@@ -234,6 +221,7 @@ const Nucleus = ({
     </group>
   );
 };
+
 const Electron = ({ radius, speed }: { radius: number; speed: number }) => {
   const ref = useRef<THREE.Mesh>(null!);
   const angle = useRef(Math.random() * Math.PI * 2);
@@ -259,6 +247,7 @@ const Electron = ({ radius, speed }: { radius: number; speed: number }) => {
     </mesh>
   );
 };
+
 const OrbitRing = ({ radius }: { radius: number }) => (
   <mesh>
     <ringGeometry
@@ -278,7 +267,6 @@ const OrbitRing = ({ radius }: { radius: number }) => (
 );
 
 export const AtomModel = () => {
-  const element = useCurrentElement();
   const {
     sliderValue,
     refreshCounter,
@@ -286,6 +274,7 @@ export const AtomModel = () => {
     isInputFocused,
     shakeCounter,
   } = useAppStore();
+  const element = useCurrentElement();
 
   const modelGroupRef = useRef<THREE.Group>(null!);
   const controlsRef = useRef<OrbitControlsImpl>(null!);
@@ -298,7 +287,6 @@ export const AtomModel = () => {
   const clickStartPos = useRef<{ x: number; y: number } | null>(null);
 
   const linearVelocity = useRef(new THREE.Vector3(0, 0, 0));
-  // NOWE REFERENCJE: Osobno dla osi i prędkości obrotu
   const rotationAxis = useRef(new THREE.Vector3(0, 1, 0));
   const rotationSpeed = useRef(0);
 
@@ -312,7 +300,7 @@ export const AtomModel = () => {
         );
         modelGroupRef.current.position.set(0, 0, 0);
         linearVelocity.current.set(0, 0, 0);
-        rotationSpeed.current = 0; // Resetujemy prędkość
+        rotationSpeed.current = 0;
       }
       if (controlsRef.current) {
         controlsRef.current.reset();
@@ -324,7 +312,6 @@ export const AtomModel = () => {
     const linearStrength = 2;
     const angularMinStrength = 10;
     const angularMaxStrength = 18;
-
     const newLinearVelocity = new THREE.Vector3(
       Math.random() - 0.5,
       Math.random() - 0.5,
@@ -332,9 +319,6 @@ export const AtomModel = () => {
     );
     newLinearVelocity.normalize().multiplyScalar(linearStrength);
     linearVelocity.current.copy(newLinearVelocity);
-
-    // NOWA LOGIKA DLA ROTACJI
-    // 1. Ustal losową oś obrotu
     const newAxis = new THREE.Vector3();
     do {
       newAxis.set(
@@ -345,8 +329,6 @@ export const AtomModel = () => {
     } while (newAxis.lengthSq() === 0);
     newAxis.normalize();
     rotationAxis.current.copy(newAxis);
-
-    // 2. Ustal losową prędkość obrotu wokół tej osi
     const speed =
       angularMinStrength +
       Math.random() * (angularMaxStrength - angularMinStrength);
@@ -434,7 +416,7 @@ export const AtomModel = () => {
           rotationState={rotationState}
           isInputFocused={isInputFocused}
         />
-        <SceneUpdater
+        <ScenePhysics
           modelGroupRef={modelGroupRef}
           linearVelocity={linearVelocity}
           rotationAxis={rotationAxis}

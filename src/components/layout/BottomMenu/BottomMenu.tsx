@@ -8,6 +8,7 @@ import { useAppStore, useCurrentElement } from "../../../store/appStore";
 import { elements } from "../../AtomModel/elementsData";
 import { ParticleControl } from "./ParticleControl";
 import { ShakeIcon } from "@/assets/icons/ShakeIcon";
+import { RefreshIcon } from "@/assets/icons/RefreshIcon";
 
 const PARTICLE_LIMIT = 300;
 
@@ -29,6 +30,9 @@ export const BottomMenu = () => {
     setParticles,
     setSelectedElement,
     triggerShake,
+    triggerRefresh,
+    hideInfoPanel,
+    resetToDefaults, // Pobieramy nową akcję
   } = useAppStore();
   const element = useCurrentElement();
   const speedSliderRef = useRef<HTMLInputElement>(null);
@@ -49,6 +53,13 @@ export const BottomMenu = () => {
     slider?.addEventListener("input", updateSliderFill);
     return () => slider?.removeEventListener("input", updateSliderFill);
   }, [sliderValue]);
+
+  // Zaktualizowana funkcja obsługi kliknięcia
+  const handleRefreshClick = () => {
+    triggerRefresh(); // Resetuje kamerę 3D
+    resetToDefaults(); // Resetuje cząstki i suwak
+    hideInfoPanel(); // Ukrywa panel info
+  };
 
   const isLongConfig = element.electronConfiguration.split(" ").length >= 5;
 
@@ -96,14 +107,24 @@ export const BottomMenu = () => {
               value={sliderValue}
               onChange={(e) => setSliderValue(Number(e.target.value))}
             />
-            <button
-              className={styles.shakeButton}
-              onClick={triggerShake}
-              title="Shake Atom"
-              aria-label="Shake Atom"
-            >
-              <ShakeIcon fill="rgb(255,255,255,0.7)" />
-            </button>
+            <div className={styles.actionButtons}>
+              <button
+                className={styles.actionButton}
+                onClick={triggerShake}
+                title="Shake Atom"
+                aria-label="Shake Atom"
+              >
+                <ShakeIcon />
+              </button>
+              <button
+                className={styles.actionButton}
+                onClick={handleRefreshClick}
+                title="Reset View"
+                aria-label="Reset View"
+              >
+                <RefreshIcon size={18} />
+              </button>
+            </div>
           </div>
         </div>
         <div className={styles.legend}>
