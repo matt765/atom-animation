@@ -217,7 +217,7 @@
   top: 0;
   left: 100%; /* Zaczyna się DOKŁADNIE tam, gdzie kończy się kontener symbolu */
   margin-left: 0.15em; /* Mały odstęp od symbolu */
-  font-size: 1.25rem; 
+  font-size: 1.25rem;
   font-weight: 600;
   color: #a5f3fc;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -253,6 +253,34 @@
   align-items: center;
   gap: 1rem;
   position: relative;
+}
+
+.shakeButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  background: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: 0.2s;
+  border-radius: 7px;
+}
+
+.shakeButton:hover {
+  border-color: rgba(56, 210, 248, 0.4);
+  background: rgb(255, 255, 255, 0.05);
+}
+
+.shakeButton:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(56, 189, 248, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 .navButtonGroup {

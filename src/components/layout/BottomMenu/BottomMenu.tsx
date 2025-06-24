@@ -7,13 +7,13 @@ import { CONFIG } from "../../AtomModel/AtomModel";
 import { useAppStore, useCurrentElement } from "../../../store/appStore";
 import { elements } from "../../AtomModel/elementsData";
 import { ParticleControl } from "./ParticleControl";
+import { ShakeIcon } from "@/assets/icons/ShakeIcon";
 
 const PARTICLE_LIMIT = 300;
 
-// Funkcja pomocnicza do formatowania ładunku jonu
 const formatCharge = (charge: number): string => {
   if (charge === 0) return "";
-  const sign = charge > 0 ? "+" : "−"; // Używamy znaku minus, nie dywizu/łącznika
+  const sign = charge > 0 ? "+" : "−";
   const absCharge = Math.abs(charge);
   if (absCharge === 1) return sign;
   return `${absCharge}${sign}`;
@@ -28,6 +28,7 @@ export const BottomMenu = () => {
     electrons,
     setParticles,
     setSelectedElement,
+    triggerShake,
   } = useAppStore();
   const element = useCurrentElement();
   const speedSliderRef = useRef<HTMLInputElement>(null);
@@ -95,6 +96,14 @@ export const BottomMenu = () => {
               value={sliderValue}
               onChange={(e) => setSliderValue(Number(e.target.value))}
             />
+            <button
+              className={styles.shakeButton}
+              onClick={triggerShake}
+              title="Shake Atom"
+              aria-label="Shake Atom"
+            >
+              <ShakeIcon fill="rgb(255,255,255,0.7)" />
+            </button>
           </div>
         </div>
         <div className={styles.legend}>

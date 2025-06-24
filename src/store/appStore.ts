@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { ElementConfig, elements } from "../components/AtomModel/elementsData";
 import type { SetStateAction } from "react";
 
-// Rozszerzamy typ, aby hook useCurrentElement mógł zwracać dodatkowe, obliczone właściwości
 export type ExtendedElementConfig = ElementConfig & {
   isIsotope: boolean;
   isStable: boolean;
@@ -11,7 +10,6 @@ export type ExtendedElementConfig = ElementConfig & {
   electrons: number;
 };
 
-// Obiekt zastępczy dla niestandardowych lub nieznanych kombinacji cząstek
 const UNKNOWN_ELEMENT: ElementConfig = {
   name: "Unknown",
   symbol: "?",
@@ -31,7 +29,6 @@ const UNKNOWN_ELEMENT: ElementConfig = {
   boilingPointK: null,
 };
 
-// Oblicza rozkład elektronów na powłokach na podstawie ich liczby
 const calculateShells = (electronCount: number): number[] => {
   if (electronCount <= 0) return [];
   const shells: number[] = [];
@@ -53,7 +50,6 @@ const calculateShells = (electronCount: number): number[] => {
   return shells;
 };
 
-// Definicja stanu i akcji w store Zustand
 interface AppState {
   selectedElementName: string;
   protons: number;
@@ -64,6 +60,7 @@ interface AppState {
   panelPosition: { x: number; y: number };
   refreshCounter: number;
   periodicTableRefreshCounter: number;
+  shakeCounter: number;
   isInputFocused: boolean;
 
   setParticles: (particles: {
@@ -80,6 +77,7 @@ interface AppState {
   setPanelPosition: (position: { x: number; y: number }) => void;
   triggerRefresh: () => void;
   triggerPeriodicTableRefresh: () => void;
+  triggerShake: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -92,6 +90,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   panelPosition: { x: 0, y: 0 },
   refreshCounter: 0,
   periodicTableRefreshCounter: 0,
+  shakeCounter: 0,
   isInputFocused: false,
 
   setParticles: (particles) => {
@@ -133,16 +132,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     set((state) => ({
       periodicTableRefreshCounter: state.periodicTableRefreshCounter + 1,
     })),
+  triggerShake: () =>
+    set((state) => ({ shakeCounter: state.shakeCounter + 1 })),
 }));
 
-// Ten hook jest "mózgiem" aplikacji, dynamicznie tworzącym obiekt pierwiastka
 export const useCurrentElement = (): ExtendedElementConfig => {
   const { protons, neutrons, electrons } = useAppStore();
 
   const baseElement = elements.find((el) => el.protons === protons);
   const charge = protons - electrons;
 
-  // Obsługa przypadku, gdy liczba protonów nie odpowiada żadnemu pierwiastkowi
   if (!baseElement) {
     return {
       ...UNKNOWN_ELEMENT,
