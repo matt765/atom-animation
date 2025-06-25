@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useMemo } from "react";
 import styles from "./ElementSelect.module.css";
 import { Select, SelectOption } from "../../common/Select/Select";
 import { useAppStore } from "../../../store/appStore";
+import { useLongPress } from "../../../hooks/useLongPress";
 
 export interface ElementData {
   name: string;
@@ -27,7 +28,6 @@ export const ElementSelect = ({
   setSelectedElement,
 }: ElementSelectProps) => {
   const { setInputFocus } = useAppStore();
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const handleNextElement = () => {
     setSelectedElement((currentElementName) => {
@@ -49,20 +49,8 @@ export const ElementSelect = ({
     });
   };
 
-  const startChangingElement = (direction: "up" | "down") => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    const changeFunction =
-      direction === "up" ? handlePreviousElement : handleNextElement;
-    changeFunction();
-    intervalRef.current = setInterval(changeFunction, 100);
-  };
-
-  const stopChangingElement = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  };
+  const previousElementProps = useLongPress(handlePreviousElement);
+  const nextElementProps = useLongPress(handleNextElement);
 
   const elementOptions: SelectOption[] = useMemo(
     () => elements.map((el) => ({ value: el.name, label: el.name })),
@@ -81,22 +69,18 @@ export const ElementSelect = ({
       />
       <div className={styles.navButtonGroup}>
         <button
+          {...previousElementProps}
           className={styles.elementNavButton}
-          onMouseDown={() => startChangingElement("up")}
-          onMouseUp={stopChangingElement}
-          onMouseLeave={stopChangingElement}
           title="Previous element"
         >
-          ▲
+          ▼
         </button>
         <button
+          {...nextElementProps}
           className={styles.elementNavButton}
-          onMouseDown={() => startChangingElement("down")}
-          onMouseUp={stopChangingElement}
-          onMouseLeave={stopChangingElement}
           title="Next element"
         >
-          ▼
+          ▲
         </button>
       </div>
     </div>
