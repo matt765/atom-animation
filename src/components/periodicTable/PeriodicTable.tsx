@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { useAppStore } from "@/store/appStore";
 import { elements, ElementConfig } from "@/components/AtomModel/elementsData";
+import { groupsData, GroupData } from "@/components/AtomModel/groupsData";
 import styles from "./PeriodicTable.module.css";
 
 type ElementCategory =
@@ -36,19 +37,6 @@ const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
   unknown: "#444444",
 };
 
-const legendData: { name: string; class: ElementCategory }[] = [
-  { name: "Alkali Metal", class: "alkali-metal" },
-  { name: "Alkaline Earth Metal", class: "alkaline-earth-metal" },
-  { name: "Transition Metal", class: "transition-metal" },
-  { name: "Post-transition Metal", class: "post-transition-metal" },
-  { name: "Metalloid", class: "metalloid" },
-  { name: "Reactive Nonmetal", class: "reactive-nonmetal" },
-  { name: "Noble Gas", class: "noble-gas" },
-  { name: "Lanthanide", class: "lanthanide" },
-  { name: "Actinide", class: "actinide" },
-  { name: "Unknown", class: "unknown" },
-];
-
 const getElementCategory = (element: ElementConfig): ElementCategory => {
   const { protons, group } = element;
   if (protons >= 57 && protons <= 71) return "lanthanide";
@@ -74,25 +62,49 @@ const getElementCategory = (element: ElementConfig): ElementCategory => {
   return "unknown";
 };
 
-const LegendAndExample = () => (
+const LegendAndExample = ({
+  onGroupHover,
+  onGroupClick,
+}: {
+  onGroupHover: (groupClass: ElementCategory | null) => void;
+  onGroupClick: (group: GroupData) => void;
+}) => (
   <div className={styles.legendAndExampleContainer}>
     <div className={styles.legendContainer}>
-      {legendData.slice(0, 5).map((item) => (
-        <div key={item.name} className={styles.legendItem}>
+      {groupsData.slice(0, 5).map((item) => (
+        <div
+          key={item.name}
+          className={styles.legendItem}
+          onMouseEnter={() => onGroupHover(item.class as ElementCategory)}
+          onMouseLeave={() => onGroupHover(null)}
+          onClick={() => onGroupClick(item)}
+        >
           <div
             className={styles.legendSwatch}
-            style={{ backgroundColor: ELEMENT_CATEGORY_COLORS[item.class] }}
+            style={{
+              backgroundColor:
+                ELEMENT_CATEGORY_COLORS[item.class as ElementCategory],
+            }}
           />
           <span>{item.name}</span>
         </div>
       ))}
     </div>
     <div className={styles.legendContainer}>
-      {legendData.slice(5).map((item) => (
-        <div key={item.name} className={styles.legendItem}>
+      {groupsData.slice(5).map((item) => (
+        <div
+          key={item.name}
+          className={styles.legendItem}
+          onMouseEnter={() => onGroupHover(item.class as ElementCategory)}
+          onMouseLeave={() => onGroupHover(null)}
+          onClick={() => onGroupClick(item)}
+        >
           <div
             className={styles.legendSwatch}
-            style={{ backgroundColor: ELEMENT_CATEGORY_COLORS[item.class] }}
+            style={{
+              backgroundColor:
+                ELEMENT_CATEGORY_COLORS[item.class as ElementCategory],
+            }}
           />
           <span>{item.name}</span>
         </div>
@@ -174,16 +186,14 @@ const columnHeaders = [
 ];
 
 export const PeriodicTable = () => {
-  const {
-    selectedElementName,
-    isPanelVisible,
-    setSelectedElement,
-    showInfoPanel,
-    hideInfoPanel,
-    setPanelPosition,
-  } = useAppStore();
+  const { protons, setSelectedElement, setSelectedGroup, hideInfoPanel } =
+    useAppStore();
 
   const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
+  const [hoveredGroup, setHoveredGroup] = useState<ElementCategory | null>(
+    null
+  );
+
   const containerRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
   const actionStateRef = useRef({
@@ -221,26 +231,32 @@ export const PeriodicTable = () => {
 
   const handleElementClick = useCallback(
     (newElementName: string) => {
-      const isPanelAlreadyVisible = isPanelVisible;
-
-      if (isPanelAlreadyVisible && selectedElementName === newElementName) {
+      const { infoPanelContent } = useAppStore.getState();
+      if (
+        infoPanelContent?.type === "element" &&
+        infoPanelContent.data.name === newElementName
+      ) {
         hideInfoPanel();
       } else {
-        if (!isPanelAlreadyVisible) {
-          setPanelPosition({ x: 0, y: 0 });
-        }
         setSelectedElement(newElementName);
-        showInfoPanel();
       }
     },
-    [
-      isPanelVisible,
-      selectedElementName,
-      hideInfoPanel,
-      setPanelPosition,
-      setSelectedElement,
-      showInfoPanel,
-    ]
+    [hideInfoPanel, setSelectedElement]
+  );
+
+  const handleGroupClick = useCallback(
+    (group: GroupData) => {
+      const { infoPanelContent } = useAppStore.getState();
+      if (
+        infoPanelContent?.type === "group" &&
+        infoPanelContent.data.name === group.name
+      ) {
+        hideInfoPanel();
+      } else {
+        setSelectedGroup(group);
+      }
+    },
+    [hideInfoPanel, setSelectedGroup]
   );
 
   useEffect(() => {
@@ -305,9 +321,15 @@ export const PeriodicTable = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
-    if (target.closest(`.${styles.legendAndExampleContainer}`)) {
+
+    if (
+      target.closest(`.${styles.legendItem}`) ||
+      target.closest(`.${styles.legendAndExampleContainer}`)
+    ) {
+      e.stopPropagation();
       return;
     }
+
     e.preventDefault();
     actionStateRef.current.isPointerDown = true;
     actionStateRef.current.startX = e.clientX;
@@ -340,6 +362,8 @@ export const PeriodicTable = () => {
 
     setViewState({ x: newX, y: newY, scale: clampedScale });
   };
+
+  const currentModelElement = elements.find((el) => el.protons === protons);
 
   return (
     <div
@@ -376,16 +400,22 @@ export const PeriodicTable = () => {
           </div>
         ))}
 
-        <LegendAndExample />
+        <LegendAndExample
+          onGroupHover={setHoveredGroup}
+          onGroupClick={handleGroupClick}
+        />
         {elements.map((element) => {
-          const isActive = element.name === selectedElementName;
+          const isActive = element.name === currentModelElement?.name;
           const categoryClass = getElementCategory(element);
+          const isHighlighted = hoveredGroup === categoryClass;
           const gridPosition = getGridPosition(element);
           return (
             <div
               key={element.name}
               data-element-name={element.name}
-              className={`${styles.element} ${isActive ? styles.active : ""}`}
+              className={`${styles.element} ${isActive ? styles.active : ""} ${
+                isHighlighted ? styles.highlighted : ""
+              }`}
               style={{
                 ...gridPosition,
                 backgroundColor: ELEMENT_CATEGORY_COLORS[categoryClass],

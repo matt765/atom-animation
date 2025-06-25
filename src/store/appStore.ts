@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { ElementConfig, elements } from "../components/AtomModel/elementsData";
-import type { SetStateAction } from "react";
+import { GroupData } from "../components/AtomModel/groupsData";
 
 export type ExtendedElementConfig = ElementConfig & {
   isIsotope: boolean;
@@ -9,6 +9,10 @@ export type ExtendedElementConfig = ElementConfig & {
   defaultNeutrons: number;
   electrons: number;
 };
+
+export type InfoPanelContent =
+  | { type: "element"; data: ExtendedElementConfig }
+  | { type: "group"; data: GroupData };
 
 const UNKNOWN_ELEMENT: ElementConfig = {
   name: "Unknown",
@@ -50,103 +54,11 @@ const calculateShells = (electronCount: number): number[] => {
   return shells;
 };
 
-interface AppState {
-  selectedElementName: string;
-  protons: number;
-  neutrons: number;
-  electrons: number;
-  sliderValue: number;
-  isPanelVisible: boolean;
-  panelPosition: { x: number; y: number };
-  refreshCounter: number;
-  shakeCounter: number;
-  isInputFocused: boolean;
-
-  setParticles: (particles: {
-    protons?: number;
-    neutrons?: number;
-    electrons?: number;
-  }) => void;
-  setSelectedElement: (update: SetStateAction<string>) => void;
-  updateParticlesFromElement: (elementName: string) => void;
-  setSliderValue: (value: number) => void;
-  setInputFocus: (isFocused: boolean) => void;
-  showInfoPanel: (position?: { x: number; y: number }) => void;
-  hideInfoPanel: () => void;
-  setPanelPosition: (position: { x: number; y: number }) => void;
-  triggerRefresh: () => void;
-  triggerShake: () => void;
-  resetActionCounters: () => void;
-  resetToDefaults: () => void; // NOWA AKCJA
-}
-
-export const useAppStore = create<AppState>((set, get) => ({
-  selectedElementName: "Carbon",
-  protons: 6,
-  neutrons: 6,
-  electrons: 6,
-  sliderValue: 25, // ZMNIEJSZONA WARTOŚĆ DOMYŚLNA
-  isPanelVisible: false,
-  panelPosition: { x: 0, y: 0 },
-  refreshCounter: 0,
-  shakeCounter: 0,
-  isInputFocused: false,
-
-  setParticles: (particles) => {
-    const currentState = get();
-    const newProtons = particles.protons ?? currentState.protons;
-    const baseElement = elements.find((el) => el.protons === newProtons);
-    set({
-      ...particles,
-      selectedElementName: baseElement ? baseElement.name : "Unknown",
-    });
-  },
-  setSelectedElement: (update) => {
-    const currentName = get().selectedElementName;
-    const newName = typeof update === "function" ? update(currentName) : update;
-    get().updateParticlesFromElement(newName);
-  },
-  updateParticlesFromElement: (elementName) => {
-    const element =
-      elements.find((el) => el.name === elementName) || UNKNOWN_ELEMENT;
-    set({
-      selectedElementName: elementName,
-      protons: element.protons,
-      neutrons: element.neutrons,
-      electrons: element.protons,
-    });
-  },
-  setSliderValue: (value) => set({ sliderValue: value }),
-  setInputFocus: (isFocused) => set({ isInputFocused: isFocused }),
-  showInfoPanel: (position) =>
-    set((state) => ({
-      isPanelVisible: true,
-      panelPosition: position !== undefined ? position : state.panelPosition,
-    })),
-  hideInfoPanel: () => set({ isPanelVisible: false }),
-  setPanelPosition: (position) => set({ panelPosition: position }),
-  triggerRefresh: () =>
-    set((state) => ({ refreshCounter: state.refreshCounter + 1 })),
-  triggerShake: () =>
-    set((state) => ({ shakeCounter: state.shakeCounter + 1 })),
-  resetActionCounters: () => set({ refreshCounter: 0, shakeCounter: 0 }),
-
-  // IMPLEMENTACJA NOWEJ AKCJI
-  resetToDefaults: () => {
-    const { protons } = get();
-    const element =
-      elements.find((el) => el.protons === protons) || UNKNOWN_ELEMENT;
-    set({
-      neutrons: element.neutrons, // Domyślna liczba neutronów
-      electrons: element.protons, // Domyślna liczba elektronów (równa liczbie protonów)
-      sliderValue: 25, // Domyślna wartość suwaka
-    });
-  },
-}));
-
-export const useCurrentElement = (): ExtendedElementConfig => {
-  const { protons, neutrons, electrons } = useAppStore();
-
+const calculateExtendedElementConfig = (
+  protons: number,
+  neutrons: number,
+  electrons: number
+): ExtendedElementConfig => {
   const baseElement = elements.find((el) => el.protons === protons);
   const charge = protons - electrons;
 
@@ -180,4 +92,113 @@ export const useCurrentElement = (): ExtendedElementConfig => {
     charge,
     defaultNeutrons: baseElement.neutrons,
   };
+};
+
+interface AppState {
+  protons: number;
+  neutrons: number;
+  electrons: number;
+  sliderValue: number;
+  isPanelVisible: boolean;
+  panelPosition: { x: number; y: number };
+  infoPanelContent: InfoPanelContent | null;
+  refreshCounter: number;
+  shakeCounter: number;
+  isInputFocused: boolean;
+
+  setParticles: (particles: {
+    protons?: number;
+    neutrons?: number;
+    electrons?: number;
+  }) => void;
+  setSelectedElement: (
+    elementName: string,
+    position?: { x: number; y: number }
+  ) => void;
+  setSelectedGroup: (group: GroupData) => void;
+  updateParticlesFromElement: (elementName: string) => void;
+  setSliderValue: (value: number) => void;
+  setInputFocus: (isFocused: boolean) => void;
+  hideInfoPanel: () => void;
+  setPanelPosition: (position: { x: number; y: number }) => void;
+  triggerRefresh: () => void;
+  triggerShake: () => void;
+  resetActionCounters: () => void;
+  resetToDefaults: () => void;
+}
+
+export const useAppStore = create<AppState>((set, get) => ({
+  protons: 6,
+  neutrons: 6,
+  electrons: 6,
+  sliderValue: 25,
+  isPanelVisible: false,
+  panelPosition: { x: 0, y: 0 },
+  infoPanelContent: null,
+  refreshCounter: 0,
+  shakeCounter: 0,
+  isInputFocused: false,
+
+  setParticles: (particles) => {
+    set({ ...particles });
+  },
+  updateParticlesFromElement: (elementName) => {
+    const element =
+      elements.find((el) => el.name === elementName) || UNKNOWN_ELEMENT;
+    set({
+      protons: element.protons,
+      neutrons: element.neutrons,
+      electrons: element.protons,
+    });
+  },
+  setSelectedElement: (elementName, position) => {
+    const wasPanelVisible = get().isPanelVisible;
+    get().updateParticlesFromElement(elementName);
+    const { protons, neutrons, electrons } = get();
+    const extendedConfig = calculateExtendedElementConfig(
+      protons,
+      neutrons,
+      electrons
+    );
+    set({
+      infoPanelContent: { type: "element", data: extendedConfig },
+      isPanelVisible: true,
+      panelPosition:
+        position ?? (wasPanelVisible ? get().panelPosition : { x: 0, y: 0 }),
+    });
+  },
+  setSelectedGroup: (group) => {
+    const wasPanelVisible = get().isPanelVisible;
+    set({
+      infoPanelContent: { type: "group", data: group },
+      isPanelVisible: true,
+    });
+    if (!wasPanelVisible) {
+      set({ panelPosition: { x: 0, y: 0 } });
+    }
+  },
+  setSliderValue: (value) => set({ sliderValue: value }),
+  setInputFocus: (isFocused) => set({ isInputFocused: isFocused }),
+  hideInfoPanel: () => set({ isPanelVisible: false, infoPanelContent: null }),
+  setPanelPosition: (position) => set({ panelPosition: position }),
+  triggerRefresh: () =>
+    set((state) => ({ refreshCounter: state.refreshCounter + 1 })),
+  triggerShake: () =>
+    set((state) => ({ shakeCounter: state.shakeCounter + 1 })),
+  resetActionCounters: () => set({ refreshCounter: 0, shakeCounter: 0 }),
+  resetToDefaults: () => {
+    const { protons } = get();
+    const element =
+      elements.find((el) => el.protons === protons) || UNKNOWN_ELEMENT;
+    set({
+      neutrons: element.neutrons,
+      electrons: element.protons,
+      sliderValue: 25,
+    });
+  },
+}));
+
+export const useCurrentElement = (): ExtendedElementConfig => {
+  const { protons, neutrons, electrons } = useAppStore();
+  return calculateExtendedElementConfig(protons, neutrons, electrons);
 };

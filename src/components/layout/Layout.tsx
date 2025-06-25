@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Layout.module.css";
-import { ElementInfoPanel } from "../AtomModel/ElementInfoPanel";
+
 import {
   DndContext,
   PointerSensor,
@@ -12,20 +12,21 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 
-import { useAppStore, useCurrentElement } from "../../store/appStore";
+import { useAppStore } from "../../store/appStore";
 import { BottomMenu } from "./BottomMenu/BottomMenu";
 import { SideMenu } from "./SideMenu/SideMenu";
+import { InfoPanel } from "../AtomModel/InfoPanel";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
     isPanelVisible,
     panelPosition,
+    infoPanelContent,
     hideInfoPanel,
     setPanelPosition,
     resetActionCounters,
   } = useAppStore();
 
-  const element = useCurrentElement();
   const pathname = usePathname();
   const isPeriodicTable = pathname === "/periodic-table";
 
@@ -44,7 +45,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       if (e.button !== 0) return;
       const target = e.target as HTMLElement;
 
-      const onInfoPanel = target.closest('[class*="ElementInfoPanel_panel"]');
+      const onInfoPanel = target.closest('[class*="InfoPanel_panel"]');
       const onBottomMenu = target.closest('[class*="BottomMenu_bottomMenu"]');
 
       if (onInfoPanel || onBottomMenu) {
@@ -71,7 +72,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     window.addEventListener("mouseup", handleMouseUp);
     return () => {
       window.removeEventListener("mousedown", handleMouseDown);
-      // POPRAWKA TUTAJ: Zmieniono "keyup" na "mouseup"
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isPanelVisible, hideInfoPanel, setPanelPosition, isPeriodicTable]);
@@ -98,9 +98,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {!isPeriodicTable && <BottomMenu />}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        {isPanelVisible && (
-          <ElementInfoPanel
-            element={element}
+        {isPanelVisible && infoPanelContent && (
+          <InfoPanel
+            content={infoPanelContent}
             position={panelPosition}
             isCentered={isPeriodicTable}
             isOnPeriodicTableView={isPeriodicTable}

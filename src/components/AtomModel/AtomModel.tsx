@@ -270,7 +270,7 @@ export const AtomModel = () => {
   const {
     sliderValue,
     refreshCounter,
-    showInfoPanel,
+    setSelectedElement,
     isInputFocused,
     shakeCounter,
   } = useAppStore();
@@ -349,7 +349,7 @@ export const AtomModel = () => {
           (e.clientY - clickStartPos.current.y) ** 2
       );
       if (dist < 5) {
-        showInfoPanel({ x: e.clientX, y: e.clientY });
+        setSelectedElement(element.name, { x: e.clientX, y: e.clientY });
       }
     }
     clickStartPos.current = null;

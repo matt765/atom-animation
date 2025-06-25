@@ -17,7 +17,7 @@
 .table {
   display: grid;
   grid-template-columns: 30px repeat(18, 85px);
-  grid-template-rows: 30px repeat(7, 85px) 20px repeat(2, 85px);
+  grid-template-rows: 30px repeat(7, 95px) 20px repeat(2, 95px);
   gap: 5px;
   will-change: transform;
   transform-origin: 0 0;
@@ -60,10 +60,20 @@
   overflow: hidden;
   text-align: center;
   cursor: pointer;
+  opacity: 1;
+  outline: 2px solid transparent;
+  transition: opacity 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease,
+    outline-color 0.15s linear, border-color 0.2s ease;
 }
 
-.tableViewport:not(.isDragging) .element {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.table:has(.legendItem:hover) .element:not(.highlighted) {
+  opacity: 0.3;
+}
+
+.element.highlighted {
+  position: relative;
+  z-index: 2;
+  outline-color: rgba(255, 255, 255, 0.75);
 }
 
 .tableViewport:not(.isDragging) .element:hover {
@@ -71,6 +81,8 @@
   border-color: #ffffff;
   z-index: 10;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+  opacity: 1;
+  outline-color: transparent;
 }
 
 .element.active {
@@ -146,7 +158,6 @@
   justify-content: space-evenly;
   align-items: center;
   gap: 0rem;
-  pointer-events: none;
   padding: 0.5rem;
   margin-right: 2rem;
   margin-bottom: 1rem;
@@ -158,12 +169,21 @@
   gap: 0.5rem;
   font-size: 0.9em;
   color: #ccc;
+  pointer-events: auto;
 }
 
 .legendItem {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.legendItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .legendSwatch {
@@ -181,6 +201,7 @@
   color: #f0f0f0;
   background-color: #634f5c;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
 .exampleContent {

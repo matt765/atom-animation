@@ -24,3 +24,11 @@
 - add periodic table
 - add particle controls
 
+## 1.0.3 (25-06-2025)
+
+- fix modal positioning
+- extract reusable outlined button
+- add shake model button
+- fix periodic table legend
+- add numbers for rows and columns
+- add periodic groups hover effect

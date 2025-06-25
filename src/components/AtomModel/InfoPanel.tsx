@@ -2,16 +2,21 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
-import styles from "./ElementInfoPanel.module.css";
+import styles from "./InfoPanel.module.css";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
-import { useAppStore, ExtendedElementConfig } from "@/store/appStore";
+import {
+  useAppStore,
+  ExtendedElementConfig,
+  InfoPanelContent,
+} from "@/store/appStore";
 import { elements } from "@/components/AtomModel/elementsData";
+import { GroupData } from "./groupsData";
 import { OutlinedButton } from "../common/OutlinedButton/OutlinedButton";
 
-type ElementInfoPanelProps = {
-  element: ExtendedElementConfig;
+type InfoPanelProps = {
+  content: InfoPanelContent;
   position: { x: number; y: number };
   isCentered?: boolean;
   isOnPeriodicTableView?: boolean;
@@ -35,55 +40,15 @@ const formatCharge = (charge: number): string => {
   return `${absCharge}${sign}`;
 };
 
-export const ElementInfoPanel = ({
+const ElementContent = ({
   element,
-  position,
-  isCentered = false,
-  isOnPeriodicTableView = false,
-}: ElementInfoPanelProps) => {
-  const [isMounted, setIsMounted] = useState(false);
+  isOnPeriodicTableView,
+}: {
+  element: ExtendedElementConfig;
+  isOnPeriodicTableView?: boolean;
+}) => {
   const router = useRouter();
   const { setSelectedElement, hideInfoPanel, setPanelPosition } = useAppStore();
-  const panelRef = useRef<HTMLDivElement | null>(null);
-
-  const [isPositionedByJs, setIsPositionedByJs] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    setIsPositionedByJs(!isCentered);
-  }, [isCentered]);
-
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: `draggable-panel-${element.name}`,
-    });
-
-  const combinedRef = useCallback(
-    (node: HTMLDivElement) => {
-      setNodeRef(node);
-      panelRef.current = node;
-    },
-    [setNodeRef]
-  );
-
-  useEffect(() => {
-    if (isDragging && !isPositionedByJs && panelRef.current) {
-      const rect = panelRef.current.getBoundingClientRect();
-      setPanelPosition({ x: rect.left, y: rect.top });
-      setIsPositionedByJs(true);
-    }
-  }, [isDragging, isPositionedByJs, setPanelPosition]);
-
-  const dndTransform = transform ? CSS.Translate.toString(transform) : "";
-
-  const style: React.CSSProperties = isPositionedByJs
-    ? {
-        top: `${position.y}px`,
-        left: `${position.x}px`,
-        transform: dndTransform,
-        position: "fixed",
-      }
-    : {};
 
   const handleShowIn3D = () => {
     const elementName =
@@ -94,20 +59,7 @@ export const ElementInfoPanel = ({
     router.push("/");
   };
 
-  const handleClose = () => {
-    hideInfoPanel();
-    setPanelPosition({ x: 0, y: 0 });
-  };
-
   const isCustomParticle = element.isIsotope || element.charge !== 0;
-
-  const getTitle = () => {
-    if (element.name === "Unknown") return "Custom Particle";
-    if (element.isIsotope)
-      return `Isotope: ${element.name}-${element.atomicWeight}`;
-    if (element.charge !== 0) return `Ion: ${element.name}`;
-    return element.title;
-  };
 
   const getDescription = () => {
     if (element.name === "Unknown") return element.description;
@@ -123,32 +75,8 @@ export const ElementInfoPanel = ({
     return element.description;
   };
 
-  const panelContent = (
-    <div
-      ref={combinedRef}
-      className={`${styles.panel} ${!isPositionedByJs ? styles.centered : ""} ${
-        isOnPeriodicTableView ? styles.dark : ""
-      }`}
-      style={style}
-    >
-      {isOnPeriodicTableView && (
-        <button
-          onClick={handleClose}
-          className={styles.closeButton}
-          aria-label="Close panel"
-        >
-          &times;
-        </button>
-      )}
-      <div
-        className={`${styles.header} ${
-          isOnPeriodicTableView ? styles.headerPeriodic : ""
-        }`}
-        {...listeners}
-        {...attributes}
-      >
-        <h3 className={styles.title}>{getTitle()}</h3>
-      </div>
+  return (
+    <>
       <div
         className={`${styles.content} ${
           isOnPeriodicTableView ? styles.contentPeriodic : ""
@@ -252,6 +180,129 @@ export const ElementInfoPanel = ({
         >
           <OutlinedButton onClick={handleShowIn3D}>Show in 3D</OutlinedButton>
         </div>
+      )}
+    </>
+  );
+};
+
+const GroupContent = ({
+  group,
+  isOnPeriodicTableView,
+}: {
+  group: GroupData;
+  isOnPeriodicTableView?: boolean;
+}) => (
+  <div
+    className={`${styles.content} ${
+      isOnPeriodicTableView ? styles.contentPeriodic : ""
+    }`}
+  >
+    <p className={styles.description}>{group.description}</p>
+  </div>
+);
+
+export const InfoPanel = ({
+  content,
+  position,
+  isCentered = false,
+  isOnPeriodicTableView = false,
+}: InfoPanelProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const { hideInfoPanel, setPanelPosition } = useAppStore();
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [isPositionedByJs, setIsPositionedByJs] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    setIsPositionedByJs(!isCentered);
+  }, [isCentered]);
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: `draggable-panel-${content.type}-${content.data.name}`,
+    });
+
+  const combinedRef = useCallback(
+    (node: HTMLDivElement) => {
+      setNodeRef(node);
+      panelRef.current = node;
+    },
+    [setNodeRef]
+  );
+
+  useEffect(() => {
+    if (isDragging && !isPositionedByJs && panelRef.current) {
+      const rect = panelRef.current.getBoundingClientRect();
+      setPanelPosition({ x: rect.left, y: rect.top });
+      setIsPositionedByJs(true);
+    }
+  }, [isDragging, isPositionedByJs, setPanelPosition]);
+
+  const dndTransform = transform ? CSS.Translate.toString(transform) : "";
+
+  const style: React.CSSProperties = isPositionedByJs
+    ? {
+        top: `${position.y}px`,
+        left: `${position.x}px`,
+        transform: dndTransform,
+        position: "fixed",
+      }
+    : {};
+
+  const handleClose = () => {
+    hideInfoPanel();
+    setPanelPosition({ x: 0, y: 0 });
+  };
+
+  const getTitle = () => {
+    if (content.type === "group") return content.data.title;
+
+    // Element title logic
+    const element = content.data;
+    if (element.name === "Unknown") return "Custom Particle";
+    if (element.isIsotope)
+      return `Isotope: ${element.name}-${element.atomicWeight}`;
+    if (element.charge !== 0) return `Ion: ${element.name}`;
+    return element.title;
+  };
+
+  const panelContent = (
+    <div
+      ref={combinedRef}
+      className={`${styles.panel} ${!isPositionedByJs ? styles.centered : ""} ${
+        isOnPeriodicTableView ? styles.dark : ""
+      }`}
+      style={style}
+    >
+      {isOnPeriodicTableView && (
+        <button
+          onClick={handleClose}
+          className={styles.closeButton}
+          aria-label="Close panel"
+        >
+          &times;
+        </button>
+      )}
+      <div
+        className={`${styles.header} ${
+          isOnPeriodicTableView ? styles.headerPeriodic : ""
+        }`}
+        {...listeners}
+        {...attributes}
+      >
+        <h3 className={styles.title}>{getTitle()}</h3>
+      </div>
+
+      {content.type === "element" ? (
+        <ElementContent
+          element={content.data}
+          isOnPeriodicTableView={isOnPeriodicTableView}
+        />
+      ) : (
+        <GroupContent
+          group={content.data}
+          isOnPeriodicTableView={isOnPeriodicTableView}
+        />
       )}
     </div>
   );
