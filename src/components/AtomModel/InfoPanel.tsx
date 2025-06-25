@@ -14,6 +14,7 @@ import {
 import { elements } from "@/components/AtomModel/elementsData";
 import { GroupData } from "./groupsData";
 import { OutlinedButton } from "../common/OutlinedButton/OutlinedButton";
+import { getElementCategory } from "./elementUtils";
 
 type InfoPanelProps = {
   content: InfoPanelContent;
@@ -191,15 +192,37 @@ const GroupContent = ({
 }: {
   group: GroupData;
   isOnPeriodicTableView?: boolean;
-}) => (
-  <div
-    className={`${styles.content} ${
-      isOnPeriodicTableView ? styles.contentPeriodic : ""
-    }`}
-  >
-    <p className={styles.description}>{group.description}</p>
-  </div>
-);
+}) => {
+  const groupElements = elements.filter(
+    (el) => getElementCategory(el) === group.class
+  );
+
+  return (
+    <div
+      className={`${styles.content} ${
+        isOnPeriodicTableView ? styles.contentPeriodic : ""
+      }`}
+    >
+      {group.description.map((paragraph, index) => (
+        <p key={index} className={styles.description}>
+          {paragraph}
+        </p>
+      ))}
+
+      {groupElements.length > 0 && (
+        <>
+          <div className={styles.divider}></div>
+          <h4 className={styles.listHeader}>Elements in this group:</h4>
+          <ul className={styles.elementList}>
+            {groupElements.map((el) => (
+              <li key={el.name}>{el.name}</li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+};
 
 export const InfoPanel = ({
   content,
@@ -257,7 +280,6 @@ export const InfoPanel = ({
   const getTitle = () => {
     if (content.type === "group") return content.data.title;
 
-    // Element title logic
     const element = content.data;
     if (element.name === "Unknown") return "Custom Particle";
     if (element.isIsotope)

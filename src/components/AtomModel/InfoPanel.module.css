@@ -36,14 +36,14 @@
 
 .closeButton {
   position: absolute;
-  top: 0.5rem;
-  right: 0.75rem;
+  top: 0.7rem;
+  right: 0.9rem;
   z-index: 10;
   background: none;
   border: none;
   padding: 0.5rem;
   color: #94a3b8;
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   line-height: 1;
   cursor: pointer;
   transition: color 0.2s ease;
@@ -91,9 +91,14 @@
   font-weight: 400;
 }
 
+.description:last-of-type {
+  margin-bottom: 0;
+}
+
 .divider {
   height: 1px;
   background-color: rgba(148, 163, 184, 0.15);
+  margin-top: 1.25rem;
   margin-bottom: 1.25rem;
 }
 
@@ -154,8 +159,9 @@
   padding: 0.8rem 1rem;
   margin-top: 1rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
   border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
@@ -193,4 +199,25 @@
 .unstable {
   color: #f87171;
   text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
+
+.listHeader {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0 0 0.75rem 0;
+}
+
+.elementList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  column-count: 2;
+  column-gap: 2rem;
+}
+
+.elementList li {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  margin-bottom: 0.5rem;
 }

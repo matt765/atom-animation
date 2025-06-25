@@ -11,19 +11,7 @@ import { useAppStore } from "@/store/appStore";
 import { elements, ElementConfig } from "@/components/AtomModel/elementsData";
 import { groupsData, GroupData } from "@/components/AtomModel/groupsData";
 import styles from "./PeriodicTable.module.css";
-
-type ElementCategory =
-  | "alkali-metal"
-  | "alkaline-earth-metal"
-  | "lanthanide"
-  | "actinide"
-  | "transition-metal"
-  | "other-metal"
-  | "metalloid"
-  | "nonmetal"
-  | "halogen"
-  | "noble-gas"
-  | "unknown";
+import { getElementCategory, ElementCategory } from "../AtomModel/elementUtils";
 
 const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
   "alkali-metal": "rgb(90, 74, 66)",
@@ -37,35 +25,6 @@ const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
   halogen: "rgb(92, 79, 99)",
   "noble-gas": "rgb(92, 79, 120)",
   unknown: "rgb(68, 68, 68)",
-};
-
-const getElementCategory = (element: ElementConfig): ElementCategory => {
-  const { protons, group } = element;
-
-  if (protons >= 57 && protons <= 71) return "lanthanide";
-  if (protons >= 89 && protons <= 103) return "actinide";
-
-  if (group === 1) return protons === 1 ? "nonmetal" : "alkali-metal";
-  if (group === 2) return "alkaline-earth-metal";
-  if (group >= 3 && group <= 12) return "transition-metal";
-
-  const halogens: number[] = [9, 17, 35, 53, 85, 117];
-  if (halogens.includes(protons)) return "halogen";
-
-  if (group === 18) return "noble-gas";
-
-  const metalloids: number[] = [5, 14, 32, 33, 51, 52, 84];
-  if (metalloids.includes(protons)) return "metalloid";
-
-  const otherMetals: number[] = [
-    13, 31, 49, 50, 81, 82, 83, 113, 114, 115, 116,
-  ];
-  if (otherMetals.includes(protons)) return "other-metal";
-
-  const nonmetals: number[] = [1, 6, 7, 8, 15, 16, 34];
-  if (nonmetals.includes(protons)) return "nonmetal";
-
-  return "unknown";
 };
 
 const legendDisplayData = groupsData.filter(
@@ -213,7 +172,6 @@ export const PeriodicTable = () => {
     startY: 0,
     lastX: 0,
     lastY: 0,
-    target: null as EventTarget | null,
   });
 
   const resetView = useCallback(() => {
@@ -300,19 +258,6 @@ export const PeriodicTable = () => {
 
     const handleMouseUp = () => {
       if (!actionStateRef.current.isPointerDown) return;
-
-      if (!actionStateRef.current.isDragging) {
-        const clickedElementDiv = (
-          actionStateRef.current.target as HTMLElement
-        )?.closest("[data-element-name]");
-        if (clickedElementDiv) {
-          const elementName =
-            clickedElementDiv.getAttribute("data-element-name");
-          if (elementName) {
-            handleElementClick(elementName);
-          }
-        }
-      }
       actionStateRef.current.isPointerDown = false;
       actionStateRef.current.isDragging = false;
       if (containerRef.current)
@@ -326,13 +271,18 @@ export const PeriodicTable = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [handleElementClick]);
+  }, []);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return;
+    if (e.button !== 2) return;
+
     const target = e.target as HTMLElement;
 
     if (target.closest(`.${styles.legendItem}`)) {
+      return;
+    }
+
+    if (target.closest(`[data-element-name]`)) {
       return;
     }
 
@@ -342,7 +292,6 @@ export const PeriodicTable = () => {
     actionStateRef.current.startY = e.clientY;
     actionStateRef.current.lastX = e.clientX;
     actionStateRef.current.lastY = e.clientY;
-    actionStateRef.current.target = e.target;
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -369,6 +318,10 @@ export const PeriodicTable = () => {
     setViewState({ x: newX, y: newY, scale: clampedScale });
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
   const currentModelElement = elements.find((el) => el.protons === protons);
 
   return (
@@ -377,6 +330,7 @@ export const PeriodicTable = () => {
       className={styles.tableViewport}
       onMouseDown={handleMouseDown}
       onWheel={handleWheel}
+      onContextMenu={handleContextMenu}
     >
       <div
         ref={tableRef}
@@ -419,9 +373,10 @@ export const PeriodicTable = () => {
             <div
               key={element.name}
               data-element-name={element.name}
-              className={`${styles.element} ${isActive ? styles.active : ""} ${
-                isHighlighted ? styles.highlighted : ""
-              }`}
+              onClick={() => handleElementClick(element.name)}
+              className={`${styles.element} ${
+                isActive ? styles.active : ""
+              } ${isHighlighted ? styles.highlighted : ""}`}
               style={{
                 ...gridPosition,
                 backgroundColor: ELEMENT_CATEGORY_COLORS[categoryClass],
@@ -431,7 +386,9 @@ export const PeriodicTable = () => {
               <div className={styles.atomicNumber}>{element.protons}</div>
               <div className={styles.symbol}>{element.symbol}</div>
               <div className={styles.name}>{element.name}</div>
-              <div className={styles.atomicWeight}>{element.atomicWeight}</div>
+              <div className={styles.atomicWeight}>
+                {element.atomicWeight}
+              </div>
             </div>
           );
         })}
