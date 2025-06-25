@@ -283,13 +283,7 @@ export const InfoPanel = ({
           &times;
         </button>
       )}
-      <div
-        className={`${styles.header} ${
-          isOnPeriodicTableView ? styles.headerPeriodic : ""
-        }`}
-        {...listeners}
-        {...attributes}
-      >
+      <div className={styles.header} {...listeners} {...attributes}>
         <h3 className={styles.title}>{getTitle()}</h3>
       </div>
 
