@@ -49,15 +49,12 @@ const ElementContent = ({
   isOnPeriodicTableView?: boolean;
 }) => {
   const router = useRouter();
-  const { setSelectedElement, hideInfoPanel, setPanelPosition } = useAppStore();
+  const { navigateToHomepage } = useAppStore();
 
   const handleShowIn3D = () => {
     const elementName =
       elements.find((el) => el.protons === element.protons)?.name || "Unknown";
-    setSelectedElement(elementName, undefined, false);
-    hideInfoPanel();
-    setPanelPosition({ x: 0, y: 0 });
-    router.push("/");
+    navigateToHomepage(router, elementName);
   };
 
   const isCustomParticle = element.isIsotope || element.charge !== 0;
@@ -238,7 +235,7 @@ export const InfoPanel = ({
   isOnPeriodicTableView = false,
 }: InfoPanelProps) => {
   const [isMounted, setIsMounted] = useState(false);
-  const { hideInfoPanel, setPanelPosition } = useAppStore();
+  const { hideInfoPanel, setPanelPosition, isNavigating } = useAppStore();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [isPositionedByJs, setIsPositionedByJs] = useState(false);
 
@@ -249,7 +246,7 @@ export const InfoPanel = ({
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
-      id: `draggable-panel-${content.type}-${content.data.name}`,
+      id: `draggable-panel-${content?.type}-${content?.data.name}`,
     });
 
   const combinedRef = useCallback(
@@ -285,6 +282,7 @@ export const InfoPanel = ({
   };
 
   const getTitle = () => {
+    if (!content) return "";
     if (content.type === "group") return content.data.title;
 
     const element = content.data;
@@ -294,6 +292,20 @@ export const InfoPanel = ({
     if (element.charge !== 0) return `Ion: ${element.name}`;
     return element.title;
   };
+
+  if (!isMounted) {
+    return null;
+  }
+
+  if (isNavigating) {
+    return createPortal(
+      <div className={styles.fullScreenLoader}>
+        <div className={styles.loaderSpinner}></div>
+        <p>Loading 3D Model...</p>
+      </div>,
+      document.body
+    );
+  }
 
   const panelContent = (
     <div
@@ -330,9 +342,5 @@ export const InfoPanel = ({
     </div>
   );
 
-  if (isMounted) {
-    return createPortal(panelContent, document.body);
-  }
-
-  return null;
+  return createPortal(panelContent, document.body);
 };

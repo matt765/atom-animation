@@ -8,6 +8,12 @@
   overflow: hidden;
   cursor: grab;
   user-select: none;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.tableViewport.navigating {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .tableViewport.isDragging {

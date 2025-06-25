@@ -155,8 +155,13 @@ const columnHeaders = [
 ];
 
 export const PeriodicTable = () => {
-  const { protons, setSelectedElement, showGroupInfo, hideInfoPanel } =
-    useAppStore();
+  const {
+    protons,
+    setSelectedElement,
+    showGroupInfo,
+    hideInfoPanel,
+    isNavigating,
+  } = useAppStore();
 
   const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
   const [hoveredGroup, setHoveredGroup] = useState<ElementCategory | null>(
@@ -327,7 +332,9 @@ export const PeriodicTable = () => {
   return (
     <div
       ref={containerRef}
-      className={styles.tableViewport}
+      className={`${styles.tableViewport} ${
+        isNavigating ? styles.navigating : ""
+      }`}
       onMouseDown={handleMouseDown}
       onWheel={handleWheel}
       onContextMenu={handleContextMenu}

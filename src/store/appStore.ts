@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { ElementConfig, elements } from "../components/AtomModel/elementsData";
 import { GroupData } from "../components/AtomModel/groupsData";
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export type ExtendedElementConfig = ElementConfig & {
   isIsotope: boolean;
@@ -102,6 +103,7 @@ interface AppState {
   isPanelVisible: boolean;
   panelPosition: { x: number; y: number };
   infoPanelContent: InfoPanelContent | null;
+  isNavigating: boolean;
   refreshCounter: number;
   shakeCounter: number;
   isInputFocused: boolean;
@@ -118,6 +120,7 @@ interface AppState {
   ) => void;
   showGroupInfo: (group: GroupData) => void;
   updateParticlesFromElement: (elementName: string) => void;
+  navigateToHomepage: (router: AppRouterInstance, elementName: string) => void;
   setSliderValue: (value: number) => void;
   setInputFocus: (isFocused: boolean) => void;
   hideInfoPanel: () => void;
@@ -136,6 +139,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   isPanelVisible: false,
   panelPosition: { x: 0, y: 0 },
   infoPanelContent: null,
+  isNavigating: false,
   refreshCounter: 0,
   shakeCounter: 0,
   isInputFocused: false,
@@ -183,9 +187,18 @@ export const useAppStore = create<AppState>((set, get) => ({
       set({ panelPosition: { x: 0, y: 0 } });
     }
   },
+  navigateToHomepage: (router, elementName) => {
+    set({ isNavigating: true });
+    get().setSelectedElement(elementName, undefined, false);
+
+    setTimeout(() => {
+      router.push("/");
+    }, 500);
+  },
   setSliderValue: (value) => set({ sliderValue: value }),
   setInputFocus: (isFocused) => set({ isInputFocused: isFocused }),
-  hideInfoPanel: () => set({ isPanelVisible: false, infoPanelContent: null }),
+  hideInfoPanel: () =>
+    set({ isPanelVisible: false, infoPanelContent: null, isNavigating: false }),
   setPanelPosition: (position) => set({ panelPosition: position }),
   triggerRefresh: () =>
     set((state) => ({ refreshCounter: state.refreshCounter + 1 })),
