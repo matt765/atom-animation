@@ -139,7 +139,7 @@
 .footer {
   padding: 0.75rem 2rem;
   padding-top: 1.25rem;
-  padding-bottom:  1.5rem;
+  padding-bottom: 1.5rem;
   border-top: 1px solid rgba(148, 163, 184, 0.15);
   background-color: rgba(23, 26, 30, 0.4);
   display: flex;
@@ -150,10 +150,23 @@
   background-color: rgb(30, 35, 42);
 }
 
+.ionInfo,
+.stabilityInfo,
+.isotopeInfo {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
 .stabilityInfo .label,
 .isotopeInfo .label,
 .ionInfo .label {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0;
 }
 
 .stabilityInfo .value,
@@ -177,11 +190,11 @@
 }
 
 .stable {
-  color: #4ade80; /* Zielony */
+  color: #4ade80;
   text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
 }
 
 .unstable {
-  color: #f87171; /* Czerwony */
+  color: #f87171;
   text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
 }

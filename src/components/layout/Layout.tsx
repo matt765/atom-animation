@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Layout.module.css";
-
+import { InfoPanel } from "../AtomModel/InfoPanel";
 import {
   DndContext,
   PointerSensor,
@@ -12,10 +12,9 @@ import {
   DragEndEvent,
 } from "@dnd-kit/core";
 
-import { useAppStore } from "../../store/appStore";
+import { useAppStore, useCurrentElement } from "../../store/appStore";
 import { BottomMenu } from "./BottomMenu/BottomMenu";
 import { SideMenu } from "./SideMenu/SideMenu";
-import { InfoPanel } from "../AtomModel/InfoPanel";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
@@ -27,6 +26,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     resetActionCounters,
   } = useAppStore();
 
+  const current3DElement = useCurrentElement();
   const pathname = usePathname();
   const isPeriodicTable = pathname === "/periodic-table";
 
@@ -90,6 +90,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const contentForPanel = isPeriodicTable
+    ? infoPanelContent
+    : { type: "element" as const, data: current3DElement };
+
   return (
     <div className={styles.mainContainer}>
       <SideMenu />
@@ -98,9 +102,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {!isPeriodicTable && <BottomMenu />}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        {isPanelVisible && infoPanelContent && (
+        {isPanelVisible && contentForPanel && (
           <InfoPanel
-            content={infoPanelContent}
+            content={contentForPanel}
             position={panelPosition}
             isCentered={isPeriodicTable}
             isOnPeriodicTableView={isPeriodicTable}
