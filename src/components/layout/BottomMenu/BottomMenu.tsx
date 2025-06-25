@@ -62,7 +62,7 @@ export const BottomMenu = () => {
 
   const handleElementSelection = (value: React.SetStateAction<string>) => {
     const newName = typeof value === "function" ? value(element.name) : value;
-    setSelectedElement(newName);
+    setSelectedElement(newName, undefined, false);
   };
 
   const isLongConfig = element.electronConfiguration.split(" ").length >= 5;

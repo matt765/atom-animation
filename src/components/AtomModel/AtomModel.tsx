@@ -349,7 +349,7 @@ export const AtomModel = () => {
           (e.clientY - clickStartPos.current.y) ** 2
       );
       if (dist < 5) {
-        setSelectedElement(element.name, { x: e.clientX, y: e.clientY });
+        setSelectedElement(element.name, { x: e.clientX, y: e.clientY }, true);
       }
     }
     clickStartPos.current = null;

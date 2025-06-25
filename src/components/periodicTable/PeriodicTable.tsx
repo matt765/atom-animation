@@ -155,7 +155,7 @@ const columnHeaders = [
 ];
 
 export const PeriodicTable = () => {
-  const { protons, setSelectedElement, setSelectedGroup, hideInfoPanel } =
+  const { protons, setSelectedElement, showGroupInfo, hideInfoPanel } =
     useAppStore();
 
   const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
@@ -206,7 +206,7 @@ export const PeriodicTable = () => {
       ) {
         hideInfoPanel();
       } else {
-        setSelectedElement(newElementName);
+        setSelectedElement(newElementName, undefined, true);
       }
     },
     [hideInfoPanel, setSelectedElement]
@@ -221,10 +221,10 @@ export const PeriodicTable = () => {
       ) {
         hideInfoPanel();
       } else {
-        setSelectedGroup(group);
+        showGroupInfo(group);
       }
     },
-    [hideInfoPanel, setSelectedGroup]
+    [hideInfoPanel, showGroupInfo]
   );
 
   useEffect(() => {
@@ -374,9 +374,9 @@ export const PeriodicTable = () => {
               key={element.name}
               data-element-name={element.name}
               onClick={() => handleElementClick(element.name)}
-              className={`${styles.element} ${
-                isActive ? styles.active : ""
-              } ${isHighlighted ? styles.highlighted : ""}`}
+              className={`${styles.element} ${isActive ? styles.active : ""} ${
+                isHighlighted ? styles.highlighted : ""
+              }`}
               style={{
                 ...gridPosition,
                 backgroundColor: ELEMENT_CATEGORY_COLORS[categoryClass],
@@ -386,9 +386,7 @@ export const PeriodicTable = () => {
               <div className={styles.atomicNumber}>{element.protons}</div>
               <div className={styles.symbol}>{element.symbol}</div>
               <div className={styles.name}>{element.name}</div>
-              <div className={styles.atomicWeight}>
-                {element.atomicWeight}
-              </div>
+              <div className={styles.atomicWeight}>{element.atomicWeight}</div>
             </div>
           );
         })}

@@ -54,7 +54,7 @@ const ElementContent = ({
   const handleShowIn3D = () => {
     const elementName =
       elements.find((el) => el.protons === element.protons)?.name || "Unknown";
-    setSelectedElement(elementName);
+    setSelectedElement(elementName, undefined, false);
     hideInfoPanel();
     setPanelPosition({ x: 0, y: 0 });
     router.push("/");
@@ -217,7 +217,10 @@ const GroupContent = ({
           <h4 className={styles.listHeader}>Elements in this group:</h4>
           <ul className={styles.elementList}>
             {groupElements.map((el) => (
-              <li key={el.name} onClick={() => setSelectedElement(el.name)}>
+              <li
+                key={el.name}
+                onClick={() => setSelectedElement(el.name, undefined, true)}
+              >
                 {el.name}
               </li>
             ))}

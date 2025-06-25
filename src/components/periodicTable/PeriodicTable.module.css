@@ -17,7 +17,7 @@
 .table {
   display: grid;
   grid-template-columns: 30px repeat(18, 85px);
-  grid-template-rows: 30px repeat(7, 95px) 20px repeat(2, 95px);
+  grid-template-rows: 30px repeat(7, 95px) 35px repeat(2, 95px);
   gap: 5px;
   will-change: transform;
   transform-origin: 0 0;

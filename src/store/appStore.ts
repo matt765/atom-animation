@@ -113,9 +113,10 @@ interface AppState {
   }) => void;
   setSelectedElement: (
     elementName: string,
-    position?: { x: number; y: number }
+    position?: { x: number; y: number },
+    shouldShowPanel?: boolean
   ) => void;
-  setSelectedGroup: (group: GroupData) => void;
+  showGroupInfo: (group: GroupData) => void;
   updateParticlesFromElement: (elementName: string) => void;
   setSliderValue: (value: number) => void;
   setInputFocus: (isFocused: boolean) => void;
@@ -151,23 +152,28 @@ export const useAppStore = create<AppState>((set, get) => ({
       electrons: element.protons,
     });
   },
-  setSelectedElement: (elementName, position) => {
-    const wasPanelVisible = get().isPanelVisible;
+  setSelectedElement: (elementName, position, shouldShowPanel = false) => {
     get().updateParticlesFromElement(elementName);
-    const { protons, neutrons, electrons } = get();
-    const extendedConfig = calculateExtendedElementConfig(
-      protons,
-      neutrons,
-      electrons
-    );
-    set({
-      infoPanelContent: { type: "element", data: extendedConfig },
-      isPanelVisible: true,
-      panelPosition:
-        position ?? (wasPanelVisible ? get().panelPosition : { x: 0, y: 0 }),
-    });
+
+    if (shouldShowPanel) {
+      const wasPanelVisible = get().isPanelVisible;
+      const element = elements.find((el) => el.name === elementName);
+      if (!element) return;
+
+      const extendedConfig = calculateExtendedElementConfig(
+        element.protons,
+        element.neutrons,
+        element.protons
+      );
+      set({
+        infoPanelContent: { type: "element", data: extendedConfig },
+        isPanelVisible: true,
+        panelPosition:
+          position ?? (wasPanelVisible ? get().panelPosition : { x: 0, y: 0 }),
+      });
+    }
   },
-  setSelectedGroup: (group) => {
+  showGroupInfo: (group) => {
     const wasPanelVisible = get().isPanelVisible;
     set({
       infoPanelContent: { type: "group", data: group },
