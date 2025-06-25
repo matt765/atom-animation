@@ -32,7 +32,7 @@ export const BottomMenu = () => {
     triggerShake,
     triggerRefresh,
     hideInfoPanel,
-    resetToDefaults, // Pobieramy nową akcję
+    resetToDefaults,
   } = useAppStore();
   const element = useCurrentElement();
   const speedSliderRef = useRef<HTMLInputElement>(null);
@@ -54,11 +54,15 @@ export const BottomMenu = () => {
     return () => slider?.removeEventListener("input", updateSliderFill);
   }, [sliderValue]);
 
-  // Zaktualizowana funkcja obsługi kliknięcia
   const handleRefreshClick = () => {
-    triggerRefresh(); // Resetuje kamerę 3D
-    resetToDefaults(); // Resetuje cząstki i suwak
-    hideInfoPanel(); // Ukrywa panel info
+    triggerRefresh();
+    resetToDefaults();
+    hideInfoPanel();
+  };
+
+  const handleElementSelection = (value: React.SetStateAction<string>) => {
+    const newName = typeof value === "function" ? value(element.name) : value;
+    setSelectedElement(newName);
   };
 
   const isLongConfig = element.electronConfiguration.split(" ").length >= 5;
@@ -94,7 +98,7 @@ export const BottomMenu = () => {
           <ElementSelect
             elements={elements}
             selectedElementName={element.name}
-            setSelectedElement={setSelectedElement}
+            setSelectedElement={handleElementSelection}
           />
           <div className={styles.controlGroup} id="speed-control-group">
             <label htmlFor="speed">Speed:</label>

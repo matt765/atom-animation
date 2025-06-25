@@ -96,6 +96,7 @@
   opacity: 0.9;
   padding-left: 2px;
   pointer-events: none;
+  margin-bottom: auto;
 }
 
 .symbol {
@@ -104,6 +105,7 @@
   line-height: 1.1;
   color: #fff;
   pointer-events: none;
+  padding-bottom: 4px;
 }
 
 .name {
@@ -121,34 +123,37 @@
 }
 
 .alkali-metal {
-  background-color: #5a4a42;
+  background-color: rgb(90, 74, 66);
 }
 .alkaline-earth-metal {
-  background-color: #5a5242;
+  background-color: rgb(90, 82, 66);
 }
 .transition-metal {
-  background-color: #634f5c;
+  background-color: rgb(99, 79, 92);
 }
 .lanthanide {
-  background-color: #425a52;
+  background-color: rgb(66, 90, 82);
 }
 .actinide {
-  background-color: #425a5a;
+  background-color: rgb(66, 90, 90);
 }
-.post-transition-metal {
-  background-color: #4c596f;
+.other-metal {
+  background-color: rgb(76, 89, 111);
 }
 .metalloid {
-  background-color: #425a47;
+  background-color: rgb(66, 90, 71);
 }
-.reactive-nonmetal {
-  background-color: #475868;
+.nonmetal {
+  background-color: rgb(71, 88, 104);
+}
+.halogen {
+  background-color: rgb(92, 79, 99);
 }
 .noble-gas {
-  background-color: #5c4f63;
+  background-color: rgb(92, 79, 120);
 }
 .unknown {
-  background-color: #444444;
+  background-color: rgb(68, 68, 68);
 }
 
 .legendAndExampleContainer {
@@ -199,7 +204,7 @@
   height: 8em;
   border: 1px solid #aaa;
   color: #f0f0f0;
-  background-color: #634f5c;
+  background-color: rgb(99, 79, 92);
   flex-shrink: 0;
   pointer-events: none;
 }

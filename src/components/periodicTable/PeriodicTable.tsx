@@ -18,49 +18,59 @@ type ElementCategory =
   | "lanthanide"
   | "actinide"
   | "transition-metal"
-  | "post-transition-metal"
+  | "other-metal"
   | "metalloid"
-  | "reactive-nonmetal"
+  | "nonmetal"
+  | "halogen"
   | "noble-gas"
   | "unknown";
 
 const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
-  "alkali-metal": "#5a4a42",
-  "alkaline-earth-metal": "#5a5242",
-  "transition-metal": "#634f5c",
-  lanthanide: "#425a52",
-  actinide: "#425a5a",
-  "post-transition-metal": "#4c596f",
-  metalloid: "#425a47",
-  "reactive-nonmetal": "#475868",
-  "noble-gas": "#5c4f63",
-  unknown: "#444444",
+  "alkali-metal": "rgb(90, 74, 66)",
+  "alkaline-earth-metal": "rgb(90, 82, 66)",
+  "transition-metal": "rgb(99, 79, 92)",
+  lanthanide: "rgb(66, 90, 82)",
+  actinide: "rgb(66, 90, 90)",
+  "other-metal": "rgb(76, 89, 111)",
+  metalloid: "rgb(66, 90, 71)",
+  nonmetal: "rgb(71, 88, 104)",
+  halogen: "rgb(92, 79, 99)",
+  "noble-gas": "rgb(92, 79, 120)",
+  unknown: "rgb(68, 68, 68)",
 };
 
 const getElementCategory = (element: ElementConfig): ElementCategory => {
   const { protons, group } = element;
+
   if (protons >= 57 && protons <= 71) return "lanthanide";
   if (protons >= 89 && protons <= 103) return "actinide";
-  if (group === 1) return protons === 1 ? "reactive-nonmetal" : "alkali-metal";
+
+  if (group === 1) return protons === 1 ? "nonmetal" : "alkali-metal";
   if (group === 2) return "alkaline-earth-metal";
   if (group >= 3 && group <= 12) return "transition-metal";
+
+  const halogens: number[] = [9, 17, 35, 53, 85, 117];
+  if (halogens.includes(protons)) return "halogen";
+
   if (group === 18) return "noble-gas";
 
   const metalloids: number[] = [5, 14, 32, 33, 51, 52, 84];
   if (metalloids.includes(protons)) return "metalloid";
 
-  const postTransitionMetals: number[] = [
+  const otherMetals: number[] = [
     13, 31, 49, 50, 81, 82, 83, 113, 114, 115, 116,
   ];
-  if (postTransitionMetals.includes(protons)) return "post-transition-metal";
+  if (otherMetals.includes(protons)) return "other-metal";
 
-  const reactiveNonmetals: number[] = [
-    1, 6, 7, 8, 9, 15, 16, 17, 34, 35, 53, 85, 117,
-  ];
-  if (reactiveNonmetals.includes(protons)) return "reactive-nonmetal";
+  const nonmetals: number[] = [1, 6, 7, 8, 15, 16, 34];
+  if (nonmetals.includes(protons)) return "nonmetal";
 
   return "unknown";
 };
+
+const legendDisplayData = groupsData.filter(
+  (group) => group.class !== "unknown"
+);
 
 const LegendAndExample = ({
   onGroupHover,
@@ -71,7 +81,7 @@ const LegendAndExample = ({
 }) => (
   <div className={styles.legendAndExampleContainer}>
     <div className={styles.legendContainer}>
-      {groupsData.slice(0, 5).map((item) => (
+      {legendDisplayData.slice(0, 5).map((item) => (
         <div
           key={item.name}
           className={styles.legendItem}
@@ -91,7 +101,7 @@ const LegendAndExample = ({
       ))}
     </div>
     <div className={styles.legendContainer}>
-      {groupsData.slice(5).map((item) => (
+      {legendDisplayData.slice(5).map((item) => (
         <div
           key={item.name}
           className={styles.legendItem}
@@ -322,11 +332,7 @@ export const PeriodicTable = () => {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
 
-    if (
-      target.closest(`.${styles.legendItem}`) ||
-      target.closest(`.${styles.legendAndExampleContainer}`)
-    ) {
-      e.stopPropagation();
+    if (target.closest(`.${styles.legendItem}`)) {
       return;
     }
 
