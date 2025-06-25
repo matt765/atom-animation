@@ -117,13 +117,16 @@
 
 .legendAndExampleContainer {
   grid-column: 3 / 13;
-  grid-row: 2 / 5;
+  grid-row: 0 / 6;
+  margin-top: 6rem;
+  margin-right: 1rem;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0rem;
   pointer-events: none;
   padding: 0.5rem;
+
 }
 
 .legendContainer {
