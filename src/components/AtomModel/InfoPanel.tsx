@@ -14,7 +14,7 @@ import {
 import { elements } from "@/components/AtomModel/elementsData";
 import { GroupData } from "./groupsData";
 import { OutlinedButton } from "../common/OutlinedButton/OutlinedButton";
-import { getElementCategory } from "./elementUtils";
+import { getElementCategory } from "../AtomModel/elementUtils";
 
 type InfoPanelProps = {
   content: InfoPanelContent;
@@ -193,6 +193,8 @@ const GroupContent = ({
   group: GroupData;
   isOnPeriodicTableView?: boolean;
 }) => {
+  const { setSelectedElement } = useAppStore();
+
   const groupElements = elements.filter(
     (el) => getElementCategory(el) === group.class
   );
@@ -215,7 +217,9 @@ const GroupContent = ({
           <h4 className={styles.listHeader}>Elements in this group:</h4>
           <ul className={styles.elementList}>
             {groupElements.map((el) => (
-              <li key={el.name}>{el.name}</li>
+              <li key={el.name} onClick={() => setSelectedElement(el.name)}>
+                {el.name}
+              </li>
             ))}
           </ul>
         </>
