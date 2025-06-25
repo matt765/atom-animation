@@ -127,18 +127,51 @@ const LegendAndExample = () => (
 );
 
 const getGridPosition = (element: ElementConfig) => {
+  const gridColumnOffset = 1;
+  const gridRowOffset = 1;
+
   if (element.group > 0) {
-    return { gridRow: element.period, gridColumn: element.group };
+    return {
+      gridRow: element.period + gridRowOffset,
+      gridColumn: element.group + gridColumnOffset,
+    };
   }
   const atomicNumber = element.protons;
-  if (atomicNumber >= 58 && atomicNumber <= 71) {
-    return { gridRow: 9, gridColumn: atomicNumber - 58 + 3 };
+  if (atomicNumber >= 57 && atomicNumber <= 71) {
+    return {
+      gridRow: 10,
+      gridColumn: atomicNumber - 57 + 3 + gridColumnOffset,
+    };
   }
-  if (atomicNumber >= 90 && atomicNumber <= 103) {
-    return { gridRow: 10, gridColumn: atomicNumber - 90 + 3 };
+  if (atomicNumber >= 89 && atomicNumber <= 103) {
+    return {
+      gridRow: 11,
+      gridColumn: atomicNumber - 89 + 3 + gridColumnOffset,
+    };
   }
   return {};
 };
+
+const columnHeaders = [
+  { group: 1, row: 1, col: 2 },
+  { group: 2, row: 2, col: 3 },
+  { group: 3, row: 4, col: 4 },
+  { group: 4, row: 4, col: 5 },
+  { group: 5, row: 4, col: 6 },
+  { group: 6, row: 4, col: 7 },
+  { group: 7, row: 4, col: 8 },
+  { group: 8, row: 4, col: 9 },
+  { group: 9, row: 4, col: 10 },
+  { group: 10, row: 4, col: 11 },
+  { group: 11, row: 4, col: 12 },
+  { group: 12, row: 4, col: 13 },
+  { group: 13, row: 2, col: 14 },
+  { group: 14, row: 2, col: 15 },
+  { group: 15, row: 2, col: 16 },
+  { group: 16, row: 2, col: 17 },
+  { group: 17, row: 2, col: 18 },
+  { group: 18, row: 1, col: 19 },
+];
 
 export const PeriodicTable = () => {
   const {
@@ -323,6 +356,26 @@ export const PeriodicTable = () => {
           transform: `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`,
         }}
       >
+        {columnHeaders.map(({ group, row, col }) => (
+          <div
+            key={`col-header-${group}`}
+            className={styles.columnHeader}
+            style={{ gridRow: row, gridColumn: col }}
+          >
+            {group}
+          </div>
+        ))}
+
+        {Array.from({ length: 7 }, (_, i) => (
+          <div
+            key={`row-header-${i}`}
+            className={styles.rowHeader}
+            style={{ gridRow: i + 2, gridColumn: 1 }}
+          >
+            {i + 1}
+          </div>
+        ))}
+
         <LegendAndExample />
         {elements.map((element) => {
           const isActive = element.name === selectedElementName;

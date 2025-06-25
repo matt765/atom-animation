@@ -16,11 +16,35 @@
 
 .table {
   display: grid;
-  grid-template-columns: repeat(18, 85px);
-  grid-template-rows: repeat(10, 85px);
+  grid-template-columns: 30px repeat(18, 85px);
+  grid-template-rows: 30px repeat(7, 85px) 20px repeat(2, 85px);
   gap: 5px;
   will-change: transform;
   transform-origin: 0 0;
+  padding: 10px;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #aaa;
+  font-family: var(--font-geist-mono);
+  font-weight: bold;
+  pointer-events: none;
+  padding-bottom: 4px;
+}
+
+.rowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #aaa;
+  font-family: var(--font-geist-mono);
+  font-weight: bold;
+  pointer-events: none;
 }
 
 .element {
@@ -116,17 +140,16 @@
 }
 
 .legendAndExampleContainer {
-  grid-column: 3 / 13;
-  grid-row: 0 / 6;
-  margin-top: 6rem;
-  margin-right: 1rem;
+  grid-column: 4 / 14;
+  grid-row: 1 / 5;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
   gap: 0rem;
   pointer-events: none;
   padding: 0.5rem;
-
+  margin-right: 2rem;
+  margin-bottom: 1rem;
 }
 
 .legendContainer {
