@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import styles from "./BottomMenuMobile.module.css";
-import { useAppStore, useCurrentElement } from "../../../store/appStore";
+import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
 import { elements } from "../../AtomModel/elementsData";
 import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
 import { ParticleControl } from "./ParticleControl";
@@ -15,7 +15,7 @@ const PARTICLE_LIMIT = 300;
 
 export const BottomMenuMobile = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const element = useCurrentElement();
+  const element = useAppStore(deriveCurrentElement);
   const {
     sliderValue,
     setSliderValue,

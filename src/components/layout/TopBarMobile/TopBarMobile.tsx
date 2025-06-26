@@ -2,7 +2,7 @@
 
 import React from "react";
 import styles from "./TopBarMobile.module.css";
-import { useCurrentElement } from "@/store/appStore"; // Poprawiona ścieżka importu
+import { useAppStore, deriveCurrentElement } from "@/store/appStore";
 
 /**
  * TopBarMobile component
@@ -10,7 +10,7 @@ import { useCurrentElement } from "@/store/appStore"; // Poprawiona ścieżka im
  * It is a fixed bar that is always visible.
  */
 export const TopBarMobile = () => {
-  const element = useCurrentElement();
+  const element = useAppStore(deriveCurrentElement);
 
   return (
     <div className={styles.topBar}>

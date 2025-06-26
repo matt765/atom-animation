@@ -77,7 +77,7 @@ const initialState: AppState = {
   protons: 8,
   neutrons: 8,
   electrons: 8,
-  selectedElementName: "Oxygen",
+  selectedElementName: "Titanium",
   refreshCounter: 0,
   shakeCounter: 0,
   isInputFocused: false,
@@ -98,11 +98,9 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
   },
 
   showGroupInfo: (group: GroupData) => {
-    // Jeśli panel na tablicy jest już otwarty, podmień tylko content.
     if (get().panelMode === "periodic-table") {
       set({ infoPanelContent: { type: "group", data: group } });
     } else {
-      // W przeciwnym razie otwórz go na nowo na środku.
       set({
         panelMode: "periodic-table",
         infoPanelContent: { type: "group", data: group },
@@ -136,7 +134,7 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
 
     const panelWidth = 480;
     const panelHeight = 600;
-const x = window.innerWidth - panelWidth - (window.innerWidth * 0.15);
+    const x = window.innerWidth - panelWidth - window.innerWidth * 0.15;
     const y = (window.innerHeight - panelHeight) / 2;
 
     set({
@@ -144,7 +142,7 @@ const x = window.innerWidth - panelWidth - (window.innerWidth * 0.15);
       infoPanelContent: content,
       isCameraAnimating: true,
       panelPosition: { x: Math.max(10, x), y: Math.max(10, y) },
-      isPanelManuallyPositioned: false,
+      isPanelManuallyPositioned: true,
     });
   },
 
@@ -186,13 +184,11 @@ const x = window.innerWidth - panelWidth - (window.innerWidth * 0.15);
             position
           );
         } else {
-          // Jeśli panel na tablicy jest już otwarty, podmień tylko content.
           if (get().panelMode === "periodic-table") {
             set({
               infoPanelContent: { type: "element", data: extendedElement },
             });
           } else {
-            // W przeciwnym razie otwórz go na nowo na środku.
             set({
               panelMode: "periodic-table",
               infoPanelContent: { type: "element", data: extendedElement },
@@ -212,7 +208,7 @@ const x = window.innerWidth - panelWidth - (window.innerWidth * 0.15);
   resetActionCounters: () => set({ refreshCounter: 0, shakeCounter: 0 }),
   setInputFocus: (isFocused) => set({ isInputFocused: isFocused }),
   resetToDefaults: () => {
-    const defaultElement = elements.find((el) => el.name === "Oxygen");
+    const defaultElement = elements.find((el) => el.name === "Titanium");
     if (defaultElement) {
       set({
         sliderValue: 50,
