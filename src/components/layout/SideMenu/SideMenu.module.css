@@ -1,31 +1,48 @@
-/* src/components/layout/SideMenu/SideMenu.module.css */
 .sideMenuContainer {
   position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  box-sizing: border-box;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   z-index: 1000;
 }
 
-.toggleButton {
-  background-color: #2a2a2a;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 10px 15px;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 14px;
-  text-align: center;
-  transition: background-color 0.2s;
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  /* background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 9999px; 
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px,
+    rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+  backdrop-filter: blur(15px); */
 }
 
-.toggleButton:hover {
-  background-color: #3a3a3a;
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  background-color: rgba(45, 55, 72, 0.8);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 50%; /* Kluczowa zmiana - tworzy okrąg */
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.navButton:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background-color: rgba(71, 85, 105, 0.8);
+}
+
+.navButton.active {
+  color: #3bc3e2; /* Morski/jasnoniebieski kolor ikony */
+  /* border-color: #3bc3e2; */
+  /* background-color: rgba(59, 195, 226, 0.15); */
+  box-shadow: 0 0 12px rgba(59, 195, 226, 0.5);
 }

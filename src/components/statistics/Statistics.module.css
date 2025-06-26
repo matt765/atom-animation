@@ -1,0 +1,92 @@
+.container {
+  width: 100%;
+  height: 100%;
+  padding: 2rem 2rem 2rem 10rem; /* Increased left padding to not overlap with SideMenu */
+  box-sizing: border-box;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #f8fafc;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.controls {
+  display: flex;
+}
+
+.filterInput {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background-color: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  color: #e2e8f0;
+  width: 300px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filterInput:focus {
+  outline: none;
+  border-color: #3bc3e2;
+  box-shadow: 0 0 10px rgba(59, 195, 226, 0.5);
+}
+
+.tableContainer {
+  flex-grow: 1;
+  overflow: auto; /* Makes only the table scrollable */
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.table th {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  background-color: rgba(15, 23, 42, 0.5);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease-in-out;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(59, 195, 226, 0.1);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}

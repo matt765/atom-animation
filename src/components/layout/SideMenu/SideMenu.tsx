@@ -1,23 +1,42 @@
-// src/components/layout/SideMenu/SideMenu.tsx
 "use client";
 
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./SideMenu.module.css";
+import { AtomIcon } from "@/assets/icons/AtomIcon";
+import { PeriodicTableIcon } from "@/assets/icons/PeriodicTableIcon";
+import { ChartIcon } from "@/assets/icons/ChartIcon";
+
+const navItems = [
+  { href: "/", label: "Atom Model", icon: <AtomIcon /> },
+  {
+    href: "/periodic-table",
+    label: "Periodic Table",
+    icon: <PeriodicTableIcon />,
+  },
+  { href: "/statistics", label: "Statistics", icon: <ChartIcon /> },
+];
 
 export const SideMenu = () => {
   const pathname = usePathname();
 
-  const isPeriodicTable = pathname === "/periodic-table";
-  const href = isPeriodicTable ? "/" : "/periodic-table";
-  const buttonText = isPeriodicTable ? "Show 3D Model" : "Show Periodic Table";
-
   return (
     <div className={styles.sideMenuContainer}>
-      <Link href={href} className={styles.toggleButton}>
-        {buttonText}
-      </Link>
+      <nav className={styles.nav}>
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`${styles.navButton} ${
+              pathname === item.href ? styles.active : ""
+            }`}
+            title={item.label}
+          >
+            {item.icon}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 };
