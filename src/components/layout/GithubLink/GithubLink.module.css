@@ -1,0 +1,16 @@
+.githubLink {
+  position: fixed;
+  top: 1rem;
+  right: 1.25rem;
+  z-index: 1001;
+  color: #a0a0a0; /* Domyślny kolor ikony (np. szary) */
+  opacity: 0.6;   /* Domyślna przezroczystość */
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, color 0.2s ease-in-out;
+  max-width: 2rem;
+}
+
+.githubLink:hover {
+   color: #a0a0a0; /* Kolor ikony po najechaniu (np. biały) */
+  opacity: 1;
+  transform: scale(1.1);
+}

@@ -17,6 +17,7 @@ import { BottomMenu } from "./BottomMenu/BottomMenu";
 import { BottomMenuMobile } from "./BottomMenu/BottomMenuMobile";
 import { SideMenu } from "./SideMenu/SideMenu";
 import { TopBarMobile } from "./TopBarMobile/TopBarMobile";
+import { GitHubLink } from "./GithubLink/GithubLink";
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -127,6 +128,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className={styles.mainContainer}>
+      <GitHubLink />
       {!isMobile && <SideMenu />}
       {isMobile && showControls && <TopBarMobile />}
 
