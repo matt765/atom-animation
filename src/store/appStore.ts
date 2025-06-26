@@ -132,9 +132,9 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  protons: 6,
-  neutrons: 6,
-  electrons: 6,
+  protons: 22,
+  neutrons: 26,
+  electrons: 22,
   sliderValue: 25,
   isPanelVisible: false,
   panelPosition: { x: 0, y: 0 },

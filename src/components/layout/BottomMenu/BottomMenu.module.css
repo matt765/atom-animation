@@ -137,8 +137,8 @@
 
 .rightPanel input[type="range"] {
   --slider-fill-percentage: 50%;
-  --track-bg: #1e293b;
-  --fill-bg: linear-gradient(90deg, #2fb7c9, #165263);
+  --track-bg: #3a737365;
+  --fill-bg: linear-gradient(90deg, #2fb7c9, #6bc6c6);
   -webkit-appearance: none;
   appearance: none;
   width: 160px;

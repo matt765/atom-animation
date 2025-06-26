@@ -1,6 +1,6 @@
 .sideMenuContainer {
   position: fixed;
-  left: 0.5rem;
+  left: 0rem;
   top: 50%;
   transform: translateY(-50%);
   z-index: 1000;
