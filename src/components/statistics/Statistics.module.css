@@ -176,6 +176,7 @@
   text-align: left;
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
   white-space: nowrap;
+   
 }
 
 .table th {
@@ -198,27 +199,11 @@
   gap: 0.5rem;
 }
 
-.table tbody tr:hover {
+.table tbody tr {
   background-color: rgba(255,255,255,0.01);
 }
 
-/* Scrollbar Styles */
-.tableContainer::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+.table tbody td {
+  background-color: rgba(255,255,255,0.01);
 }
 
-.tableContainer::-webkit-scrollbar-track {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.tableContainer::-webkit-scrollbar-thumb {
-  background-color: rgba(148, 163, 184, 0.3);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.tableContainer::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(148, 163, 184, 0.5);
-}

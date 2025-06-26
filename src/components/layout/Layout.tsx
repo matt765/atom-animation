@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Layout.module.css";
 import { InfoPanel } from "../AtomModel/InfoPanel";
@@ -14,7 +14,26 @@ import {
 
 import { useAppStore, useCurrentElement } from "../../store/appStore";
 import { BottomMenu } from "./BottomMenu/BottomMenu";
+import { BottomMenuMobile } from "./BottomMenu/BottomMenuMobile";
 import { SideMenu } from "./SideMenu/SideMenu";
+import { TopBarMobile } from "./TopBarMobile/TopBarMobile";
+
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 1280);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  return isMobile;
+};
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
@@ -28,8 +47,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const current3DElement = useCurrentElement();
   const pathname = usePathname();
-  const isPeriodicTable = pathname === "/periodic-table";
-  const isStatistics = pathname === "/statistics"; // Dodajemy flagę dla strony statystyk
+  const isMobile = useIsMobile();
+
+  // On mobile, we assume only the main page with the atom model is available.
+  const isMainPage = isMobile ? true : pathname === "/";
+  const isPeriodicTable = !isMobile && pathname === "/periodic-table";
+  const isStatistics = !isMobile && pathname === "/statistics";
 
   const clickOutsideTracker = useRef<{ x: number; y: number } | null>(null);
 
@@ -48,8 +71,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
       const onInfoPanel = target.closest('[class*="InfoPanel_panel"]');
       const onBottomMenu = target.closest('[class*="BottomMenu_bottomMenu"]');
+      const onBottomMenuMobile = target.closest(
+        '[class*="BottomMenuMobile_bottomMenuMobile"]'
+      );
+      const onTopBarMobile = target.closest('[class*="TopBarMobile_topBar"]');
 
-      if (onInfoPanel || onBottomMenu) {
+      if (onInfoPanel || onBottomMenu || onBottomMenuMobile || onTopBarMobile) {
         return;
       }
 
@@ -95,15 +122,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     ? infoPanelContent
     : { type: "element" as const, data: current3DElement };
 
-  // Sprawdzamy, czy pokazać BottomMenu
-  const showBottomMenu = !isPeriodicTable && !isStatistics;
+  // Determine whether to show any bottom menu
+  const showControls = isMainPage && !isPeriodicTable && !isStatistics;
 
   return (
     <div className={styles.mainContainer}>
-      <SideMenu />
-      <main className={styles.main}> {children}</main>
+      {!isMobile && <SideMenu />}
+      {isMobile && showControls && <TopBarMobile />}
 
-      {showBottomMenu && <BottomMenu />}
+      <main className={`${styles.main} ${isMobile ? styles.mobileLayout : ""}`}>
+        {" "}
+        {children}
+      </main>
+
+      {showControls && (isMobile ? <BottomMenuMobile /> : <BottomMenu />)}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {isPanelVisible && contentForPanel && (
