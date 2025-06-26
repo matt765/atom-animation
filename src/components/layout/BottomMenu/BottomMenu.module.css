@@ -41,6 +41,71 @@
   width: 100%;
 }
 
+.elementSelectContainer {
+  display: flex;
+  align-items: center;
+}
+
+.elementSelect {
+  width: 150px;
+  height: 2.2rem;
+  background-color: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-left: none;
+  border-right: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0 0.5rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.elementSelect:focus {
+  outline: none;
+  border-top-color: rgba(56, 210, 248, 0.4);
+  border-bottom-color: rgba(56, 210, 248, 0.4);
+}
+
+.elementArrowButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  background: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: 0.2s;
+  font-size: 1rem;
+}
+
+.elementArrowButton:first-of-type {
+  border-radius: 7px 0 0 7px;
+}
+
+.elementArrowButton:last-of-type {
+  border-radius: 0 7px 7px 0;
+}
+
+.elementArrowButton:hover {
+  border-color: rgba(56, 210, 248, 0.4);
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.elementArrowButton:active {
+  transform: scale(0.95);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .legend {
   display: flex;
   justify-content: center;
