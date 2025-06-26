@@ -1,13 +1,19 @@
 "use client";
 
 import React, { useRef, useMemo, useEffect, useCallback } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 import styles from "./AtomModel.module.css";
-import { useAppStore, useCurrentElement } from "../../store/appStore";
+import { useAppStore, deriveCurrentElement } from "../../store/appStore";
+
+const DETAILED_VIEW_CONFIG = {
+  ATOM_POSITION: new THREE.Vector3(-16, 0, 0),
+  CAMERA_TARGET: new THREE.Vector3(-12, 0, 0),
+  CAMERA_POSITION: new THREE.Vector3(-12, 2, 14),
+};
 
 const KeyboardRotator = ({
   modelGroupRef,
@@ -83,30 +89,65 @@ const KeyboardRotator = ({
 
 const ScenePhysics = ({
   modelGroupRef,
+  controlsRef,
   linearVelocity,
   rotationAxis,
   rotationSpeed,
+  targetPosition,
+  targetCameraPosition,
+  targetControlsTarget,
+  isCameraAnimating,
+  setIsCameraAnimating,
 }: {
   modelGroupRef: React.RefObject<THREE.Group>;
+  controlsRef: React.RefObject<OrbitControlsImpl>;
   linearVelocity: React.RefObject<THREE.Vector3>;
   rotationAxis: React.RefObject<THREE.Vector3>;
   rotationSpeed: React.RefObject<number>;
+  targetPosition: React.RefObject<THREE.Vector3>;
+  targetCameraPosition: React.RefObject<THREE.Vector3>;
+  targetControlsTarget: React.RefObject<THREE.Vector3>;
+  isCameraAnimating: boolean;
+  setIsCameraAnimating: (isAnimating: boolean) => void;
 }) => {
+  const { camera } = useThree();
+
   useFrame((_, delta) => {
-    if (!modelGroupRef.current) return;
+    const model = modelGroupRef.current;
+    const controls = controlsRef.current;
+
+    if (!model || !controls) return;
+
     if (Math.abs(rotationSpeed.current) > 0.01) {
-      const angleThisFrame = rotationSpeed.current * delta;
-      modelGroupRef.current.rotateOnAxis(rotationAxis.current, angleThisFrame);
+      model.rotateOnAxis(rotationAxis.current, rotationSpeed.current * delta);
       rotationSpeed.current *= 0.99;
     }
+
     if (linearVelocity.current.lengthSq() > 0.0001) {
-      modelGroupRef.current.position.add(
-        linearVelocity.current.clone().multiplyScalar(delta)
-      );
+      model.position.add(linearVelocity.current.clone().multiplyScalar(delta));
       linearVelocity.current.multiplyScalar(0.95);
-    } else if (modelGroupRef.current.position.lengthSq() > 0.0001) {
-      modelGroupRef.current.position.lerp(new THREE.Vector3(0, 0, 0), 0.05);
+      controls.target.copy(model.position);
+    } else {
+      if (isCameraAnimating) {
+        const smoothingFactor = 0.05;
+        model.position.lerp(targetPosition.current, smoothingFactor);
+        camera.position.lerp(targetCameraPosition.current, smoothingFactor);
+        controls.target.lerp(targetControlsTarget.current, smoothingFactor);
+
+        const modelDist = model.position.distanceTo(targetPosition.current);
+        const cameraDist = camera.position.distanceTo(
+          targetCameraPosition.current
+        );
+        const controlsDist = controls.target.distanceTo(
+          targetControlsTarget.current
+        );
+
+        if (modelDist < 0.01 && cameraDist < 0.01 && controlsDist < 0.01) {
+          setIsCameraAnimating(false);
+        }
+      }
     }
+    controls.update();
   });
 
   return null;
@@ -273,8 +314,11 @@ export const AtomModel = () => {
     setSelectedElement,
     isInputFocused,
     shakeCounter,
+    panelMode,
+    isCameraAnimating,
+    setIsCameraAnimating,
   } = useAppStore();
-  const element = useCurrentElement();
+  const element = useAppStore(deriveCurrentElement);
 
   const modelGroupRef = useRef<THREE.Group>(null!);
   const controlsRef = useRef<OrbitControlsImpl>(null!);
@@ -289,6 +333,26 @@ export const AtomModel = () => {
   const linearVelocity = useRef(new THREE.Vector3(0, 0, 0));
   const rotationAxis = useRef(new THREE.Vector3(0, 1, 0));
   const rotationSpeed = useRef(0);
+  const targetPosition = useRef(new THREE.Vector3(0, 0, 0));
+  const targetCameraPosition = useRef(
+    new THREE.Vector3(
+      CONFIG.cameraPosition.x,
+      CONFIG.cameraPosition.y,
+      CONFIG.cameraPosition.z
+    )
+  );
+  const targetControlsTarget = useRef(new THREE.Vector3(0, 0, 0));
+
+  useEffect(() => {
+    if (panelMode === "detailed") {
+      targetPosition.current.copy(DETAILED_VIEW_CONFIG.ATOM_POSITION);
+      targetControlsTarget.current.copy(DETAILED_VIEW_CONFIG.CAMERA_TARGET);
+      targetCameraPosition.current.copy(DETAILED_VIEW_CONFIG.CAMERA_POSITION);
+      setIsCameraAnimating(true);
+    }
+    // Usunięto blok 'else', aby atom nie wracał na środek po zamknięciu panelu.
+    // Powrót odbywa się teraz tylko przez przycisk Reset.
+  }, [panelMode, setIsCameraAnimating]);
 
   useEffect(() => {
     if (refreshCounter > 0) {
@@ -298,15 +362,19 @@ export const AtomModel = () => {
           CONFIG.initialRotation.y,
           CONFIG.initialRotation.z
         );
-        modelGroupRef.current.position.set(0, 0, 0);
+        targetPosition.current.set(0, 0, 0);
+        targetControlsTarget.current.set(0, 0, 0);
+        targetCameraPosition.current.set(
+          CONFIG.cameraPosition.x,
+          CONFIG.cameraPosition.y,
+          CONFIG.cameraPosition.z
+        );
         linearVelocity.current.set(0, 0, 0);
         rotationSpeed.current = 0;
-      }
-      if (controlsRef.current) {
-        controlsRef.current.reset();
+        setIsCameraAnimating(true);
       }
     }
-  }, [refreshCounter]);
+  }, [refreshCounter, setIsCameraAnimating]);
 
   const triggerShake = useCallback(() => {
     const linearStrength = 2;
@@ -377,6 +445,12 @@ export const AtomModel = () => {
     });
   }, [element]);
 
+  const handleControlsStart = useCallback(() => {
+    if (isCameraAnimating) {
+      setIsCameraAnimating(false);
+    }
+  }, [isCameraAnimating, setIsCameraAnimating]);
+
   return (
     <div className={styles.animationContainer}>
       <Canvas
@@ -410,7 +484,12 @@ export const AtomModel = () => {
             );
           })}
         </group>
-        <OrbitControls ref={controlsRef} enableZoom enablePan />
+        <OrbitControls
+          ref={controlsRef}
+          enableZoom
+          enablePan
+          onStart={handleControlsStart}
+        />
         <KeyboardRotator
           modelGroupRef={modelGroupRef}
           rotationState={rotationState}
@@ -418,9 +497,15 @@ export const AtomModel = () => {
         />
         <ScenePhysics
           modelGroupRef={modelGroupRef}
+          controlsRef={controlsRef}
           linearVelocity={linearVelocity}
           rotationAxis={rotationAxis}
           rotationSpeed={rotationSpeed}
+          targetPosition={targetPosition}
+          targetCameraPosition={targetCameraPosition}
+          targetControlsTarget={targetControlsTarget}
+          isCameraAnimating={isCameraAnimating}
+          setIsCameraAnimating={setIsCameraAnimating}
         />
       </Canvas>
     </div>

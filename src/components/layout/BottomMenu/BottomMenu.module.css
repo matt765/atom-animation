@@ -234,6 +234,12 @@
     "weight weight";
   align-items: center;
   overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.elementDisplay:hover {
+  border-color: rgba(59, 195, 226, 0.5);
 }
 
 .wideDisplay {
@@ -327,7 +333,7 @@
   padding: 0;
   background: rgb(255, 255, 255, 0.02);
   border: 1px solid rgba(148, 163, 184, 0.2);
-  color: rgba(255, 255, 255, 0.7); /* Ustawiamy domyślny kolor ikony */
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -341,7 +347,7 @@
 .actionButton:hover {
   border-color: rgba(56, 210, 248, 0.4);
   background: rgb(255, 255, 255, 0.05);
-  color: white; /* Zmieniamy kolor ikony na biały po najechaniu */
+  color: white;
 }
 
 .actionButton:active {

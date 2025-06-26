@@ -11,8 +11,9 @@ import {
   useSensors,
   DragEndEvent,
 } from "@dnd-kit/core";
+import { createPortal } from "react-dom";
 
-import { useAppStore, useCurrentElement } from "../../store/appStore";
+import { useAppStore, deriveCurrentElement } from "../../store/appStore";
 import { BottomMenu } from "./BottomMenu/BottomMenu";
 import { BottomMenuMobile } from "./BottomMenu/BottomMenuMobile";
 import { SideMenu } from "./SideMenu/SideMenu";
@@ -38,19 +39,20 @@ const useIsMobile = () => {
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
-    isPanelVisible,
+    panelMode,
     panelPosition,
     infoPanelContent,
     hideInfoPanel,
     setPanelPosition,
+    setPanelManuallyPositioned,
     resetActionCounters,
+    isNavigating,
   } = useAppStore();
 
-  const current3DElement = useCurrentElement();
+  const current3DElement = useAppStore(deriveCurrentElement);
   const pathname = usePathname();
   const isMobile = useIsMobile();
 
-  // On mobile, we assume only the main page with the atom model is available.
   const isMainPage = isMobile ? true : pathname === "/";
   const isPeriodicTable = !isMobile && pathname === "/periodic-table";
   const isStatistics = !isMobile && pathname === "/statistics";
@@ -59,12 +61,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     hideInfoPanel();
-    setPanelPosition({ x: 0, y: 0 });
     resetActionCounters();
-  }, [pathname, hideInfoPanel, setPanelPosition, resetActionCounters]);
+  }, [pathname, hideInfoPanel, resetActionCounters]);
 
   useEffect(() => {
-    if (!isPanelVisible || isPeriodicTable) return;
+    const isPanelVisible = panelMode !== "hidden";
+
+    // Zamykanie panelu po kliknięciu na zewnątrz działa dla trybu 'default' i 'detailed'
+    if (!isPanelVisible || panelMode === "periodic-table") return;
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
@@ -76,8 +80,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         '[class*="BottomMenuMobile_bottomMenuMobile"]'
       );
       const onTopBarMobile = target.closest('[class*="TopBarMobile_topBar"]');
+      const onGitHubLink = target.closest('a[href*="github.com"]');
 
-      if (onInfoPanel || onBottomMenu || onBottomMenuMobile || onTopBarMobile) {
+      if (
+        onInfoPanel ||
+        onBottomMenu ||
+        onBottomMenuMobile ||
+        onTopBarMobile ||
+        onGitHubLink
+      ) {
         return;
       }
 
@@ -92,7 +103,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         );
         if (dist < 5) {
           hideInfoPanel();
-          setPanelPosition({ x: 0, y: 0 });
         }
       }
       clickOutsideTracker.current = null;
@@ -103,7 +113,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isPanelVisible, hideInfoPanel, setPanelPosition, isPeriodicTable]);
+  }, [panelMode, hideInfoPanel]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -113,27 +123,35 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { delta } = event;
+    const currentPosition = useAppStore.getState().panelPosition;
     setPanelPosition({
-      x: panelPosition.x + delta.x,
-      y: panelPosition.y + delta.y,
+      x: currentPosition.x + delta.x,
+      y: currentPosition.y + delta.y,
     });
+    setPanelManuallyPositioned(true);
   };
 
   const contentForPanel = isPeriodicTable
     ? infoPanelContent
     : { type: "element" as const, data: current3DElement };
 
-  // Determine whether to show any bottom menu
   const showControls = isMainPage && !isPeriodicTable && !isStatistics;
+  const isPanelVisible = panelMode !== "hidden";
 
   return (
     <div className={styles.mainContainer}>
+      {isNavigating &&
+        createPortal(
+          <div className={styles.fullScreenLoader}>
+            <div className={styles.loaderSpinner}></div>
+          </div>,
+          document.body
+        )}
       <GitHubLink />
       {!isMobile && <SideMenu />}
       {isMobile && showControls && <TopBarMobile />}
 
       <main className={`${styles.main} ${isMobile ? styles.mobileLayout : ""}`}>
-        {" "}
         {children}
       </main>
 
@@ -144,8 +162,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <InfoPanel
             content={contentForPanel}
             position={panelPosition}
-            isCentered={isPeriodicTable}
-            isOnPeriodicTableView={isPeriodicTable}
+            mode={panelMode}
           />
         )}
       </DndContext>

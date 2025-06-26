@@ -1,4 +1,4 @@
-import { ElementConfig } from "./elementsData";
+import { ElementConfig, elements } from "./elementsData";
 
 export type ElementCategory =
   | "alkali-metal"
@@ -40,4 +40,29 @@ export const getElementCategory = (element: ElementConfig): ElementCategory => {
   if (nonmetals.includes(protons)) return "nonmetal";
 
   return "unknown";
+};
+
+export const getElementByProtons = (protons: number): ElementConfig => {
+  const element = elements.find((el) => el.protons === protons);
+  if (element) {
+    return element;
+  }
+
+  return {
+    name: "Unknown",
+    symbol: "X",
+    title: "Custom Particle",
+    description: "A custom particle with a specified number of protons.",
+    protons: protons,
+    neutrons: 0,
+    atomicWeight: protons.toString(),
+    electronConfiguration: "Custom",
+    stateAtSTP: "Unknown",
+    group: -1,
+    period: -1,
+    stableNeutrons: [],
+    shells: [],
+    meltingPointK: null,
+    boilingPointK: null,
+  };
 };

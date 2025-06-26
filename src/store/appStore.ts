@@ -1,223 +1,262 @@
 import { create } from "zustand";
-import { ElementConfig, elements } from "../components/AtomModel/elementsData";
-import { GroupData } from "../components/AtomModel/groupsData";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { elements, ElementConfig } from "../components/AtomModel/elementsData";
+import { getElementByProtons } from "../components/AtomModel/elementUtils";
+import { GroupData } from "@/components/AtomModel/groupsData";
 
-export type ExtendedElementConfig = ElementConfig & {
+export interface ExtendedElementConfig extends ElementConfig {
+  electrons: number;
   isIsotope: boolean;
   isStable: boolean;
   charge: number;
   defaultNeutrons: number;
-  electrons: number;
-};
+}
 
 export type InfoPanelContent =
   | { type: "element"; data: ExtendedElementConfig }
   | { type: "group"; data: GroupData };
 
-const UNKNOWN_ELEMENT: ElementConfig = {
-  name: "Unknown",
-  symbol: "?",
-  protons: 0,
-  neutrons: 0,
-  stableNeutrons: [],
-  shells: [],
-  atomicWeight: "—",
-  electronConfiguration: "[Unknown]",
-  title: "Custom Particle",
-  description:
-    "This combination of particles does not correspond to a known element. You are exploring the frontiers of physics!",
-  group: 0,
-  period: 0,
-  stateAtSTP: "Unknown",
-  meltingPointK: null,
-  boilingPointK: null,
-};
+type PanelMode = "hidden" | "default" | "detailed" | "periodic-table";
 
-const calculateShells = (electronCount: number): number[] => {
-  if (electronCount <= 0) return [];
-  const shells: number[] = [];
-  let remainingElectrons = electronCount;
-  const shellCapacities = [2, 8, 18, 32, 32, 18, 8];
-
-  for (const capacity of shellCapacities) {
-    if (remainingElectrons > 0) {
-      const electronsInShell = Math.min(remainingElectrons, capacity);
-      shells.push(electronsInShell);
-      remainingElectrons -= electronsInShell;
-    } else {
-      break;
-    }
-  }
-  if (remainingElectrons > 0) {
-    shells.push(remainingElectrons);
-  }
-  return shells;
-};
-
-const calculateExtendedElementConfig = (
-  protons: number,
-  neutrons: number,
-  electrons: number
-): ExtendedElementConfig => {
-  const baseElement = elements.find((el) => el.protons === protons);
-  const charge = protons - electrons;
-
-  if (!baseElement) {
-    return {
-      ...UNKNOWN_ELEMENT,
-      protons,
-      neutrons,
-      electrons,
-      atomicWeight: (protons + neutrons).toString(),
-      shells: calculateShells(electrons),
-      isIsotope: true,
-      isStable: false,
-      charge,
-      defaultNeutrons: 0,
-    };
-  }
-
-  const isIsotope = baseElement.neutrons !== neutrons;
-  const isStable = baseElement.stableNeutrons.includes(neutrons);
-
-  return {
-    ...baseElement,
-    protons,
-    neutrons,
-    electrons,
-    atomicWeight: (protons + neutrons).toString(),
-    shells: calculateShells(electrons),
-    isIsotope,
-    isStable,
-    charge,
-    defaultNeutrons: baseElement.neutrons,
-  };
-};
-
-interface AppState {
+type AppState = {
+  panelMode: PanelMode;
+  isPanelManuallyPositioned: boolean;
+  panelPosition: { x: number; y: number };
+  infoPanelContent: InfoPanelContent | null;
+  sliderValue: number;
   protons: number;
   neutrons: number;
   electrons: number;
-  sliderValue: number;
-  isPanelVisible: boolean;
-  panelPosition: { x: number; y: number };
-  infoPanelContent: InfoPanelContent | null;
-  isNavigating: boolean;
+  selectedElementName: string;
   refreshCounter: number;
   shakeCounter: number;
   isInputFocused: boolean;
+  isNavigating: boolean;
+  isCameraAnimating: boolean;
+};
 
+type AppActions = {
+  showInfoPanel: (
+    content: InfoPanelContent,
+    position?: { x: number; y: number }
+  ) => void;
+  showGroupInfo: (group: GroupData) => void;
+  hideInfoPanel: () => void;
+  setPanelPosition: (position: { x: number; y: number }) => void;
+  setPanelManuallyPositioned: (isManual: boolean) => void;
+  showDetailedView: () => void;
+  setSliderValue: (value: number) => void;
   setParticles: (particles: {
     protons?: number;
     neutrons?: number;
     electrons?: number;
   }) => void;
   setSelectedElement: (
-    elementName: string,
+    name: string,
     position?: { x: number; y: number },
-    shouldShowPanel?: boolean
+    showPanel?: boolean
   ) => void;
-  showGroupInfo: (group: GroupData) => void;
-  updateParticlesFromElement: (elementName: string) => void;
-  navigateToHomepage: (router: AppRouterInstance, elementName: string) => void;
-  setSliderValue: (value: number) => void;
-  setInputFocus: (isFocused: boolean) => void;
-  hideInfoPanel: () => void;
-  setPanelPosition: (position: { x: number; y: number }) => void;
   triggerRefresh: () => void;
   triggerShake: () => void;
-  resetActionCounters: () => void;
   resetToDefaults: () => void;
-}
+  resetActionCounters: () => void;
+  setInputFocus: (isFocused: boolean) => void;
+  navigateToHomepage: (
+    router: AppRouterInstance,
+    elementName: string
+  ) => Promise<void>;
+  setIsCameraAnimating: (isAnimating: boolean) => void;
+};
 
-export const useAppStore = create<AppState>((set, get) => ({
-  protons: 22,
-  neutrons: 26,
-  electrons: 22,
-  sliderValue: 25,
-  isPanelVisible: false,
+const initialState: AppState = {
+  panelMode: "hidden",
+  isPanelManuallyPositioned: false,
   panelPosition: { x: 0, y: 0 },
   infoPanelContent: null,
-  isNavigating: false,
+  sliderValue: 50,
+  protons: 8,
+  neutrons: 8,
+  electrons: 8,
+  selectedElementName: "Oxygen",
   refreshCounter: 0,
   shakeCounter: 0,
   isInputFocused: false,
+  isNavigating: false,
+  isCameraAnimating: false,
+};
 
-  setParticles: (particles) => {
-    set({ ...particles });
-  },
-  updateParticlesFromElement: (elementName) => {
-    const element =
-      elements.find((el) => el.name === elementName) || UNKNOWN_ELEMENT;
+export const useAppStore = create<AppState & AppActions>((set, get) => ({
+  ...initialState,
+
+  showInfoPanel: (content, position) => {
     set({
-      protons: element.protons,
-      neutrons: element.neutrons,
-      electrons: element.protons,
+      panelMode: "default",
+      infoPanelContent: content,
+      panelPosition: position || { x: 0, y: 0 },
+      isPanelManuallyPositioned: !!position,
     });
   },
-  setSelectedElement: (elementName, position, shouldShowPanel = false) => {
-    get().updateParticlesFromElement(elementName);
 
-    if (shouldShowPanel) {
-      const wasPanelVisible = get().isPanelVisible;
-      const element = elements.find((el) => el.name === elementName);
-      if (!element) return;
-
-      const extendedConfig = calculateExtendedElementConfig(
-        element.protons,
-        element.neutrons,
-        element.protons
-      );
+  showGroupInfo: (group: GroupData) => {
+    // Jeśli panel na tablicy jest już otwarty, podmień tylko content.
+    if (get().panelMode === "periodic-table") {
+      set({ infoPanelContent: { type: "group", data: group } });
+    } else {
+      // W przeciwnym razie otwórz go na nowo na środku.
       set({
-        infoPanelContent: { type: "element", data: extendedConfig },
-        isPanelVisible: true,
-        panelPosition:
-          position ?? (wasPanelVisible ? get().panelPosition : { x: 0, y: 0 }),
+        panelMode: "periodic-table",
+        infoPanelContent: { type: "group", data: group },
+        panelPosition: { x: 0, y: 0 },
+        isPanelManuallyPositioned: false,
       });
     }
   },
-  showGroupInfo: (group) => {
-    const wasPanelVisible = get().isPanelVisible;
+
+  hideInfoPanel: () => {
     set({
-      infoPanelContent: { type: "group", data: group },
-      isPanelVisible: true,
+      panelMode: "hidden",
+      infoPanelContent: null,
+      panelPosition: { x: 0, y: 0 },
+      isPanelManuallyPositioned: false,
+      isCameraAnimating: false,
     });
-    if (!wasPanelVisible) {
-      set({ panelPosition: { x: 0, y: 0 } });
+  },
+
+  setPanelPosition: (position) => {
+    set({ panelPosition: position });
+  },
+
+  setPanelManuallyPositioned: (isManual: boolean) => {
+    set({ isPanelManuallyPositioned: isManual });
+  },
+
+  showDetailedView: () => {
+    const element = deriveCurrentElement(get());
+    const content = { type: "element" as const, data: element };
+
+    const panelWidth = 480;
+    const panelHeight = 600;
+const x = window.innerWidth - panelWidth - (window.innerWidth * 0.15);
+    const y = (window.innerHeight - panelHeight) / 2;
+
+    set({
+      panelMode: "detailed",
+      infoPanelContent: content,
+      isCameraAnimating: true,
+      panelPosition: { x: Math.max(10, x), y: Math.max(10, y) },
+      isPanelManuallyPositioned: false,
+    });
+  },
+
+  setSliderValue: (value) => set({ sliderValue: value }),
+
+  setParticles: (newParticles) => {
+    const currentState = get();
+    const {
+      protons = currentState.protons,
+      neutrons,
+      electrons,
+    } = newParticles;
+    const elementData = getElementByProtons(protons);
+
+    set({
+      protons,
+      neutrons: neutrons !== undefined ? neutrons : currentState.neutrons,
+      electrons: electrons !== undefined ? electrons : currentState.electrons,
+      selectedElementName: elementData.name,
+    });
+  },
+
+  setSelectedElement: (name, position, showPanel = true) => {
+    const element = elements.find((el) => el.name === name);
+    if (element) {
+      const newState = {
+        selectedElementName: element.name,
+        protons: element.protons,
+        neutrons: element.neutrons,
+        electrons: element.protons,
+      };
+      set(newState);
+
+      if (showPanel) {
+        const extendedElement = deriveCurrentElement({ ...get(), ...newState });
+        if (position) {
+          get().showInfoPanel(
+            { type: "element", data: extendedElement },
+            position
+          );
+        } else {
+          // Jeśli panel na tablicy jest już otwarty, podmień tylko content.
+          if (get().panelMode === "periodic-table") {
+            set({
+              infoPanelContent: { type: "element", data: extendedElement },
+            });
+          } else {
+            // W przeciwnym razie otwórz go na nowo na środku.
+            set({
+              panelMode: "periodic-table",
+              infoPanelContent: { type: "element", data: extendedElement },
+              panelPosition: { x: 0, y: 0 },
+              isPanelManuallyPositioned: false,
+            });
+          }
+        }
+      }
     }
   },
-  navigateToHomepage: (router, elementName) => {
-    set({ isNavigating: true });
-    get().setSelectedElement(elementName, undefined, false);
 
-    setTimeout(() => {
-      router.push("/");
-    }, 500);
-  },
-  setSliderValue: (value) => set({ sliderValue: value }),
-  setInputFocus: (isFocused) => set({ isInputFocused: isFocused }),
-  hideInfoPanel: () =>
-    set({ isPanelVisible: false, infoPanelContent: null, isNavigating: false }),
-  setPanelPosition: (position) => set({ panelPosition: position }),
   triggerRefresh: () =>
     set((state) => ({ refreshCounter: state.refreshCounter + 1 })),
   triggerShake: () =>
     set((state) => ({ shakeCounter: state.shakeCounter + 1 })),
   resetActionCounters: () => set({ refreshCounter: 0, shakeCounter: 0 }),
+  setInputFocus: (isFocused) => set({ isInputFocused: isFocused }),
   resetToDefaults: () => {
-    const { protons } = get();
-    const element =
-      elements.find((el) => el.protons === protons) || UNKNOWN_ELEMENT;
-    set({
-      neutrons: element.neutrons,
-      electrons: element.protons,
-      sliderValue: 25,
-    });
+    const defaultElement = elements.find((el) => el.name === "Oxygen");
+    if (defaultElement) {
+      set({
+        sliderValue: 50,
+        selectedElementName: defaultElement.name,
+        protons: defaultElement.protons,
+        neutrons: defaultElement.neutrons,
+        electrons: defaultElement.protons,
+        isCameraAnimating: false,
+      });
+    }
   },
+  navigateToHomepage: async (router, elementName) => {
+    set({ isNavigating: true });
+    get().setSelectedElement(elementName, undefined, false);
+    await router.push("/");
+    setTimeout(() => set({ isNavigating: false }), 100);
+  },
+  setIsCameraAnimating: (isAnimating) =>
+    set({ isCameraAnimating: isAnimating }),
 }));
 
-export const useCurrentElement = (): ExtendedElementConfig => {
-  const { protons, neutrons, electrons } = useAppStore();
-  return calculateExtendedElementConfig(protons, neutrons, electrons);
+export const deriveCurrentElement = (
+  state: AppState
+): ExtendedElementConfig => {
+  const { protons, neutrons, electrons, selectedElementName } = state;
+  const baseElement =
+    elements.find((el) => el.name === selectedElementName) ||
+    getElementByProtons(protons);
+
+  const isIsotope = baseElement.neutrons !== neutrons;
+  const charge = protons - electrons;
+
+  const getStability = () => {
+    return baseElement.stableNeutrons.includes(neutrons);
+  };
+
+  return {
+    ...baseElement,
+    protons,
+    neutrons,
+    electrons,
+    isIsotope,
+    charge,
+    isStable: getStability(),
+    defaultNeutrons: baseElement.neutrons,
+  };
 };

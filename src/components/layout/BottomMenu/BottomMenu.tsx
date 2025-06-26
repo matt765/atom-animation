@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from "react";
 import styles from "./BottomMenu.module.css";
 import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
 import { CONFIG } from "../../AtomModel/AtomModel";
-import { useAppStore, useCurrentElement } from "../../../store/appStore";
+import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
 import { elements } from "../../AtomModel/elementsData";
 import { ParticleControl } from "./ParticleControl";
 import { ShakeIcon } from "@/assets/icons/ShakeIcon";
@@ -33,8 +33,9 @@ export const BottomMenu = () => {
     triggerRefresh,
     hideInfoPanel,
     resetToDefaults,
+    showDetailedView,
   } = useAppStore();
-  const element = useCurrentElement();
+  const element = useAppStore(deriveCurrentElement);
   const speedSliderRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,6 +66,13 @@ export const BottomMenu = () => {
     setSelectedElement(newName, undefined, false);
   };
 
+  const handleDisplayClick = () => {
+    // Ta akcja ma zawsze włączać widok szczegółowy.
+    // Zamykanie tego widoku odbywa się poprzez inne akcje (np. kliknięcie poza panelem).
+    // To uproszczenie eliminuje niespójne zachowanie przycisku.
+    showDetailedView();
+  };
+
   const isLongConfig = element.electronConfiguration.split(" ").length >= 5;
 
   return (
@@ -74,6 +82,7 @@ export const BottomMenu = () => {
           className={`${styles.elementDisplay} ${
             isLongConfig ? styles.wideDisplay : ""
           }`}
+          onClick={handleDisplayClick}
         >
           <div className={styles.atomicNumber}>
             {element.protons > 0 ? element.protons : ""}

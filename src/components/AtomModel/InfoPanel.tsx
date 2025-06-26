@@ -14,13 +14,12 @@ import {
 import { elements } from "@/components/AtomModel/elementsData";
 import { GroupData } from "./groupsData";
 import { OutlinedButton } from "../common/OutlinedButton/OutlinedButton";
-import { getElementCategory } from "../AtomModel/elementUtils";
+import { getElementCategory } from "./elementUtils";
 
 type InfoPanelProps = {
   content: InfoPanelContent;
   position: { x: number; y: number };
-  isCentered?: boolean;
-  isOnPeriodicTableView?: boolean;
+  mode: "hidden" | "default" | "detailed" | "periodic-table";
 };
 
 const formatValue = (
@@ -228,26 +227,44 @@ const GroupContent = ({
   );
 };
 
-export const InfoPanel = ({
-  content,
-  position,
-  isCentered = false,
-  isOnPeriodicTableView = false,
-}: InfoPanelProps) => {
+export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
   const [isMounted, setIsMounted] = useState(false);
-  const { hideInfoPanel, setPanelPosition, isNavigating } = useAppStore();
+  const { hideInfoPanel, setPanelPosition, isPanelManuallyPositioned } =
+    useAppStore();
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const [isPositionedByJs, setIsPositionedByJs] = useState(false);
+
+  // Ten stan decyduje, czy panel jest pozycjonowany przez CSS (false) czy JS (true)
+  const [isPositionedByJs, setIsPositionedByJs] = useState(
+    mode !== "periodic-table"
+  );
 
   useEffect(() => {
     setIsMounted(true);
-    setIsPositionedByJs(!isCentered);
-  }, [isCentered]);
+    // Resetuj stan pozycjonowania przy zmianie trybu panelu
+    // Używamy isPanelManuallyPositioned z globalnego store, aby "przeżyć" ponowne renderowanie
+    if (isPanelManuallyPositioned) {
+      setIsPositionedByJs(true);
+    } else {
+      setIsPositionedByJs(mode !== "periodic-table");
+    }
+  }, [mode, isPanelManuallyPositioned]);
 
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
-      id: `draggable-panel-${content?.type}-${content?.data.name}`,
+      id: `draggable-panel-${content.type}-${
+        content.type === "element" ? content.data.name : content.data.title
+      }`,
     });
+
+  // Kiedy zaczynamy przeciągać panel, który był pozycjonowany przez CSS,
+  // odczytujemy jego pozycję i przełączamy go na stałe w tryb pozycjonowania JS.
+  useEffect(() => {
+    if (isDragging && !isPositionedByJs && panelRef.current) {
+      const rect = panelRef.current.getBoundingClientRect();
+      setPanelPosition({ x: rect.left, y: rect.top });
+      setIsPositionedByJs(true);
+    }
+  }, [isDragging, isPositionedByJs, setPanelPosition]);
 
   const combinedRef = useCallback(
     (node: HTMLDivElement) => {
@@ -257,29 +274,13 @@ export const InfoPanel = ({
     [setNodeRef]
   );
 
-  useEffect(() => {
-    if (isDragging && !isPositionedByJs && panelRef.current) {
-      const rect = panelRef.current.getBoundingClientRect();
-      setPanelPosition({ x: rect.left, y: rect.top });
-      setIsPositionedByJs(true);
-    }
-  }, [isDragging, isPositionedByJs, setPanelPosition]);
-
-  const dndTransform = transform ? CSS.Translate.toString(transform) : "";
-
-  const style: React.CSSProperties = isPositionedByJs
-    ? {
-        top: `${position.y}px`,
-        left: `${position.x}px`,
-        transform: dndTransform,
-        position: "fixed",
-      }
-    : {};
-
-  const handleClose = () => {
-    hideInfoPanel();
-    setPanelPosition({ x: 0, y: 0 });
-  };
+  const style: React.CSSProperties = {};
+  if (isPositionedByJs) {
+    style.position = "fixed";
+    style.top = `${position.y}px`;
+    style.left = `${position.x}px`;
+    style.transform = transform ? CSS.Translate.toString(transform) : undefined;
+  }
 
   const getTitle = () => {
     if (!content) return "";
@@ -297,27 +298,22 @@ export const InfoPanel = ({
     return null;
   }
 
-  if (isNavigating) {
-    return createPortal(
-      <div className={styles.fullScreenLoader}>
-        <div className={styles.loaderSpinner}></div>
-        <p>Loading 3D Model...</p>
-      </div>,
-      document.body
-    );
-  }
+  const isPeriodicTableMode = mode === "periodic-table";
+  const isDetailedMode = mode === "detailed";
 
   const panelContent = (
     <div
       ref={combinedRef}
-      className={`${styles.panel} ${!isPositionedByJs ? styles.centered : ""} ${
-        isOnPeriodicTableView ? styles.dark : ""
+      className={`${styles.panel} ${
+        isPeriodicTableMode && !isPositionedByJs ? styles.centered : ""
+      } ${isPeriodicTableMode ? styles.dark : ""} ${
+        isDetailedMode && !isPanelManuallyPositioned ? styles.sideView : ""
       }`}
       style={style}
     >
-      {isOnPeriodicTableView && (
+      {isPeriodicTableMode && (
         <button
-          onClick={handleClose}
+          onClick={hideInfoPanel}
           className={styles.closeButton}
           aria-label="Close panel"
         >
@@ -331,12 +327,12 @@ export const InfoPanel = ({
       {content.type === "element" ? (
         <ElementContent
           element={content.data}
-          isOnPeriodicTableView={isOnPeriodicTableView}
+          isOnPeriodicTableView={isPeriodicTableMode}
         />
       ) : (
         <GroupContent
           group={content.data}
-          isOnPeriodicTableView={isOnPeriodicTableView}
+          isOnPeriodicTableView={isPeriodicTableMode}
         />
       )}
     </div>

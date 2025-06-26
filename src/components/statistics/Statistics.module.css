@@ -1,12 +1,14 @@
 .pageContainer {
-  width: 100%;
+  width: 90vw;
   height: 100%;
-  padding: 2rem 4rem 2rem 10rem;
+  padding: 3rem 6rem 2rem 10rem;
   box-sizing: border-box;
   color: #e2e8f0;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .controlsContainer {
@@ -16,6 +18,7 @@
   flex-shrink: 0;
   gap: 1rem;
   min-height: 50px; /* Adjust as needed */
+  margin-bottom: 1rem;
 }
 
 .searchAndChipsWrapper {
@@ -45,7 +48,7 @@
 
 .buttonsWrapper {
   display: flex;
-  gap: 0.75rem;
+  gap: 1.25rem;
   flex-shrink: 0;
 }
 
@@ -53,11 +56,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.65rem 1rem;
+  padding: 0.7rem 1.2rem;
   background: rgb(255, 255, 255, 0.02);
   border: 1px solid rgba(148, 163, 184, 0.2);
   color: #cbd5e1;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.05) inset;
@@ -79,7 +82,7 @@
   top: calc(100% + 8px);
   right: 0;
   width: 220px;
-  background: rgba(150,150,150, 0.05);
+  background: rgba(150, 150, 150, 0.05);
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -111,7 +114,7 @@
 }
 
 .dropdownItem:hover {
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
   color: #fff;
 }
 
@@ -127,12 +130,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.3rem 0.85rem;
-  background-color: rgba(59, 195, 226, 0.15);
-  border: 1px solid rgba(59, 195, 226, 0.5);
-  border-radius: 16px;
+
+  border: 1px solid rgba(59, 195, 226, 0.3);
+  border-radius: 6px;
   font-size: 0.85rem;
   color: #a5f3fc;
-  box-shadow: 0 0 8px rgba(59, 195, 226, 0.2);
+
   white-space: nowrap;
 }
 
@@ -162,7 +165,7 @@
   flex-grow: 1;
   overflow-y: auto;
   overflow-x: auto;
-  box-shadow: 0 0 40px rgba(59, 195, 226, 0.1);
+  box-shadow: 0 0 40px rgba(59, 195, 226, 0);
 }
 
 .table {
@@ -176,7 +179,6 @@
   text-align: left;
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
   white-space: nowrap;
-   
 }
 
 .table th {
@@ -185,7 +187,7 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #94a3b8;
-  background-color: rgb(30,35,42);
+  background-color: rgb(30, 35, 42);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -200,10 +202,11 @@
 }
 
 .table tbody tr {
-  background-color: rgba(255,255,255,0.01);
+  background-color: rgba(255, 255, 255, 0.01);
 }
-
+.table tbody tr:hover {
+  background-color: rgba(155, 155, 155, 0.04);
+}
 .table tbody td {
-  background-color: rgba(255,255,255,0.01);
+  background-color: rgba(255, 255, 255, 0.01);
 }
-

@@ -17,14 +17,7 @@ Whether you're fixing a typo, improving documentation, or adding a feature — y
 
 This project is released under the **AGPL-3.0** license, which ensures that the software remains open and available to everyone under  copyleft terms.
 
-However, to keep things flexible for future development and potential use cases, all contributions are accepted under the **MIT license**.
-
-This means:
-
-- The project **remains AGPL-3.0** for everyone using it.
-- As a contributor, you agree to license your contribution under MIT license.
-
-This solution helps to maintain the project over the long term and avoids complicated relicensing efforts down the road. By submitting a pull request, you confirm that you voluntarily license your contribution under the MIT License for the benefit of the project’s future development.
+All contributions require a Contributor License Agreement (CLA). This solution helps to maintain the project over the long term and avoids complicated relicensing efforts down the road. By submitting a pull request, you confirm that you agree to the terms of the CLA for the benefit of the project's future development.
 
 ## Other ways to support the project
 
@@ -37,6 +30,6 @@ Every form of support means a lot and helps keep this project alive and growing.
 
 ## A Note of Thanks
 
-Thanks again for taking the time to contribute. Your effort, no matter how small it may seem, helps make this project better for everyone.
+Thanks again for taking the time to contribute..
 
 Happy coding!

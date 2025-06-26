@@ -34,6 +34,7 @@
   transition: all 0.2s ease-in-out;
   box-shadow: none;
   padding: 0.9rem;
+  backdrop-filter: blur(15px);
 }
 
 .navButton:hover {
@@ -46,5 +47,5 @@
   color: #3bc3e2; /* Morski/jasnoniebieski kolor ikony */
   /* border-color: #3bc3e2; */
   /* background-color: rgba(59, 195, 226, 0.15); */
-  box-shadow: 0 0 12px rgba(59, 195, 226, 0.5);
+  /* box-shadow: 0 0 12px rgba(59, 195, 226, 0.5); */
 }
