@@ -29,6 +29,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const current3DElement = useCurrentElement();
   const pathname = usePathname();
   const isPeriodicTable = pathname === "/periodic-table";
+  const isStatistics = pathname === "/statistics"; // Dodajemy flagę dla strony statystyk
 
   const clickOutsideTracker = useRef<{ x: number; y: number } | null>(null);
 
@@ -94,12 +95,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     ? infoPanelContent
     : { type: "element" as const, data: current3DElement };
 
+  // Sprawdzamy, czy pokazać BottomMenu
+  const showBottomMenu = !isPeriodicTable && !isStatistics;
+
   return (
     <div className={styles.mainContainer}>
       <SideMenu />
       <main className={styles.main}> {children}</main>
 
-      {!isPeriodicTable && <BottomMenu />}
+      {showBottomMenu && <BottomMenu />}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {isPanelVisible && contentForPanel && (

@@ -32,3 +32,12 @@
 - fix periodic table legend
 - add numbers for rows and columns
 - add periodic groups hover effect
+
+## 1.0.4 (26-06-2025)
+
+- fix bottom menu error
+- fix isotopes and ions modes
+- improve modal positioning
+- add side menu buttons
+- add statistics view
+- fix select element arrows

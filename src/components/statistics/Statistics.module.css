@@ -1,50 +1,168 @@
-.container {
+.pageContainer {
   width: 100%;
   height: 100%;
-  padding: 2rem 2rem 2rem 10rem; /* Increased left padding to not overlap with SideMenu */
+  padding: 2rem 4rem 2rem 10rem;
   box-sizing: border-box;
   color: #e2e8f0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  overflow: hidden;
+  gap: 1rem;
 }
 
-.title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #f8fafc;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.controls {
+.controlsContainer {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 1rem;
+  min-height: 50px; /* Adjust as needed */
 }
 
-.filterInput {
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  background-color: rgba(30, 41, 59, 0.7);
+.searchAndChipsWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-grow: 1;
+}
+
+.searchInput {
+  padding: 0.65rem 1rem;
+  font-size: 0.95rem;
+  background-color: rgb(255, 255, 255, 0.02);
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 8px;
   color: #e2e8f0;
-  width: 300px;
+  width: 350px;
   transition: border-color 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
 }
 
-.filterInput:focus {
+.searchInput:focus {
   outline: none;
   border-color: #3bc3e2;
   box-shadow: 0 0 10px rgba(59, 195, 226, 0.5);
 }
 
+.buttonsWrapper {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.dropdownButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: all 0.2s ease-in-out;
+}
+
+.dropdownButton:hover {
+  border-color: rgba(59, 195, 226, 0.4);
+  color: #fff;
+  background: rgb(255, 255, 255, 0.05);
+}
+
+.dropdownContainer {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  background: rgba(150,150,150, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  z-index: 10;
+  padding: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdownSection {
+  padding: 0.75rem 0.75rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dropdownItem {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dropdownItem:hover {
+  background-color: rgba(255,255,255,0.05);
+  color: #fff;
+}
+
+.chipsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.85rem;
+  background-color: rgba(59, 195, 226, 0.15);
+  border: 1px solid rgba(59, 195, 226, 0.5);
+  border-radius: 16px;
+  font-size: 0.85rem;
+  color: #a5f3fc;
+  box-shadow: 0 0 8px rgba(59, 195, 226, 0.2);
+  white-space: nowrap;
+}
+
+.chip strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.chip button {
+  background: none;
+  border: none;
+  color: #a5f3fc;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 0 0 0.25rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.chip button:hover {
+  opacity: 1;
+}
+
 .tableContainer {
   flex-grow: 1;
-  overflow: auto; /* Makes only the table scrollable */
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  border-radius: 12px;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(10px);
+  overflow-y: auto;
+  overflow-x: auto;
+  box-shadow: 0 0 40px rgba(59, 195, 226, 0.1);
 }
 
 .table {
@@ -54,18 +172,19 @@
 
 .table th,
 .table td {
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   text-align: left;
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  white-space: nowrap;
 }
 
 .table th {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #94a3b8;
-  background-color: rgba(15, 23, 42, 0.5);
+  background-color: rgb(30,35,42);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -79,14 +198,27 @@
   gap: 0.5rem;
 }
 
-.table tbody tr {
-  transition: background-color 0.15s ease-in-out;
-}
-
 .table tbody tr:hover {
-  background-color: rgba(59, 195, 226, 0.1);
+  background-color: rgba(255,255,255,0.01);
 }
 
-.table tbody tr:last-child td {
-  border-bottom: none;
+/* Scrollbar Styles */
+.tableContainer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.5);
 }

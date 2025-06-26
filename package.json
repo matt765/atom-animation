@@ -1,6 +1,6 @@
 {
   "name": "atom-animation",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "license": "AGPL-3.0-only",
   "description": "Interactive atom 3d model made in Three.js",

@@ -18,8 +18,7 @@
   background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px,
-    rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+  box-shadow: 0 0 40px rgba(59, 195, 226, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -223,8 +222,7 @@
   box-sizing: border-box;
   border-radius: 12px;
   border: 1px solid rgba(148, 163, 184, 0.15);
-  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px,
-    rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+  box-shadow: 0 0 40px rgba(59, 195, 226, 0.06);
   backdrop-filter: blur(15px);
   display: grid;
   grid-template-columns: 1fr 1fr;
