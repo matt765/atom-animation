@@ -41,3 +41,82 @@ a {
     color-scheme: dark;
   }
 }
+
+/* Scrollbar styles for different browsers */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+*::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 30px !important;
+  border: none !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.tableContainer::-webkit-scrollbar,
+.dropdownMenu::-webkit-scrollbar,
+.content::-webkit-scrollbar {
+  width: 10px !important;
+}
+
+.tableContainer::-webkit-scrollbar-thumb,
+.dropdownMenu::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 30px !important;
+  border: none !important;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover,
+.dropdownMenu::-webkit-scrollbar-thumb:hover,
+.content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.tableContainer::-webkit-scrollbar-track,
+.dropdownMenu::-webkit-scrollbar-track,
+.content::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+:root {
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0);
+}
+
+::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+@-moz-document url-prefix() {
+  * {
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1) !important;
+    scrollbar-width: thin !important;
+  }
+  
+  .tableContainer,
+  .dropdownMenu,
+  .content {
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.1) !important;
+    scrollbar-width: thin !important;
+  }
+}

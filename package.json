@@ -3,7 +3,7 @@
   "version": "1.0.4",
   "private": true,
   "license": "AGPL-3.0-only",
-  "description": "Interactive atom 3d model made in Three.js",
+  "description": "Interactive atom 3d animation made in Three.js",
   "author": {
     "name": "matt765",
     "email": "mateusz.wyrebek@gmail.com",
