@@ -115,7 +115,7 @@ export const SortingTable = () => {
     ).sort((a, b) => Number(a) - Number(b));
 
   return (
-    <>
+    <div className={styles.sortingTableContainer}>
       <div className={styles.controlsContainer}>
         <div className={styles.searchAndChipsWrapper}>
           <input
@@ -287,6 +287,6 @@ export const SortingTable = () => {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 };

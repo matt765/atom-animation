@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   ComposedChart,
   Line,
@@ -55,6 +55,22 @@ interface CustomTooltipProps {
   label?: string | number;
 }
 
+const FullscreenIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+  </svg>
+);
+
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const fullName = payload[0].payload.fullName;
@@ -85,6 +101,9 @@ const renderLegendText = (value: string) => {
 };
 
 export const DataCharts = () => {
+  const [fullscreenChart, setFullscreenChart] =
+    useState<React.ReactNode | null>(null);
+
   const nucleonsVsElectronsData = useMemo(
     () =>
       elements.map((el) => ({
@@ -207,10 +226,11 @@ export const DataCharts = () => {
     []
   );
 
-  return (
-    <div className={styles.chartsGrid}>
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Nucleons vs. Electrons</h3>
+  const chartsData = [
+    {
+      id: "nucleonsVsElectrons",
+      title: "Nucleons vs. Electrons",
+      component: (
         <ResponsiveContainer>
           <ComposedChart data={nucleonsVsElectronsData}>
             <defs>
@@ -246,10 +266,12 @@ export const DataCharts = () => {
             />
           </ComposedChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Neutron to Proton (N/Z) Ratio</h3>
+      ),
+    },
+    {
+      id: "neutronToProtonRatio",
+      title: "Neutron to Proton (N/Z) Ratio",
+      component: (
         <ResponsiveContainer>
           <AreaChart data={neutronToProtonRatioData}>
             <defs>
@@ -278,10 +300,12 @@ export const DataCharts = () => {
             />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Melting & Boiling Points (K)</h3>
+      ),
+    },
+    {
+      id: "meltingBoilingPoints",
+      title: "Melting & Boiling Points (K)",
+      component: (
         <ResponsiveContainer>
           <LineChart data={meltingBoilingData}>
             <CartesianGrid
@@ -309,10 +333,12 @@ export const DataCharts = () => {
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Liquid Range (Boiling vs Melting)</h3>
+      ),
+    },
+    {
+      id: "liquidRange",
+      title: "Liquid Range (Boiling vs Melting)",
+      component: (
         <ResponsiveContainer>
           <ScatterChart>
             <CartesianGrid
@@ -342,10 +368,12 @@ export const DataCharts = () => {
             <Scatter name="Elements" data={liquidRangeData} fill={COLORS[5]} />
           </ScatterChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Map of Nuclear Stability</h3>
+      ),
+    },
+    {
+      id: "nuclearStability",
+      title: "Map of Nuclear Stability",
+      component: (
         <ResponsiveContainer>
           <ComposedChart>
             <CartesianGrid
@@ -390,10 +418,12 @@ export const DataCharts = () => {
             />
           </ComposedChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Electron Shell Filling</h3>
+      ),
+    },
+    {
+      id: "shellFilling",
+      title: "Electron Shell Filling",
+      component: (
         <ResponsiveContainer>
           <LineChart data={shellFillingData}>
             <CartesianGrid
@@ -451,10 +481,12 @@ export const DataCharts = () => {
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>State of Matter at STP</h3>
+      ),
+    },
+    {
+      id: "stateOfMatter",
+      title: "State of Matter at STP",
+      component: (
         <ResponsiveContainer>
           <PieChart>
             <Pie
@@ -481,10 +513,12 @@ export const DataCharts = () => {
             />
           </PieChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Valence Electrons</h3>
+      ),
+    },
+    {
+      id: "valenceElectrons",
+      title: "Valence Electrons",
+      component: (
         <ResponsiveContainer>
           <BarChart data={valenceElectronsData}>
             <CartesianGrid
@@ -501,10 +535,12 @@ export const DataCharts = () => {
             <Bar dataKey="Valence Electrons" fill={COLORS[5]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Number of Stable Isotopes</h3>
+      ),
+    },
+    {
+      id: "stableIsotopes",
+      title: "Number of Stable Isotopes",
+      component: (
         <ResponsiveContainer>
           <BarChart data={stableIsotopesData}>
             <CartesianGrid
@@ -521,10 +557,12 @@ export const DataCharts = () => {
             <Bar dataKey="Stable Isotopes" fill={COLORS[4]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className={styles.chartContainer}>
-        <h3 className={styles.chartTitle}>Number of Electron Shells</h3>
+      ),
+    },
+    {
+      id: "electronShells",
+      title: "Number of Electron Shells",
+      component: (
         <ResponsiveContainer>
           <LineChart data={shellCountData}>
             <CartesianGrid
@@ -550,7 +588,40 @@ export const DataCharts = () => {
             />
           </LineChart>
         </ResponsiveContainer>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <div className={styles.chartsGrid}>
+        {chartsData.map((chart) => (
+          <div key={chart.id} className={styles.chartContainer}>
+            <h3 className={styles.chartTitle}>{chart.title}</h3>
+            <button
+              onClick={() => setFullscreenChart(chart.component)}
+              className={styles.fullscreenButton}
+              aria-label={`View ${chart.title} in fullscreen`}
+            >
+              <FullscreenIcon />
+            </button>
+            <div className={styles.chartContent}>{chart.component}</div>
+          </div>
+        ))}
       </div>
-    </div>
+
+      {fullscreenChart && (
+        <div className={styles.modal}>
+          <button
+            onClick={() => setFullscreenChart(null)}
+            className={styles.closeButton}
+            aria-label="Close fullscreen view"
+          >
+            &times;
+          </button>
+          <div className={styles.modalContent}>{fullscreenChart}</div>
+        </div>
+      )}
+    </>
   );
 };

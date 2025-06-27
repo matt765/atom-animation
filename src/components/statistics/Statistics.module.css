@@ -1,7 +1,9 @@
 .pageContainer {
-  width: 90vw;
+  width: 75vw;
   height: 100%;
   padding: 3rem 6rem 2rem 10rem;
+  padding-left: 0;
+  padding-right: 0;
   box-sizing: border-box;
   color: #e2e8f0;
   display: flex;
@@ -9,6 +11,7 @@
   gap: 1rem;
   margin-left: auto;
   margin-right: auto;
+ 
 }
 
 .tabsContainer {

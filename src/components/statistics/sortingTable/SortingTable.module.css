@@ -5,9 +5,14 @@
   flex-shrink: 0;
   gap: 1rem;
   min-height: 50px;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  margin-top: -0.4rem;
 }
-
+.sortingTableContainer {
+  width: 100%;
+  height: auto;
+  padding-bottom: 5rem;
+}
 .searchAndChipsWrapper {
   display: flex;
   align-items: center;
