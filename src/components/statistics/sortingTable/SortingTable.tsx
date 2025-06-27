@@ -13,7 +13,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { elements, ElementConfig } from "../../AtomModel/elementsData";
+import { elements, ElementConfig } from "../../../elementsData/elementsData";
 import styles from "./SortingTable.module.css";
 import { FilterIcon } from "@/assets/icons/FilterIcon";
 import { SortIcon } from "@/assets/icons/SortIcon";

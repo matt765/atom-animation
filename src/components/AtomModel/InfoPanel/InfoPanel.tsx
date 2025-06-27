@@ -11,10 +11,10 @@ import {
   ExtendedElementConfig,
   InfoPanelContent,
 } from "@/store/appStore";
-import { elements } from "@/components/AtomModel/elementsData";
-import { GroupData } from "./groupsData";
-import { OutlinedButton } from "../common/OutlinedButton/OutlinedButton";
-import { getElementCategory } from "./elementUtils";
+import { elements } from "@/elementsData/elementsData";
+import { GroupData } from "../../../elementsData/groupsData";
+import { OutlinedButton } from "../../common/OutlinedButton/OutlinedButton";
+import { getElementCategory } from "../elementUtils";
 
 type InfoPanelProps = {
   content: InfoPanelContent;

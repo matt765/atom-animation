@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Layout.module.css";
-import { InfoPanel } from "../AtomModel/InfoPanel";
+
 import {
   DndContext,
   PointerSensor,
@@ -19,6 +19,7 @@ import { BottomMenuMobile } from "./BottomMenu/BottomMenuMobile";
 import { SideMenu } from "./SideMenu/SideMenu";
 import { TopBarMobile } from "./TopBarMobile/TopBarMobile";
 import { GitHubLink } from "./GithubLink/GithubLink";
+import { InfoPanel } from "../AtomModel/InfoPanel/InfoPanel";
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);

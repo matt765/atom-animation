@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "./BottomMenuMobile.module.css";
 import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
-import { elements } from "../../AtomModel/elementsData";
+import { elements } from "../../../elementsData/elementsData";
 import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
 import { ParticleControl } from "./ParticleControl";
 import { CONFIG } from "../../AtomModel/AtomModel";

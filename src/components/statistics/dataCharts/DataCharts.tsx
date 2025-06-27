@@ -25,7 +25,7 @@ import {
   ValueType,
   NameType,
 } from "recharts/types/component/DefaultTooltipContent";
-import { elements } from "../../AtomModel/elementsData";
+import { elements } from "../../../elementsData/elementsData";
 import styles from "./DataCharts.module.css";
 
 const COLORS = [

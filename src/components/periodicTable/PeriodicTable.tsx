@@ -8,8 +8,8 @@ import React, {
   useCallback,
 } from "react";
 import { useAppStore } from "@/store/appStore";
-import { elements, ElementConfig } from "@/components/AtomModel/elementsData";
-import { groupsData, GroupData } from "@/components/AtomModel/groupsData";
+import { elements, ElementConfig } from "@/elementsData/elementsData";
+import { groupsData, GroupData } from "@/elementsData/groupsData";
 import styles from "./PeriodicTable.module.css";
 import { getElementCategory, ElementCategory } from "../AtomModel/elementUtils";
 

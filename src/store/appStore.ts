@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { elements, ElementConfig } from "../components/AtomModel/elementsData";
+import { elements, ElementConfig } from "../elementsData/elementsData";
 import { getElementByProtons } from "../components/AtomModel/elementUtils";
-import { GroupData } from "@/components/AtomModel/groupsData";
+import { GroupData } from "@/elementsData/groupsData";
 
 export interface ExtendedElementConfig extends ElementConfig {
   electrons: number;

@@ -1,4 +1,4 @@
-import { ElementConfig, elements } from "./elementsData";
+import { ElementConfig, elements } from "../../elementsData/elementsData";
 
 export type ElementCategory =
   | "alkali-metal"

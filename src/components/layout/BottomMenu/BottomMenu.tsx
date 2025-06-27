@@ -5,7 +5,7 @@ import styles from "./BottomMenu.module.css";
 import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
 import { CONFIG } from "../../AtomModel/AtomModel";
 import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
-import { elements } from "../../AtomModel/elementsData";
+import { elements } from "../../../elementsData/elementsData";
 import { ParticleControl } from "./ParticleControl";
 import { ShakeIcon } from "@/assets/icons/ShakeIcon";
 import { RefreshIcon } from "@/assets/icons/RefreshIcon";
