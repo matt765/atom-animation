@@ -1,6 +1,7 @@
+// components/AtomModel/ElementSelect/ElementSelect.tsx
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import styles from "./ElementSelect.module.css";
 import { Select, SelectOption } from "../../common/Select/Select";
 import { useAppStore } from "../../../store/appStore";
@@ -28,6 +29,7 @@ export const ElementSelect = ({
   setSelectedElement,
 }: ElementSelectProps) => {
   const { setInputFocus } = useAppStore();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleNextElement = () => {
     setSelectedElement((currentElementName) => {
@@ -57,15 +59,48 @@ export const ElementSelect = ({
     [elements]
   );
 
+  // Automatyczna zmiana elementu na podstawie wyszukiwania
+  useEffect(() => {
+    const lowercasedFilter = searchTerm.toLowerCase().trim();
+    if (!lowercasedFilter) return;
+
+    const filtered = elements.filter(
+      (el) =>
+        el.name.toLowerCase().includes(lowercasedFilter) ||
+        el.symbol.toLowerCase().includes(lowercasedFilter)
+    );
+
+    // Natychmiast zmień na pierwszy znaleziony element
+    if (filtered.length > 0 && selectedElementName !== filtered[0].name) {
+      setSelectedElement(filtered[0].name);
+    }
+  }, [searchTerm, elements, setSelectedElement, selectedElementName]);
+
+  const handleSelectFocus = () => {
+    setInputFocus(true);
+  };
+
+  const handleSelectBlur = () => {
+    setInputFocus(false);
+    setSearchTerm(""); // Resetuj searchTerm po utracie focusu
+  };
+
+  const handleSelectChange = (value: string) => {
+    setSelectedElement(value);
+    setSearchTerm(""); // Resetuj searchTerm po wybraniu opcji
+  };
+
   return (
     <div className={styles.controlGroup}>
       <label>Element:</label>
       <Select
         options={elementOptions}
         value={selectedElementName}
-        onChange={setSelectedElement}
-        onFocus={() => setInputFocus(true)}
-        onBlur={() => setInputFocus(false)}
+        onChange={handleSelectChange}
+        onFocus={handleSelectFocus}
+        onBlur={handleSelectBlur}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
       />
       <div className={styles.navButtonGroup}>
         <button
