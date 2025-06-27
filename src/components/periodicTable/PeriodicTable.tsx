@@ -8,8 +8,10 @@ import React, {
   useCallback,
 } from "react";
 import { useAppStore } from "@/store/appStore";
-import { elements, ElementConfig } from "@/elementsData/elementsData";
-import { groupsData, GroupData } from "@/elementsData/groupsData";
+import { elements } from "@/elementsData/elementsData";
+import type { ElementConfig } from "@/elementsData/elementsData";
+import { allGroupsAndPeriodsData, legendData } from "@/elementsData/groupsData";
+import type { FullGroupData } from "@/elementsData/groupsData";
 import styles from "./PeriodicTable.module.css";
 import { getElementCategory, ElementCategory } from "../AtomModel/elementUtils";
 
@@ -27,16 +29,14 @@ const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
   unknown: "rgb(68, 68, 68)",
 };
 
-const legendDisplayData = groupsData.filter(
-  (group) => group.class !== "unknown"
-);
+const legendDisplayData = legendData;
 
 const LegendAndExample = ({
   onGroupHover,
   onGroupClick,
 }: {
   onGroupHover: (groupClass: ElementCategory | null) => void;
-  onGroupClick: (group: GroupData) => void;
+  onGroupClick: (group: FullGroupData) => void;
 }) => (
   <div className={styles.legendAndExampleContainer}>
     <div className={styles.legendContainer}>
@@ -55,7 +55,7 @@ const LegendAndExample = ({
                 ELEMENT_CATEGORY_COLORS[item.class as ElementCategory],
             }}
           />
-          <span>{item.name}</span>
+          <span>{item.title}</span>
         </div>
       ))}
     </div>
@@ -75,7 +75,7 @@ const LegendAndExample = ({
                 ELEMENT_CATEGORY_COLORS[item.class as ElementCategory],
             }}
           />
-          <span>{item.name}</span>
+          <span>{item.title}</span>
         </div>
       ))}
     </div>
@@ -167,6 +167,8 @@ export const PeriodicTable = () => {
   const [hoveredGroup, setHoveredGroup] = useState<ElementCategory | null>(
     null
   );
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null);
+  const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLDivElement>(null);
@@ -202,35 +204,59 @@ export const PeriodicTable = () => {
     resetView();
   }, [resetView]);
 
-  const handleElementClick = useCallback(
-    (newElementName: string) => {
+  const handleInfoClick = useCallback(
+    (type: "element" | "group", identifier: string | FullGroupData) => {
       const { infoPanelContent } = useAppStore.getState();
-      if (
-        infoPanelContent?.type === "element" &&
-        infoPanelContent.data.name === newElementName
-      ) {
+
+      let isSameContent = false;
+      if (infoPanelContent) {
+        if (
+          type === "element" &&
+          infoPanelContent.type === "element" &&
+          typeof identifier === "string" &&
+          infoPanelContent.data.name === identifier
+        ) {
+          isSameContent = true;
+        } else if (
+          type === "group" &&
+          infoPanelContent.type === "group" &&
+          typeof identifier === "object" &&
+          infoPanelContent.data.name === identifier.name
+        ) {
+          isSameContent = true;
+        }
+      }
+
+      if (isSameContent) {
         hideInfoPanel();
       } else {
-        setSelectedElement(newElementName, undefined, true);
+        if (type === "element" && typeof identifier === "string") {
+          setSelectedElement(identifier, undefined, true);
+        } else if (type === "group" && typeof identifier === "object") {
+          showGroupInfo(identifier);
+        }
       }
     },
-    [hideInfoPanel, setSelectedElement]
+    [hideInfoPanel, setSelectedElement, showGroupInfo]
   );
 
-  const handleGroupClick = useCallback(
-    (group: GroupData) => {
-      const { infoPanelContent } = useAppStore.getState();
-      if (
-        infoPanelContent?.type === "group" &&
-        infoPanelContent.data.name === group.name
-      ) {
-        hideInfoPanel();
-      } else {
-        showGroupInfo(group);
-      }
-    },
-    [hideInfoPanel, showGroupInfo]
-  );
+  const handleColumnClick = (groupNumber: number) => {
+    const groupData = allGroupsAndPeriodsData.find(
+      (g) => g.class === `group-${groupNumber}`
+    );
+    if (groupData) {
+      handleInfoClick("group", groupData);
+    }
+  };
+
+  const handleRowClick = (periodNumber: number) => {
+    const periodData = allGroupsAndPeriodsData.find(
+      (p) => p.class === `period-${periodNumber}`
+    );
+    if (periodData) {
+      handleInfoClick("group", periodData);
+    }
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -283,11 +309,12 @@ export const PeriodicTable = () => {
 
     const target = e.target as HTMLElement;
 
-    if (target.closest(`.${styles.legendItem}`)) {
-      return;
-    }
-
-    if (target.closest(`[data-element-name]`)) {
+    if (
+      target.closest(`.${styles.legendItem}`) ||
+      target.closest(`[data-element-name]`) ||
+      target.closest(`.${styles.columnHeader}`) ||
+      target.closest(`.${styles.rowHeader}`)
+    ) {
       return;
     }
 
@@ -352,6 +379,9 @@ export const PeriodicTable = () => {
             key={`col-header-${group}`}
             className={styles.columnHeader}
             style={{ gridRow: row, gridColumn: col }}
+            onMouseEnter={() => setHoveredColumn(group)}
+            onMouseLeave={() => setHoveredColumn(null)}
+            onClick={() => handleColumnClick(group)}
           >
             {group}
           </div>
@@ -362,6 +392,9 @@ export const PeriodicTable = () => {
             key={`row-header-${i}`}
             className={styles.rowHeader}
             style={{ gridRow: i + 2, gridColumn: 1 }}
+            onMouseEnter={() => setHoveredRow(i + 1)}
+            onMouseLeave={() => setHoveredRow(null)}
+            onClick={() => handleRowClick(i + 1)}
           >
             {i + 1}
           </div>
@@ -369,20 +402,26 @@ export const PeriodicTable = () => {
 
         <LegendAndExample
           onGroupHover={setHoveredGroup}
-          onGroupClick={handleGroupClick}
+          onGroupClick={(group) => handleInfoClick("group", group)}
         />
         {elements.map((element) => {
           const isActive = element.name === currentModelElement?.name;
           const categoryClass = getElementCategory(element);
-          const isHighlighted = hoveredGroup === categoryClass;
+          const isGroupHighlighted = hoveredGroup === categoryClass;
+          const isRowHighlighted =
+            hoveredRow !== null && element.period === hoveredRow;
+          const isColumnHighlighted =
+            hoveredColumn !== null && element.group === hoveredColumn;
           const gridPosition = getGridPosition(element);
           return (
             <div
               key={element.name}
               data-element-name={element.name}
-              onClick={() => handleElementClick(element.name)}
+              onClick={() => handleInfoClick("element", element.name)}
               className={`${styles.element} ${isActive ? styles.active : ""} ${
-                isHighlighted ? styles.highlighted : ""
+                isGroupHighlighted ? styles.highlighted : ""
+              } ${isRowHighlighted ? styles.highlightRow : ""} ${
+                isColumnHighlighted ? styles.highlightColumn : ""
               }`}
               style={{
                 ...gridPosition,

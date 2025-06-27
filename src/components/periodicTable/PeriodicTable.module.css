@@ -38,8 +38,14 @@
   color: #aaa;
   font-family: var(--font-geist-mono);
   font-weight: bold;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: color 0.2s ease;
   padding-bottom: 4px;
+}
+
+.columnHeader:hover {
+  color: #fff;
 }
 
 .rowHeader {
@@ -50,7 +56,13 @@
   color: #aaa;
   font-family: var(--font-geist-mono);
   font-weight: bold;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.rowHeader:hover {
+  color: #fff;
 }
 
 .element {
@@ -76,9 +88,24 @@
   opacity: 0.3;
 }
 
+.table:has(.rowHeader:hover) .element:not(.highlightRow) {
+  opacity: 0.3;
+}
+
+.table:has(.columnHeader:hover) .element:not(.highlightColumn) {
+  opacity: 0.3;
+}
+
 .element.highlighted {
   position: relative;
   z-index: 2;
+  outline-color: rgba(255, 255, 255, 0.75);
+}
+
+.element.highlightRow,
+.element.highlightColumn {
+  position: relative;
+  z-index: 1;
   outline-color: rgba(255, 255, 255, 0.75);
 }
 
@@ -177,7 +204,6 @@
 .legendContainer {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   font-size: 0.9em;
   color: #ccc;
   pointer-events: auto;

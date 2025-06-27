@@ -35,7 +35,7 @@
   box-shadow: none;
   padding: 0.9rem;
   backdrop-filter: blur(15px);
-    box-shadow: 0 0 40px rgba(59, 195, 226, 0.07);
+  box-shadow: 0 0 40px rgba(59, 195, 226, 0.07);
 }
 
 .navButton:hover {

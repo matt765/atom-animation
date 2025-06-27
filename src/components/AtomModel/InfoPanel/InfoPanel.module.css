@@ -13,7 +13,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 85vh;
+  max-height: 70vh;
 }
 
 .panel.centered {
@@ -28,10 +28,6 @@
 
 .sideView {
   right: 2.5rem;
-}
-
-.sideView .header {
-  /* cursor: default; */
 }
 
 .dark {
@@ -206,22 +202,41 @@
   margin: 0 0 0.75rem 0;
 }
 
-.elementList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  column-count: 2;
-  column-gap: 2rem;
+.elementGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.75rem;
 }
 
-.elementList li {
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  margin-bottom: 0.5rem;
+.elementListItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.05);
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.elementList li:hover {
+.elementListItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+}
+
+.elementSymbol {
+  font-family: var(--font-geist-mono);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+  width: 2em;
+  text-align: center;
+}
+
+.elementName {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

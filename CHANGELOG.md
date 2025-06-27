@@ -41,3 +41,15 @@
 - add side menu buttons
 - add statistics view
 - fix select element arrows
+
+## 1.0.5 (27-06-2025)
+
+- improve mobile menu
+- add Github link
+- add presentation mode
+- fix console bugs
+- improve scrollbar
+- add data charts
+- add full screen modal
+- add search input
+- add periods highlighting

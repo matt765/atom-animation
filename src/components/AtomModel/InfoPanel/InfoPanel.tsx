@@ -12,9 +12,8 @@ import {
   InfoPanelContent,
 } from "@/store/appStore";
 import { elements } from "@/elementsData/elementsData";
-import { GroupData } from "../../../elementsData/groupsData";
+import { FullGroupData } from "../../../elementsData/groupsData";
 import { OutlinedButton } from "../../common/OutlinedButton/OutlinedButton";
-import { getElementCategory } from "../elementUtils";
 
 type InfoPanelProps = {
   content: InfoPanelContent;
@@ -186,14 +185,10 @@ const GroupContent = ({
   group,
   isOnPeriodicTableView,
 }: {
-  group: GroupData;
+  group: FullGroupData;
   isOnPeriodicTableView?: boolean;
 }) => {
   const { setSelectedElement } = useAppStore();
-
-  const groupElements = elements.filter(
-    (el) => getElementCategory(el) === group.class
-  );
 
   return (
     <div
@@ -207,20 +202,22 @@ const GroupContent = ({
         </p>
       ))}
 
-      {groupElements.length > 0 && (
+      {group.elements && group.elements.length > 0 && (
         <>
           <div className={styles.divider}></div>
-          <h4 className={styles.listHeader}>Elements in this group:</h4>
-          <ul className={styles.elementList}>
-            {groupElements.map((el) => (
-              <li
+          <h4 className={styles.listHeader}>Elements in this category:</h4>
+          <div className={styles.elementGrid}>
+            {group.elements.map((el) => (
+              <div
                 key={el.name}
+                className={styles.elementListItem}
                 onClick={() => setSelectedElement(el.name, undefined, true)}
               >
-                {el.name}
-              </li>
+                <span className={styles.elementSymbol}>{el.symbol}</span>
+                <span className={styles.elementName}>{el.name}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </>
       )}
     </div>
@@ -233,15 +230,12 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
     useAppStore();
   const panelRef = useRef<HTMLDivElement | null>(null);
 
-  // Ten stan decyduje, czy panel jest pozycjonowany przez CSS (false) czy JS (true)
   const [isPositionedByJs, setIsPositionedByJs] = useState(
     mode !== "periodic-table"
   );
 
   useEffect(() => {
     setIsMounted(true);
-    // Resetuj stan pozycjonowania przy zmianie trybu panelu
-    // Używamy isPanelManuallyPositioned z globalnego store, aby "przeżyć" ponowne renderowanie
     if (isPanelManuallyPositioned) {
       setIsPositionedByJs(true);
     } else {
@@ -256,8 +250,6 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
       }`,
     });
 
-  // Kiedy zaczynamy przeciągać panel, który był pozycjonowany przez CSS,
-  // odczytujemy jego pozycję i przełączamy go na stałe w tryb pozycjonowania JS.
   useEffect(() => {
     if (isDragging && !isPositionedByJs && panelRef.current) {
       const rect = panelRef.current.getBoundingClientRect();
@@ -331,7 +323,7 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
         />
       ) : (
         <GroupContent
-          group={content.data}
+          group={content.data as FullGroupData}
           isOnPeriodicTableView={isPeriodicTableMode}
         />
       )}
