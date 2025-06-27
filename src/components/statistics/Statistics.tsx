@@ -4,8 +4,7 @@ import React from "react";
 import styles from "./Statistics.module.css";
 import { useAppStore } from "@/store/appStore";
 import { SortingTable } from "./sortingTable/SortingTable";
-// W przyszłości tu będzie import widoku z wykresami
-// import { ChartsView } from "./dataGraphs/ChartsView";
+import { DataCharts } from "./dataCharts/DataCharts";
 
 export const Statistics = () => {
   const { statisticsTab, setStatisticsTab } = useAppStore();
@@ -31,12 +30,7 @@ export const Statistics = () => {
         </button>
       </div>
 
-      {statisticsTab === "charts" && (
-        <div className={styles.chartsViewContainer}>
-          {/* Tu w przyszłości będzie komponent <ChartsView /> */}
-          <p>Charts will be displayed here.</p>
-        </div>
-      )}
+      {statisticsTab === "charts" && <DataCharts />}
 
       {statisticsTab === "table" && <SortingTable />}
     </div>

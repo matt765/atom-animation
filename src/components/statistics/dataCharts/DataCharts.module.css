@@ -1,0 +1,40 @@
+.chartsGrid {
+  display: grid;
+  /* ZMIANA: Powrót do 2 kolumn dla 10 wykresów */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+.chartContainer {
+  aspect-ratio: 5 / 4;
+  background: rgba(34, 39, 47, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.chartTitle {
+  text-align: center;
+  margin-bottom: 1.25rem;
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.customTooltip {
+  background-color: rgba(34, 39, 47, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  padding: 0.75rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltipLabel {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}

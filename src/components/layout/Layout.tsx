@@ -67,7 +67,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const isPanelVisible = panelMode !== "hidden";
 
-    // Zamykanie panelu po kliknięciu na zewnątrz działa dla trybu 'default' i 'detailed'
     if (!isPanelVisible || panelMode === "periodic-table") return;
 
     const handleMouseDown = (e: MouseEvent) => {
@@ -151,7 +150,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {!isMobile && <SideMenu />}
       {isMobile && showControls && <TopBarMobile />}
 
-      <main className={`${styles.main} ${isMobile ? styles.mobileLayout : ""}`}>
+      {/* ZMIANA: Dodana warunkowa klasa .scrollable */}
+      <main
+        className={`${styles.main} ${isMobile ? styles.mobileLayout : ""} ${
+          pathname === "/statistics" ? styles.scrollable : ""
+        }`}
+      >
         {children}
       </main>
 
