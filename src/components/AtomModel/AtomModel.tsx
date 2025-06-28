@@ -15,78 +15,6 @@ const DETAILED_VIEW_CONFIG = {
   CAMERA_POSITION: new THREE.Vector3(-12, 2, 14),
 };
 
-const KeyboardRotator = ({
-  modelGroupRef,
-  rotationState,
-  isInputFocused,
-}: {
-  modelGroupRef: React.RefObject<THREE.Group>;
-  rotationState: React.RefObject<{
-    up: boolean;
-    down: boolean;
-    left: boolean;
-    right: boolean;
-  }>;
-  isInputFocused: boolean;
-}) => {
-  useEffect(() => {
-    const handleKey = (event: KeyboardEvent, isDown: boolean) => {
-      if (isInputFocused) {
-        if (isDown) {
-          rotationState.current.up = false;
-          rotationState.current.down = false;
-          rotationState.current.left = false;
-          rotationState.current.right = false;
-        }
-        return;
-      }
-      switch (event.key) {
-        case "ArrowUp":
-          event.preventDefault();
-          rotationState.current.up = isDown;
-          break;
-        case "ArrowDown":
-          event.preventDefault();
-          rotationState.current.down = isDown;
-          break;
-        case "ArrowLeft":
-          event.preventDefault();
-          rotationState.current.left = isDown;
-          break;
-        case "ArrowRight":
-          event.preventDefault();
-          rotationState.current.right = isDown;
-          break;
-        default:
-          return;
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => handleKey(e, true);
-    const handleKeyUp = (e: KeyboardEvent) => handleKey(e, false);
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, [isInputFocused, rotationState]);
-
-  useFrame((_, delta) => {
-    if (!modelGroupRef.current) return;
-    const rotationSpeed = 2;
-    if (rotationState.current.up)
-      modelGroupRef.current.rotation.x -= rotationSpeed * delta;
-    if (rotationState.current.down)
-      modelGroupRef.current.rotation.x += rotationSpeed * delta;
-    if (rotationState.current.left)
-      modelGroupRef.current.rotation.y -= rotationSpeed * delta;
-    if (rotationState.current.right)
-      modelGroupRef.current.rotation.y += rotationSpeed * delta;
-  });
-
-  return null;
-};
-
 const ScenePhysics = ({
   modelGroupRef,
   controlsRef,
@@ -312,7 +240,6 @@ export const AtomModel = () => {
     sliderValue,
     refreshCounter,
     setSelectedElement,
-    isInputFocused,
     shakeCounter,
     panelMode,
     isCameraAnimating,
@@ -322,12 +249,6 @@ export const AtomModel = () => {
 
   const modelGroupRef = useRef<THREE.Group>(null!);
   const controlsRef = useRef<OrbitControlsImpl>(null!);
-  const rotationState = useRef({
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-  });
   const clickStartPos = useRef<{ x: number; y: number } | null>(null);
 
   const linearVelocity = useRef(new THREE.Vector3(0, 0, 0));
@@ -350,8 +271,6 @@ export const AtomModel = () => {
       targetCameraPosition.current.copy(DETAILED_VIEW_CONFIG.CAMERA_POSITION);
       setIsCameraAnimating(true);
     }
-    // Usunięto blok 'else', aby atom nie wracał na środek po zamknięciu panelu.
-    // Powrót odbywa się teraz tylko przez przycisk Reset.
   }, [panelMode, setIsCameraAnimating]);
 
   useEffect(() => {
@@ -377,16 +296,15 @@ export const AtomModel = () => {
   }, [refreshCounter, setIsCameraAnimating]);
 
   const triggerShake = useCallback(() => {
-    const linearStrength = 2;
+    // Anuluj inne animacje, aby uniknąć konfliktów
+    setIsCameraAnimating(false);
+    // Zresetuj prędkość liniową, aby zapobiec ruchowi w przestrzeni
+    linearVelocity.current.set(0, 0, 0);
+
     const angularMinStrength = 10;
     const angularMaxStrength = 18;
-    const newLinearVelocity = new THREE.Vector3(
-      Math.random() - 0.5,
-      Math.random() - 0.5,
-      (Math.random() - 0.5) * 0.5
-    );
-    newLinearVelocity.normalize().multiplyScalar(linearStrength);
-    linearVelocity.current.copy(newLinearVelocity);
+
+    // Ustaw tylko losową oś i prędkość obrotu
     const newAxis = new THREE.Vector3();
     do {
       newAxis.set(
@@ -397,11 +315,12 @@ export const AtomModel = () => {
     } while (newAxis.lengthSq() === 0);
     newAxis.normalize();
     rotationAxis.current.copy(newAxis);
+
     const speed =
       angularMinStrength +
       Math.random() * (angularMaxStrength - angularMinStrength);
     rotationSpeed.current = speed;
-  }, []);
+  }, [setIsCameraAnimating]);
 
   useEffect(() => {
     if (shakeCounter > 0) {
@@ -489,11 +408,6 @@ export const AtomModel = () => {
           enableZoom
           enablePan
           onStart={handleControlsStart}
-        />
-        <KeyboardRotator
-          modelGroupRef={modelGroupRef}
-          rotationState={rotationState}
-          isInputFocused={isInputFocused}
         />
         <ScenePhysics
           modelGroupRef={modelGroupRef}
