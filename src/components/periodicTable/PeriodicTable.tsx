@@ -307,17 +307,6 @@ export const PeriodicTable = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 2) return;
 
-    const target = e.target as HTMLElement;
-
-    if (
-      target.closest(`.${styles.legendItem}`) ||
-      target.closest(`[data-element-name]`) ||
-      target.closest(`.${styles.columnHeader}`) ||
-      target.closest(`.${styles.rowHeader}`)
-    ) {
-      return;
-    }
-
     e.preventDefault();
     actionStateRef.current.isPointerDown = true;
     actionStateRef.current.startX = e.clientX;
