@@ -8,12 +8,17 @@ import { MobileMenu } from "./MobileMenu";
 
 export const TopBarMobile = () => {
   const element = useAppStore(deriveCurrentElement);
+  const { hideInfoPanel } = useAppStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const topBarRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsMenuOpen((prev) => !prev);
+    const willBeOpen = !isMenuOpen;
+    if (willBeOpen) {
+      hideInfoPanel();
+    }
+    setIsMenuOpen(willBeOpen);
   };
 
   useEffect(() => {

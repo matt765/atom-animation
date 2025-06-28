@@ -26,7 +26,6 @@
   padding: 0 1rem;
   height: 60px;
   flex-shrink: 0;
-  cursor: pointer;
 }
 
 .toggleButton {
@@ -39,6 +38,7 @@
   justify-content: center;
   transition: transform 0.3s ease-in-out;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .elementSelectorWrapper {
@@ -209,19 +209,15 @@
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
-/* --- SEKCJA Z MEDIA QUERY DLA MAŁYCH EKRANÓW --- */
 @media (max-width: 400px) {
-  /* POPRAWKA DLA ZWINIĘTEGO PASKA (z Twojego screenshotu) */
   .bar {
     gap: 0.5rem;
   }
 
-  /* Zakładając, że w komponencie ElementSelect etykieta to <label> */
   .elementSelectorWrapper :global(label) {
     display: none;
   }
 
-  /* POPRAWKA DLA ROZWINIĘTEGO MENU (nasza poprzednia) */
   .content {
     padding-left: 1rem;
     padding-right: 1rem;

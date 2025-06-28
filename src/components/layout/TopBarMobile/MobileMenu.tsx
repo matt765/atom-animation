@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import styles from "./MobileMenu.module.css";
 import { AtomIcon } from "@/assets/icons/AtomIcon";
 import { PeriodicTableIcon } from "@/assets/icons/PeriodicTableIcon";
-import { ChartIcon } from "@/assets/icons/ChartIcon";
+
 import { GitHubIcon } from "@/assets/icons/GithubIcon";
 
 
@@ -16,8 +16,7 @@ const navItems = [
     href: "/periodic-table",
     label: "Periodic Table",
     icon: <PeriodicTableIcon />,
-  },
-  { href: "/statistics", label: "Statistics", icon: <ChartIcon /> },
+  }
 ];
 
 interface MobileMenuProps {

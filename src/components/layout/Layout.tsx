@@ -28,10 +28,16 @@ const useIsMobile = () => {
       setIsMobile(window.innerWidth < 1280);
     };
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
+    if (typeof window !== "undefined") {
+      checkScreenSize();
+      window.addEventListener("resize", checkScreenSize);
+    }
 
-    return () => window.removeEventListener("resize", checkScreenSize);
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", checkScreenSize);
+      }
+    };
   }, []);
 
   return isMobile;
@@ -53,11 +59,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const isMobile = useIsMobile();
 
-  const isMainPage = isMobile ? true : pathname === "/";
-  const isPeriodicTable = !isMobile && pathname === "/periodic-table";
-  const isStatistics = !isMobile && pathname === "/statistics";
-
   const clickOutsideTracker = useRef<{ x: number; y: number } | null>(null);
+
+  // Zaktualizowana, bardziej czytelna logika widoczności
+  const showDesktopControls = !isMobile && pathname === "/";
+  const showMobileBottomControls = isMobile && pathname === "/";
+  const showMobileTopBar = isMobile;
 
   useEffect(() => {
     hideInfoPanel();
@@ -67,27 +74,21 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const isPanelVisible = panelMode !== "hidden";
 
-    if (!isPanelVisible || panelMode === "periodic-table") return;
+    if (!isPanelVisible) return;
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return;
       const target = e.target as HTMLElement;
 
-      const onInfoPanel = target.closest('[class*="InfoPanel_panel"]');
-      const onBottomMenu = target.closest('[class*="BottomMenu_bottomMenu"]');
-      const onBottomMenuMobile = target.closest(
-        '[class*="BottomMenuMobile_bottomMenuMobile"]'
-      );
-      const onTopBarMobile = target.closest('[class*="TopBarMobile_topBar"]');
-      const onGitHubLink = target.closest('a[href*="github.com"]');
+      const ignoredElements = [
+        '[class*="InfoPanel_panel"]',
+        '[class*="BottomMenu_bottomMenu"]',
+        '[class*="BottomMenuMobile_bottomMenuMobile"]',
+        '[class*="TopBarMobile_topBar"]',
+        'a[href*="github.com"]',
+      ];
 
-      if (
-        onInfoPanel ||
-        onBottomMenu ||
-        onBottomMenuMobile ||
-        onTopBarMobile ||
-        onGitHubLink
-      ) {
+      if (ignoredElements.some((selector) => target.closest(selector))) {
         return;
       }
 
@@ -96,9 +97,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     const handleMouseUp = (e: MouseEvent) => {
       if (e.button !== 0) return;
       if (clickOutsideTracker.current) {
-        const dist = Math.sqrt(
-          (e.clientX - clickOutsideTracker.current.x) ** 2 +
-            (e.clientY - clickOutsideTracker.current.y) ** 2
+        const dist = Math.hypot(
+          e.clientX - clickOutsideTracker.current.x,
+          e.clientY - clickOutsideTracker.current.y
         );
         if (dist < 5) {
           hideInfoPanel();
@@ -130,11 +131,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     setPanelManuallyPositioned(true);
   };
 
-  const contentForPanel = isPeriodicTable
-    ? infoPanelContent
-    : { type: "element" as const, data: current3DElement };
+  const contentForPanel =
+    pathname === "/periodic-table"
+      ? infoPanelContent
+      : { type: "element" as const, data: current3DElement };
 
-  const showControls = isMainPage && !isPeriodicTable && !isStatistics;
   const isPanelVisible = panelMode !== "hidden";
 
   return (
@@ -148,7 +149,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         )}
       <GitHubLink />
       <SideMenu />
-      {isMobile && showControls && <TopBarMobile />}
+      {showMobileTopBar && <TopBarMobile />}
+
       <main
         className={`${styles.main} ${isMobile ? styles.mobileLayout : ""} ${
           pathname === "/statistics" ? styles.scrollable : ""
@@ -157,7 +159,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
 
-      {showControls && (isMobile ? <BottomMenuMobile /> : <BottomMenu />)}
+      {isMobile
+        ? showMobileBottomControls && <BottomMenuMobile />
+        : showDesktopControls && <BottomMenu />}
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         {isPanelVisible && contentForPanel && (

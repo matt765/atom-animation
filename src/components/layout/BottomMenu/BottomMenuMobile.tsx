@@ -57,6 +57,14 @@ export const BottomMenuMobile = () => {
     hideInfoPanel();
   };
 
+  const handleToggleExpand = () => {
+    const willBeExpanded = !isExpanded;
+    if (willBeExpanded) {
+      hideInfoPanel();
+    }
+    setIsExpanded(willBeExpanded);
+  };
+
   const handleElementSelection = (value: React.SetStateAction<string>) => {
     const newName = typeof value === "function" ? value(element.name) : value;
     setSelectedElement(newName, undefined, false);
@@ -71,7 +79,7 @@ export const BottomMenuMobile = () => {
       <div className={styles.bar}>
         <button
           className={styles.toggleButton}
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={handleToggleExpand}
           aria-expanded={isExpanded}
           aria-label={isExpanded ? "Collapse menu" : "Expand menu"}
         >

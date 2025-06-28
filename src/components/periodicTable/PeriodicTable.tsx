@@ -206,6 +206,8 @@ export const PeriodicTable = () => {
 
   const handleInfoClick = useCallback(
     (type: "element" | "group", identifier: string | FullGroupData) => {
+      if (actionStateRef.current.isDragging) return;
+
       const { infoPanelContent } = useAppStore.getState();
 
       let isSameContent = false;
@@ -241,6 +243,7 @@ export const PeriodicTable = () => {
   );
 
   const handleColumnClick = (groupNumber: number) => {
+    if (actionStateRef.current.isDragging) return;
     const groupData = allGroupsAndPeriodsData.find(
       (g) => g.class === `group-${groupNumber}`
     );
@@ -250,6 +253,7 @@ export const PeriodicTable = () => {
   };
 
   const handleRowClick = (periodNumber: number) => {
+    if (actionStateRef.current.isDragging) return;
     const periodData = allGroupsAndPeriodsData.find(
       (p) => p.class === `period-${periodNumber}`
     );
@@ -259,7 +263,7 @@ export const PeriodicTable = () => {
   };
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       if (!actionStateRef.current.isPointerDown) return;
 
       if (!actionStateRef.current.isDragging) {
@@ -287,27 +291,38 @@ export const PeriodicTable = () => {
       }
     };
 
-    const handleMouseUp = () => {
+    const handlePointerUp = () => {
       if (!actionStateRef.current.isPointerDown) return;
+
       actionStateRef.current.isPointerDown = false;
-      actionStateRef.current.isDragging = false;
       if (containerRef.current)
         containerRef.current.classList.remove(styles.isDragging);
+
+      setTimeout(() => {
+        actionStateRef.current.isDragging = false;
+      }, 0);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
     };
   }, []);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 2) return;
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 2) {
+      return;
+    }
 
-    e.preventDefault();
+    if (e.button === 2) {
+      e.preventDefault();
+    }
+
     actionStateRef.current.isPointerDown = true;
     actionStateRef.current.startX = e.clientX;
     actionStateRef.current.startY = e.clientY;
@@ -351,9 +366,10 @@ export const PeriodicTable = () => {
       className={`${styles.tableViewport} ${
         isNavigating ? styles.navigating : ""
       }`}
-      onMouseDown={handleMouseDown}
+      onPointerDown={handlePointerDown}
       onWheel={handleWheel}
       onContextMenu={handleContextMenu}
+      style={{ touchAction: "none" }}
     >
       <div
         ref={tableRef}

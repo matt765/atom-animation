@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import styles from "./InfoPanel.module.css";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   useAppStore,
   ExtendedElementConfig,
@@ -14,6 +14,18 @@ import {
 import { elements } from "@/elementsData/elementsData";
 import { FullGroupData } from "../../../elementsData/groupsData";
 import { OutlinedButton } from "../../common/OutlinedButton/OutlinedButton";
+
+const useIsSmallScreen = () => {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const check = () => setIsSmall(window.innerWidth < 600);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isSmall;
+};
 
 type InfoPanelProps = {
   content: InfoPanelContent;
@@ -72,14 +84,13 @@ const ElementContent = ({
   };
 
   return (
-    <>
+    <div className={styles.contentWrapper}>
       <div
         className={`${styles.content} ${
           isOnPeriodicTableView ? styles.contentPeriodic : ""
         }`}
       >
         <p className={styles.description}>{getDescription()}</p>
-
         {element.charge !== 0 && element.name !== "Unknown" && (
           <div className={styles.ionInfo}>
             <span className={styles.label}>ION CHARGE</span>
@@ -91,7 +102,6 @@ const ElementContent = ({
             </span>
           </div>
         )}
-
         {element.isIsotope &&
           element.name !== "Unknown" &&
           element.charge === 0 && (
@@ -117,7 +127,6 @@ const ElementContent = ({
             </span>
           </div>
         )}
-
         {!isCustomParticle && element.name !== "Unknown" && (
           <>
             <div className={styles.divider}></div>
@@ -177,7 +186,7 @@ const ElementContent = ({
           <OutlinedButton onClick={handleShowIn3D}>Show in 3D</OutlinedButton>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -229,6 +238,8 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
   const { hideInfoPanel, setPanelPosition, isPanelManuallyPositioned } =
     useAppStore();
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const isSmallScreen = useIsSmallScreen();
+  const pathname = usePathname();
 
   const [isPositionedByJs, setIsPositionedByJs] = useState(
     mode !== "periodic-table"
@@ -248,6 +259,7 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
       id: `draggable-panel-${content.type}-${
         content.type === "element" ? content.data.name : content.data.title
       }`,
+      disabled: isSmallScreen,
     });
 
   useEffect(() => {
@@ -267,7 +279,7 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
   );
 
   const style: React.CSSProperties = {};
-  if (isPositionedByJs) {
+  if (isPositionedByJs && !isSmallScreen) {
     style.position = "fixed";
     style.top = `${position.y}px`;
     style.left = `${position.x}px`;
@@ -286,6 +298,10 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
     return element.title;
   };
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   if (!isMounted) {
     return null;
   }
@@ -297,9 +313,17 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
     <div
       ref={combinedRef}
       className={`${styles.panel} ${
-        isPeriodicTableMode && !isPositionedByJs ? styles.centered : ""
-      } ${isPeriodicTableMode ? styles.dark : ""} ${
-        isDetailedMode && !isPanelManuallyPositioned ? styles.sideView : ""
+        isSmallScreen ? styles.mobileFullScreen : ""
+      } ${
+        isSmallScreen && pathname === "/periodic-table"
+          ? styles.mobilePeriodic
+          : ""
+      } ${isPeriodicTableMode && !isPositionedByJs ? styles.centered : ""} ${
+        isPeriodicTableMode ? styles.dark : ""
+      } ${
+        isDetailedMode && !isPanelManuallyPositioned && !isSmallScreen
+          ? styles.sideView
+          : ""
       }`}
       style={style}
     >
