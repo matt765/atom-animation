@@ -39,14 +39,14 @@
 
 .closeButton {
   position: absolute;
-  top: 0.7rem;
-  right: 0.9rem;
+  top: 0.3rem;
+  right: 0.6rem;
   z-index: 10;
   background: none;
   border: none;
   padding: 0.5rem;
   color: #94a3b8;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   line-height: 1;
   cursor: pointer;
   transition: color 0.2s ease;
