@@ -55,6 +55,12 @@ interface CustomTooltipProps {
   label?: string | number;
 }
 
+interface ChartConfig {
+  id: string;
+  title: string;
+  component: React.ReactNode;
+}
+
 const FullscreenIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -101,8 +107,9 @@ const renderLegendText = (value: string) => {
 };
 
 export const DataCharts = () => {
-  const [fullscreenChart, setFullscreenChart] =
-    useState<React.ReactNode | null>(null);
+  const [fullscreenChart, setFullscreenChart] = useState<ChartConfig | null>(
+    null
+  );
 
   const nucleonsVsElectronsData = useMemo(
     () =>
@@ -226,7 +233,7 @@ export const DataCharts = () => {
     []
   );
 
-  const chartsData = [
+  const chartsData: ChartConfig[] = [
     {
       id: "nucleonsVsElectrons",
       title: "Nucleons vs. Electrons",
@@ -245,7 +252,7 @@ export const DataCharts = () => {
             />
             <XAxis dataKey="name" tick={{ fill: "#94a3b8" }} interval={9} />
             <YAxis tick={{ fill: "#94a3b8" }} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -286,7 +293,7 @@ export const DataCharts = () => {
             />
             <XAxis dataKey="name" tick={{ fill: "#94a3b8" }} interval={5} />
             <YAxis tick={{ fill: "#94a3b8" }} domain={[0.8, 1.6]} width={80} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -314,7 +321,7 @@ export const DataCharts = () => {
             />
             <XAxis dataKey="name" tick={{ fill: "#94a3b8" }} interval={9} />
             <YAxis tick={{ fill: "#94a3b8" }} domain={[0, 6000]} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -362,6 +369,7 @@ export const DataCharts = () => {
               domain={[0, 6000]}
             />
             <Tooltip
+              isAnimationActive={false}
               cursor={{ strokeDasharray: "3 3" }}
               content={<CustomTooltip />}
             />
@@ -395,6 +403,7 @@ export const DataCharts = () => {
               domain={[0, 120]}
             />
             <Tooltip
+              isAnimationActive={false}
               cursor={{ strokeDasharray: "3 3" }}
               content={<CustomTooltip />}
             />
@@ -432,7 +441,7 @@ export const DataCharts = () => {
             />
             <XAxis dataKey="name" tick={{ fill: "#94a3b8" }} interval={9} />
             <YAxis tick={{ fill: "#94a3b8" }} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -506,7 +515,7 @@ export const DataCharts = () => {
                 />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -527,7 +536,7 @@ export const DataCharts = () => {
             />
             <XAxis dataKey="name" tick={{ fill: "#94a3b8" }} interval={5} />
             <YAxis tick={{ fill: "#94a3b8" }} allowDecimals={false} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -549,7 +558,7 @@ export const DataCharts = () => {
             />
             <XAxis dataKey="name" tick={{ fill: "#94a3b8" }} interval={5} />
             <YAxis tick={{ fill: "#94a3b8" }} />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -575,7 +584,7 @@ export const DataCharts = () => {
               allowDecimals={false}
               width={80}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip isAnimationActive={false} content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ paddingTop: "30px" }}
               formatter={renderLegendText}
@@ -599,7 +608,7 @@ export const DataCharts = () => {
           <div key={chart.id} className={styles.chartContainer}>
             <h3 className={styles.chartTitle}>{chart.title}</h3>
             <button
-              onClick={() => setFullscreenChart(chart.component)}
+              onClick={() => setFullscreenChart(chart)}
               className={styles.fullscreenButton}
               aria-label={`View ${chart.title} in fullscreen`}
             >
@@ -619,7 +628,10 @@ export const DataCharts = () => {
           >
             &times;
           </button>
-          <div className={styles.modalContent}>{fullscreenChart}</div>
+          <h3 className={styles.fullscreenChartTitle}>
+            {fullscreenChart.title}
+          </h3>
+          <div className={styles.modalContent}>{fullscreenChart.component}</div>
         </div>
       )}
     </>
