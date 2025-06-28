@@ -245,6 +245,7 @@ export const deriveCurrentElement = (
 
   const isIsotope = baseElement.neutrons !== neutrons;
   const charge = protons - electrons;
+  const massNumber = protons + neutrons;
 
   const getStability = () => {
     return baseElement.stableNeutrons.includes(neutrons);
@@ -255,6 +256,7 @@ export const deriveCurrentElement = (
     protons,
     neutrons,
     electrons,
+    atomicWeight: isIsotope ? massNumber.toString() : baseElement.atomicWeight,
     isIsotope,
     charge,
     isStable: getStability(),
