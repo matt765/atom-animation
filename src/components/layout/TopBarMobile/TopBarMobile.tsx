@@ -1,21 +1,54 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./TopBarMobile.module.css";
 import { useAppStore, deriveCurrentElement } from "@/store/appStore";
+import { HamburgerIcon } from "@/assets/icons/HamburgerIcon";
+import { MobileMenu } from "./MobileMenu";
 
-/**
- * TopBarMobile component
- * Displays the current element's symbol and name at the top of the screen on mobile devices.
- * It is a fixed bar that is always visible.
- */
 export const TopBarMobile = () => {
   const element = useAppStore(deriveCurrentElement);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const topBarRef = useRef<HTMLDivElement>(null);
+
+  const toggleMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMenuOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        topBarRef.current &&
+        !topBarRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <div className={styles.topBar}>
-      <span className={styles.elementSymbol}>{element.symbol}</span>
-      <span className={styles.elementName}>{element.name}</span>
+    <div ref={topBarRef} className={styles.topBarWrapper}>
+      <div className={styles.topBar}>
+        <div className={styles.spacer} />
+        <div className={styles.elementInfo}>
+          <span className={styles.elementSymbol}>{element.symbol}</span>
+          <span className={styles.elementName}>{element.name}</span>
+        </div>
+        <button
+          onClick={toggleMenu}
+          className={styles.hamburgerButton}
+          aria-label="Toggle menu"
+          aria-expanded={isMenuOpen}
+        >
+          <HamburgerIcon />
+        </button>
+      </div>
+      {isMenuOpen && <MobileMenu onLinkClick={() => setIsMenuOpen(false)} />}
     </div>
   );
 };

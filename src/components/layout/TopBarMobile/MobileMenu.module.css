@@ -1,0 +1,53 @@
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #1a1f26;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-top: none;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  padding: 0.75rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.navLink,
+.githubLink {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Wyśrodkowanie zawartości */
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #cbd5e1;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navLink:hover,
+.githubLink:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.navLink.active {
+  background-color: rgba(59, 195, 226, 0.1);
+  color: #3bc3e2;
+  font-weight: 600;
+}
+
+.navLink span,
+.githubLink span {
+  font-size: 1rem;
+}

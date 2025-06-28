@@ -51,3 +51,8 @@
   /* box-shadow: 0 0 12px rgba(59, 195, 226, 0.5); */
 
 }
+@media (max-width: 1279px) {
+  .sideMenuContainer {
+    display: none;
+  }
+}

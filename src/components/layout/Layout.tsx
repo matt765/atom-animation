@@ -3,7 +3,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Layout.module.css";
-
 import {
   DndContext,
   PointerSensor,
@@ -148,10 +147,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           document.body
         )}
       <GitHubLink />
-      {!isMobile && <SideMenu />}
+      <SideMenu />
       {isMobile && showControls && <TopBarMobile />}
-
-      {/* ZMIANA: Dodana warunkowa klasa .scrollable */}
       <main
         className={`${styles.main} ${isMobile ? styles.mobileLayout : ""} ${
           pathname === "/statistics" ? styles.scrollable : ""
