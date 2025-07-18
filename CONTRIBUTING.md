@@ -15,8 +15,6 @@ Whether you're fixing a typo, improving documentation, or adding a feature — y
 
 ## Licensing of contributions
 
-This project is released under the **AGPL-3.0** license, which ensures that the software remains open and available to everyone under  copyleft terms.
-
 All contributions require a Contributor License Agreement (CLA). This solution helps to maintain the project over the long term and avoids complicated relicensing efforts down the road. By submitting a pull request, you confirm that you agree to the terms of the CLA for the benefit of the project's future development.
 
 ## Other ways to support the project
@@ -30,6 +28,6 @@ Every form of support means a lot and helps keep this project alive and growing.
 
 ## A Note of Thanks
 
-Thanks again for taking the time to contribute..
+Thanks again for taking the time to contribute.
 
 Happy coding!

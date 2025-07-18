@@ -1,10 +1,9 @@
-// common/Select/Select.tsx
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
+
 import styles from "./Select.module.css";
-import { SearchIcon } from "@/assets/icons/SearchIcon";
 
 export interface SelectOption {
   value: string;
@@ -17,8 +16,6 @@ interface SelectProps {
   onChange: (value: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
 }
 
 export const Select = ({
@@ -27,36 +24,20 @@ export const Select = ({
   onChange,
   onFocus,
   onBlur,
-  searchTerm,
-  setSearchTerm,
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLUListElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null);
 
   const selectedOption = options.find((option) => option.value === value);
 
-  // Filtruj opcje na podstawie searchTerm
-  const filteredOptions = React.useMemo(() => {
-    if (!searchTerm.trim()) {
-      return options;
-    }
-    const lowercasedFilter = searchTerm.toLowerCase().trim();
-    return options.filter(
-      (option) =>
-        option.label.toLowerCase().includes(lowercasedFilter) ||
-        option.value.toLowerCase().includes(lowercasedFilter)
-    );
-  }, [options, searchTerm]);
-
   const updateDropdownPosition = useCallback(() => {
-    if (selectRef.current && isOpen) {
+    if (selectRef.current) {
       const rect = selectRef.current.getBoundingClientRect();
       setDropdownRect({
         left: rect.left,
-        top: rect.top - 4, // Pozycjonuj nad selectem (odejmujemy 4px gap)
+        top: rect.bottom + 4,
         width: rect.width,
         height: 0,
         x: rect.x,
@@ -65,22 +46,14 @@ export const Select = ({
         bottom: rect.bottom,
         toJSON: () => ({}),
       });
-    } else {
-      setDropdownRect(null);
     }
-  }, [isOpen]);
-
-  useEffect(() => {
-    updateDropdownPosition();
-  }, [isOpen, updateDropdownPosition]);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
+      updateDropdownPosition();
       window.addEventListener("resize", updateDropdownPosition);
       window.addEventListener("scroll", updateDropdownPosition, true);
-    } else {
-      window.removeEventListener("resize", updateDropdownPosition);
-      window.removeEventListener("scroll", updateDropdownPosition, true);
     }
     return () => {
       window.removeEventListener("resize", updateDropdownPosition);
@@ -93,12 +66,8 @@ export const Select = ({
     setIsOpen(nextIsOpen);
     if (nextIsOpen) {
       onFocus?.();
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 0);
     } else {
       onBlur?.();
-      setSearchTerm("");
     }
   };
 
@@ -106,28 +75,6 @@ export const Select = ({
     onChange(optionValue);
     setIsOpen(false);
     onBlur?.();
-    setSearchTerm(""); // Clear search after selection
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (filteredOptions.length > 0) {
-        onChange(filteredOptions[0].value);
-        setIsOpen(false);
-        onBlur?.();
-        setSearchTerm("");
-      }
-    } else if (e.key === "Escape") {
-      setIsOpen(false);
-      onBlur?.();
-      setSearchTerm("");
-    } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-      e.preventDefault();
-    }
   };
 
   useEffect(() => {
@@ -137,13 +84,10 @@ export const Select = ({
         selectRef.current &&
         !selectRef.current.contains(event.target as Node) &&
         (!dropdownRef.current ||
-          !dropdownRef.current.contains(event.target as Node)) &&
-        (!searchInputRef.current ||
-          !searchInputRef.current.contains(event.target as Node))
+          !dropdownRef.current.contains(event.target as Node))
       ) {
         setIsOpen(false);
         onBlur?.();
-        setSearchTerm("");
       }
     };
 
@@ -151,7 +95,7 @@ export const Select = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, onBlur, setSearchTerm]);
+  }, [isOpen, onBlur]);
 
   return (
     <div className={styles.selectContainer} ref={selectRef}>
@@ -174,41 +118,18 @@ export const Select = ({
               top: `${dropdownRect.top}px`,
               width: `${dropdownRect.width}px`,
               zIndex: 999999,
-              transform: "translateY(-100%)", // Przesuń całość w górę o własną wysokość
             }}
           >
-            {/* Szukajka przyklejona na górze dropdownu */}
-            <div
-              className={styles.searchOverlay}
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <SearchIcon />
-              <input
-                type="text"
-                placeholder="Search..."
-                className={styles.searchInput}
-                value={searchTerm}
-                onChange={handleSearchChange}
-                onKeyDown={handleSearchKeyDown}
-                ref={searchInputRef}
-                autoFocus
-              />
-            </div>
-            {/* Lista opcji z przewijaniem */}
             <ul className={styles.selectDropdown} ref={dropdownRef}>
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => (
-                  <li
-                    key={option.value}
-                    className={styles.selectOption}
-                    onClick={() => handleOptionClick(option.value)}
-                  >
-                    {option.label}
-                  </li>
-                ))
-              ) : (
-                <li className={styles.noResults}>No results</li>
-              )}
+              {options.map((option) => (
+                <li
+                  key={option.value}
+                  className={styles.selectOption}
+                  onClick={() => handleOptionClick(option.value)}
+                >
+                  {option.label}
+                </li>
+              ))}
             </ul>
           </div>,
           document.body

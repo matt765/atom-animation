@@ -2,7 +2,7 @@
   "name": "atom-animation",
   "version": "1.0.5",
   "private": true,
-  "license": "AGPL-3.0-only",
+  "license": "Personal Use License",
   "description": "Interactive atom 3d animation made in Three.js",
   "author": {
     "name": "matt765",
