@@ -72,16 +72,32 @@ const ElementContent = ({
   const getDescription = () => {
     if (element.name === "Unknown") return element.description;
     if (element.isIsotope && element.charge !== 0) {
-      return `This is an ion of the isotope ${element.name}-${element.atomicWeight}. This charged isotope has gained or lost electrons, altering its chemical reactivity and bonding behavior compared to the neutral atom.`;
+      return `This is an ion of the isotope ${element.name}-${Math.round(
+        element.atomicWeight
+      )}. This charged isotope has gained or lost electrons, altering its chemical reactivity and bonding behavior compared to the neutral atom.`;
     }
     if (element.isIsotope) {
-      return `This is an isotope of ${element.name} with a mass number of ${element.atomicWeight}. It contains the standard ${element.protons} protons, but has ${element.neutrons} neutrons.`;
+      return `This is an isotope of ${
+        element.name
+      } with a mass number of ${Math.round(
+        element.atomicWeight
+      )}. It contains the standard ${element.protons} protons, but has ${
+        element.neutrons
+      } neutrons.`;
     }
     if (element.charge !== 0) {
       return `This is an ion of ${element.name}. An ion is an atom that has a net electrical charge because its number of electrons does not equal its number of protons.`;
     }
     return element.description;
   };
+
+  const meltingPointK = element.phaseTransitions.find(
+    (pt) => pt.type === "melting"
+  )?.temperature_K;
+
+  const boilingPointK = element.phaseTransitions.find(
+    (pt) => pt.type === "boiling"
+  )?.temperature_K;
 
   return (
     <div className={styles.contentWrapper}>
@@ -164,13 +180,13 @@ const ElementContent = ({
               <div className={styles.property}>
                 <span className={styles.label}>MELTING PT.</span>
                 <span className={styles.value}>
-                  {formatValue(element.meltingPointK, "K")}
+                  {formatValue(meltingPointK, "K")}
                 </span>
               </div>
               <div className={styles.property}>
                 <span className={styles.label}>BOILING PT.</span>
                 <span className={styles.value}>
-                  {formatValue(element.boilingPointK, "K")}
+                  {formatValue(boilingPointK, "K")}
                 </span>
               </div>
             </div>
@@ -293,7 +309,7 @@ export const InfoPanel = ({ content, position, mode }: InfoPanelProps) => {
     const element = content.data;
     if (element.name === "Unknown") return "Custom Particle";
     if (element.isIsotope)
-      return `Isotope: ${element.name}-${element.atomicWeight}`;
+      return `Isotope: ${element.name}-${Math.round(element.atomicWeight)}`;
     if (element.charge !== 0) return `Ion: ${element.name}`;
     return element.title;
   };

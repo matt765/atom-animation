@@ -9,25 +9,25 @@ import React, {
 } from "react";
 import { useAppStore } from "@/store/appStore";
 import { elements } from "@/elementsData/elementsData";
-import type { ElementConfig } from "@/elementsData/elementsData";
+import type { ElementConfig } from "@/elementsData/types";
 import { allGroupsAndPeriodsData, legendData } from "@/elementsData/groupsData";
 import type { FullGroupData } from "@/elementsData/groupsData";
 import styles from "./PeriodicTable.module.css";
-import { getElementCategory, ElementCategory } from "../AtomModel/elementUtils";
 
-const ELEMENT_CATEGORY_COLORS: Record<ElementCategory, string> = {
-  "alkali-metal": "rgb(90, 74, 66)",
-  "alkaline-earth-metal": "rgb(90, 82, 66)",
-  "transition-metal": "rgb(99, 79, 92)",
-  lanthanide: "rgb(66, 90, 82)",
-  actinide: "rgb(66, 90, 90)",
-  "other-metal": "rgb(76, 89, 111)",
-  metalloid: "rgb(66, 90, 71)",
-  nonmetal: "rgb(71, 88, 104)",
-  halogen: "rgb(92, 79, 99)",
-  "noble-gas": "rgb(92, 79, 120)",
-  unknown: "rgb(68, 68, 68)",
+const ELEMENT_CATEGORY_COLORS = {
+  "Alkali metals": "rgb(90, 74, 66)",
+  "Alkaline earth metals": "rgb(90, 82, 66)",
+  "Transition metals": "rgb(99, 79, 92)",
+  Lanthanoids: "rgb(66, 90, 82)",
+  Actinoids: "rgb(66, 90, 90)",
+  "Post-transition metals": "rgb(76, 89, 111)",
+  Metalloids: "rgb(66, 90, 71)",
+  "Other nonmetals": "rgb(71, 88, 104)",
+  Halogens: "rgb(92, 79, 99)",
+  "Noble gases": "rgb(92, 79, 120)",
 };
+
+type ElementCategory = keyof typeof ELEMENT_CATEGORY_COLORS;
 
 const legendDisplayData = legendData;
 
@@ -44,7 +44,7 @@ const LegendAndExample = ({
         <div
           key={item.name}
           className={styles.legendItem}
-          onMouseEnter={() => onGroupHover(item.class as ElementCategory)}
+          onMouseEnter={() => onGroupHover(item.name as ElementCategory)}
           onMouseLeave={() => onGroupHover(null)}
           onClick={() => onGroupClick(item)}
         >
@@ -52,7 +52,7 @@ const LegendAndExample = ({
             className={styles.legendSwatch}
             style={{
               backgroundColor:
-                ELEMENT_CATEGORY_COLORS[item.class as ElementCategory],
+                ELEMENT_CATEGORY_COLORS[item.name as ElementCategory],
             }}
           />
           <span>{item.title}</span>
@@ -64,7 +64,7 @@ const LegendAndExample = ({
         <div
           key={item.name}
           className={styles.legendItem}
-          onMouseEnter={() => onGroupHover(item.class as ElementCategory)}
+          onMouseEnter={() => onGroupHover(item.name as ElementCategory)}
           onMouseLeave={() => onGroupHover(null)}
           onClick={() => onGroupClick(item)}
         >
@@ -72,7 +72,7 @@ const LegendAndExample = ({
             className={styles.legendSwatch}
             style={{
               backgroundColor:
-                ELEMENT_CATEGORY_COLORS[item.class as ElementCategory],
+                ELEMENT_CATEGORY_COLORS[item.name as ElementCategory],
             }}
           />
           <span>{item.title}</span>
@@ -82,7 +82,7 @@ const LegendAndExample = ({
     <div
       className={styles.exampleTile}
       style={{
-        backgroundColor: ELEMENT_CATEGORY_COLORS["transition-metal"],
+        backgroundColor: ELEMENT_CATEGORY_COLORS["Transition metals"],
       }}
     >
       <div className={styles.exampleContent}>
@@ -111,25 +111,27 @@ const getGridPosition = (element: ElementConfig) => {
   const gridColumnOffset = 1;
   const gridRowOffset = 1;
 
+  if (element.chemicalSeries === "Lanthanoids" && element.protons !== 71) {
+    return {
+      gridRow: 10,
+      gridColumn: element.protons - 57 + 3 + gridColumnOffset,
+    };
+  }
+
+  if (element.chemicalSeries === "Actinoids" && element.protons !== 103) {
+    return {
+      gridRow: 11,
+      gridColumn: element.protons - 89 + 3 + gridColumnOffset,
+    };
+  }
+
   if (element.group > 0) {
     return {
       gridRow: element.period + gridRowOffset,
       gridColumn: element.group + gridColumnOffset,
     };
   }
-  const atomicNumber = element.protons;
-  if (atomicNumber >= 57 && atomicNumber <= 71) {
-    return {
-      gridRow: 10,
-      gridColumn: atomicNumber - 57 + 3 + gridColumnOffset,
-    };
-  }
-  if (atomicNumber >= 89 && atomicNumber <= 103) {
-    return {
-      gridRow: 11,
-      gridColumn: atomicNumber - 89 + 3 + gridColumnOffset,
-    };
-  }
+
   return {};
 };
 
@@ -411,7 +413,7 @@ export const PeriodicTable = () => {
         />
         {elements.map((element) => {
           const isActive = element.name === currentModelElement?.name;
-          const categoryClass = getElementCategory(element);
+          const categoryClass = element.chemicalSeries;
           const isGroupHighlighted = hoveredGroup === categoryClass;
           const isRowHighlighted =
             hoveredRow !== null && element.period === hoveredRow;
@@ -430,7 +432,10 @@ export const PeriodicTable = () => {
               }`}
               style={{
                 ...gridPosition,
-                backgroundColor: ELEMENT_CATEGORY_COLORS[categoryClass],
+                backgroundColor:
+                  ELEMENT_CATEGORY_COLORS[
+                    categoryClass as keyof typeof ELEMENT_CATEGORY_COLORS
+                  ],
               }}
               title={element.name}
             >

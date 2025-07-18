@@ -1,4 +1,3 @@
-// components/AtomModel/ElementSelect/ElementSelect.tsx
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
@@ -6,19 +5,10 @@ import styles from "./ElementSelect.module.css";
 import { Select, SelectOption } from "../../common/Select/Select";
 import { useAppStore } from "../../../store/appStore";
 import { useLongPress } from "../../../hooks/useLongPress";
-
-export interface ElementData {
-  name: string;
-  protons: number;
-  neutrons: number;
-  atomicWeight: string;
-  symbol: string;
-  electronConfiguration: string;
-  shells: number[];
-}
+import type { ElementConfig } from "@/elementsData/types";
 
 interface ElementSelectProps {
-  elements: ElementData[];
+  elements: ElementConfig[];
   selectedElementName: string;
   setSelectedElement: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -59,7 +49,6 @@ export const ElementSelect = ({
     [elements]
   );
 
-  // Automatyczna zmiana elementu na podstawie wyszukiwania
   useEffect(() => {
     const lowercasedFilter = searchTerm.toLowerCase().trim();
     if (!lowercasedFilter) return;
@@ -70,7 +59,6 @@ export const ElementSelect = ({
         el.symbol.toLowerCase().includes(lowercasedFilter)
     );
 
-    // Natychmiast zmień na pierwszy znaleziony element
     if (filtered.length > 0 && selectedElementName !== filtered[0].name) {
       setSelectedElement(filtered[0].name);
     }
@@ -82,12 +70,12 @@ export const ElementSelect = ({
 
   const handleSelectBlur = () => {
     setInputFocus(false);
-    setSearchTerm(""); // Resetuj searchTerm po utracie focusu
+    setSearchTerm("");
   };
 
   const handleSelectChange = (value: string) => {
     setSelectedElement(value);
-    setSearchTerm(""); // Resetuj searchTerm po wybraniu opcji
+    setSearchTerm("");
   };
 
   return (

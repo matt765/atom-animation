@@ -1,11 +1,11 @@
 import { create } from "zustand";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { elements, ElementConfig } from "../elementsData/elementsData";
+import { elements } from "../elementsData/elementsData";
 import { getElementByProtons } from "../components/AtomModel/elementUtils";
 import { GroupData } from "@/elementsData/groupsData";
+import { ElementConfig } from "@/elementsData/types";
 
 export interface ExtendedElementConfig extends ElementConfig {
-  electrons: number;
   isIsotope: boolean;
   isStable: boolean;
   charge: number;
@@ -256,7 +256,7 @@ export const deriveCurrentElement = (
     protons,
     neutrons,
     electrons,
-    atomicWeight: isIsotope ? massNumber.toString() : baseElement.atomicWeight,
+    atomicWeight: isIsotope ? massNumber : baseElement.atomicWeight,
     isIsotope,
     charge,
     isStable: getStability(),

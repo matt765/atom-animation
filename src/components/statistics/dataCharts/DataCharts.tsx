@@ -26,6 +26,7 @@ import {
   NameType,
 } from "recharts/types/component/DefaultTooltipContent";
 import { elements } from "../../../elementsData/elementsData";
+import type { ElementConfig } from "@/elementsData/types";
 import styles from "./DataCharts.module.css";
 
 const COLORS = [
@@ -38,7 +39,7 @@ const COLORS = [
   "#818cf8",
   "#22d3ee",
 ];
-const STATE_COLORS = { Gas: "#a78bfa", Solid: "#60a5fa", Liquid: "#2dd4bf" };
+const STATE_COLORS = { gas: "#a78bfa", solid: "#60a5fa", liquid: "#2dd4bf" };
 
 interface TooltipPayload {
   name: NameType;
@@ -113,7 +114,7 @@ export const DataCharts = () => {
 
   const nucleonsVsElectronsData = useMemo(
     () =>
-      elements.map((el) => ({
+      elements.map((el: ElementConfig) => ({
         name: el.symbol,
         fullName: el.name,
         "Total Nucleons": el.protons + el.neutrons,
@@ -122,22 +123,33 @@ export const DataCharts = () => {
     []
   );
 
-  const meltingBoilingData = useMemo(
-    () =>
-      elements
-        .filter((el) => el.meltingPointK !== null && el.boilingPointK !== null)
-        .map((el) => ({
+  const meltingBoilingData = useMemo(() => {
+    return elements
+      .map((el: ElementConfig) => {
+        const meltingPoint = el.phaseTransitions.find(
+          (pt) => pt.type === "melting"
+        )?.temperature_K;
+        const boilingPoint = el.phaseTransitions.find(
+          (pt) => pt.type === "boiling"
+        )?.temperature_K;
+
+        return {
           name: el.symbol,
           fullName: el.name,
-          "Melting Point (K)": el.meltingPointK,
-          "Boiling Point (K)": el.boilingPointK,
-        })),
-    []
-  );
+          "Melting Point (K)": meltingPoint,
+          "Boiling Point (K)": boilingPoint,
+        };
+      })
+      .filter(
+        (el) =>
+          el["Melting Point (K)"] != null && el["Boiling Point (K)"] != null
+      );
+  }, []);
 
   const stateOfMatterData = useMemo(() => {
-    const states = elements.reduce((acc, el) => {
-      acc[el.stateAtSTP] = (acc[el.stateAtSTP] || 0) + 1;
+    const states = elements.reduce((acc, el: ElementConfig) => {
+      const state = el.stateAtSTP || "Unknown";
+      acc[state] = (acc[state] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     return Object.entries(states).map(([name, value]) => ({ name, value }));
@@ -145,7 +157,7 @@ export const DataCharts = () => {
 
   const stableIsotopesData = useMemo(
     () =>
-      elements.map((el) => ({
+      elements.map((el: ElementConfig) => ({
         name: el.symbol,
         fullName: el.name,
         "Stable Isotopes": el.stableNeutrons.length,
@@ -153,22 +165,29 @@ export const DataCharts = () => {
     []
   );
 
-  const liquidRangeData = useMemo(
-    () =>
-      elements
-        .filter((el) => el.meltingPointK && el.boilingPointK)
-        .map((el) => ({
+  const liquidRangeData = useMemo(() => {
+    return elements
+      .map((el: ElementConfig) => {
+        const meltingPoint = el.phaseTransitions.find(
+          (pt) => pt.type === "melting"
+        )?.temperature_K;
+        const boilingPoint = el.phaseTransitions.find(
+          (pt) => pt.type === "boiling"
+        )?.temperature_K;
+
+        return {
           name: el.symbol,
           fullName: el.name,
-          x: el.meltingPointK,
-          y: el.boilingPointK,
-        })),
-    []
-  );
+          x: meltingPoint,
+          y: boilingPoint,
+        };
+      })
+      .filter((el) => el.x != null && el.y != null);
+  }, []);
 
   const shellCountData = useMemo(
     () =>
-      elements.map((el) => ({
+      elements.map((el: ElementConfig) => ({
         name: el.symbol,
         fullName: el.name,
         "Electron Shells": el.shells.length,
@@ -179,7 +198,7 @@ export const DataCharts = () => {
   const neutronToProtonRatioData = useMemo(
     () =>
       elements
-        .filter((el) => el.protons > 0)
+        .filter((el: ElementConfig) => el.protons > 0)
         .map((el) => ({
           name: el.symbol,
           fullName: el.name,
@@ -190,17 +209,17 @@ export const DataCharts = () => {
 
   const valenceElectronsData = useMemo(
     () =>
-      elements.map((el) => ({
+      elements.map((el: ElementConfig) => ({
         name: el.symbol,
         fullName: el.name,
-        "Valence Electrons": el.shells[el.shells.length - 1],
+        "Valence Electrons": el.shells[el.shells.length - 1] || 0,
       })),
     []
   );
 
   const nuclearStabilityData = useMemo(
     () =>
-      elements.map((el) => ({
+      elements.map((el: ElementConfig) => ({
         name: el.symbol,
         fullName: el.name,
         protons: el.protons,
@@ -219,7 +238,7 @@ export const DataCharts = () => {
 
   const shellFillingData = useMemo(
     () =>
-      elements.map((el) => ({
+      elements.map((el: ElementConfig) => ({
         name: el.symbol,
         fullName: el.name,
         "Shell K (n=1)": el.shells[0] || 0,

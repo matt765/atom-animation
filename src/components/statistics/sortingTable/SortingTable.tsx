@@ -13,12 +13,11 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { elements, ElementConfig } from "../../../elementsData/elementsData";
+import { elements } from "../../../elementsData/elementsData";
+import type { ElementConfig } from "@/elementsData/types";
 import styles from "./SortingTable.module.css";
 import { FilterIcon } from "@/assets/icons/FilterIcon";
 import { SortIcon } from "@/assets/icons/SortIcon";
-
-type ElementWithElectrons = ElementConfig & { electrons: number };
 
 const formatHeader = (key: string): string => {
   return key
@@ -37,24 +36,10 @@ export const SortingTable = () => {
   const filterMenuRef = useRef<HTMLDivElement>(null);
   const sortMenuRef = useRef<HTMLDivElement>(null);
 
-  const tableData = useMemo(
-    () => elements.map((el) => ({ ...el, electrons: el.protons })),
-    []
-  );
+  const tableData = useMemo(() => elements, []);
 
-  const columns = useMemo<ColumnDef<ElementWithElectrons>[]>(() => {
-    const keys: (keyof ElementWithElectrons)[] = [
-      "protons",
-      "neutrons",
-      "electrons",
-      "atomicWeight",
-      "group",
-      "period",
-      "meltingPointK",
-      "boilingPointK",
-      "stateAtSTP",
-    ];
-    const columnDefs: ColumnDef<ElementWithElectrons>[] = [
+  const columns = useMemo<ColumnDef<ElementConfig>[]>(
+    () => [
       {
         accessorKey: "name",
         header: "Name",
@@ -67,16 +52,63 @@ export const SortingTable = () => {
         enableSorting: false,
         enableColumnFilter: false,
       },
-    ];
-    keys.forEach((key) => {
-      columnDefs.push({
-        accessorKey: key,
-        header: key === "protons" ? "Protons" : formatHeader(key),
+      {
+        accessorKey: "protons",
+        header: formatHeader("protons"),
         cell: (info) => info.getValue() ?? "N/A",
-      });
-    });
-    return columnDefs;
-  }, []);
+      },
+      {
+        accessorKey: "neutrons",
+        header: formatHeader("neutrons"),
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+      {
+        accessorKey: "electrons",
+        header: formatHeader("electrons"),
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+      {
+        accessorKey: "atomicWeight",
+        header: formatHeader("atomicWeight"),
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+      {
+        accessorKey: "group",
+        header: formatHeader("group"),
+        cell: (info) => {
+          const value = info.getValue<number>();
+          return value > 0 ? value : "N/A";
+        },
+      },
+      {
+        accessorKey: "period",
+        header: formatHeader("period"),
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+      {
+        id: "meltingPointK",
+        header: formatHeader("meltingPointK"),
+        accessorFn: (row) =>
+          row.phaseTransitions.find((pt) => pt.type === "melting")
+            ?.temperature_K,
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+      {
+        id: "boilingPointK",
+        header: formatHeader("boilingPointK"),
+        accessorFn: (row) =>
+          row.phaseTransitions.find((pt) => pt.type === "boiling")
+            ?.temperature_K,
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+      {
+        accessorKey: "stateAtSTP",
+        header: formatHeader("stateAtSTP"),
+        cell: (info) => info.getValue() ?? "N/A",
+      },
+    ],
+    []
+  );
 
   const table = useReactTable({
     data: tableData,
