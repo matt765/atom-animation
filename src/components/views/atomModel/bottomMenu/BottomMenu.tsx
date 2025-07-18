@@ -1,14 +1,15 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+
 import styles from "./BottomMenu.module.css";
-import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
-import { CONFIG } from "../../AtomModel/AtomModel";
-import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
-import { elements } from "../../../elementsData/elementsData";
-import { ParticleControl } from "./ParticleControl";
+import { ParticleControl } from "./particleControl/ParticleControl";
 import { ShakeIcon } from "@/assets/icons/ShakeIcon";
 import { RefreshIcon } from "@/assets/icons/RefreshIcon";
+import { ElementSelect } from "./elementSelect/ElementSelect";
+import { CONFIG } from "@/components/views/atomModel/AtomModel";
+import { deriveCurrentElement, useAppStore } from "@/store/appStore";
+import { elements } from "@/elementsData/elementsData";
 
 const PARTICLE_LIMIT = 300;
 

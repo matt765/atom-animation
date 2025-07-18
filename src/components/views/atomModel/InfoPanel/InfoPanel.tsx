@@ -12,8 +12,8 @@ import {
   InfoPanelContent,
 } from "@/store/appStore";
 import { elements } from "@/elementsData/elementsData";
-import { FullGroupData } from "../../../elementsData/groupsData";
-import { OutlinedButton } from "../../common/OutlinedButton/OutlinedButton";
+import { FullGroupData } from "../../../../elementsData/groupsData";
+import { OutlinedButton } from "../../../common/OutlinedButton/OutlinedButton";
 
 const useIsSmallScreen = () => {
   const [isSmall, setIsSmall] = useState(false);

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { elements } from "../elementsData/elementsData";
-import { getElementByProtons } from "../components/AtomModel/elementUtils";
+import { getElementByProtons } from "../utils/elementUtils";
 import { GroupData } from "@/elementsData/groupsData";
 import { ElementConfig } from "@/elementsData/types";
 

@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+
 import styles from "./BottomMenuMobile.module.css";
-import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
-import { elements } from "../../../elementsData/elementsData";
-import { ElementSelect } from "../../AtomModel/ElementSelect/ElementSelect";
-import { ParticleControl } from "./ParticleControl";
-import { CONFIG } from "../../AtomModel/AtomModel";
-import { ShakeIcon } from "../../../assets/icons/ShakeIcon";
-import { RefreshIcon } from "../../../assets/icons/RefreshIcon";
-import { ChevronUpIcon } from "../../../assets/icons/ChevronUpIcon";
+import { useAppStore, deriveCurrentElement } from "../../../../store/appStore";
+import { elements } from "../../../../elementsData/elementsData";
+import { ShakeIcon } from "../../../../assets/icons/ShakeIcon";
+import { RefreshIcon } from "../../../../assets/icons/RefreshIcon";
+import { ChevronUpIcon } from "../../../../assets/icons/ChevronUpIcon";
+import { ElementSelect } from "./elementSelect/ElementSelect";
+import { ParticleControl } from "./particleControl/ParticleControl";
+import { CONFIG } from "@/components/views/atomModel/AtomModel";
 
 const PARTICLE_LIMIT = 300;
 

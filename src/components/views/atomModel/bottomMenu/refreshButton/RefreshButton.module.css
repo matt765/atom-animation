@@ -2,7 +2,7 @@
   position: fixed;
   top: 24px;
   right: 24px;
-  z-index: 1000; /* Upewniamy się, że jest na wierzchu */
+  z-index: 1000;
   width: 40px;
   height: 40px;
   border-radius: 50%;

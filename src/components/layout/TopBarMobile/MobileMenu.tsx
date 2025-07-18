@@ -3,12 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import styles from "./MobileMenu.module.css";
 import { AtomIcon } from "@/assets/icons/AtomIcon";
 import { PeriodicTableIcon } from "@/assets/icons/PeriodicTableIcon";
 
 import { GitHubIcon } from "@/assets/icons/GithubIcon";
-
 
 const navItems = [
   { href: "/", label: "Atom Model", icon: <AtomIcon /> },
@@ -16,7 +16,7 @@ const navItems = [
     href: "/periodic-table",
     label: "Periodic Table",
     icon: <PeriodicTableIcon />,
-  }
+  },
 ];
 
 interface MobileMenuProps {

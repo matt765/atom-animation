@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+
 import styles from "./TopBarMobile.module.css";
 import { useAppStore, deriveCurrentElement } from "@/store/appStore";
 import { HamburgerIcon } from "@/assets/icons/HamburgerIcon";

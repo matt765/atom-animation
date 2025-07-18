@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import styles from "./SideMenu.module.css";
 import { AtomIcon } from "@/assets/icons/AtomIcon";
 import { PeriodicTableIcon } from "@/assets/icons/PeriodicTableIcon";

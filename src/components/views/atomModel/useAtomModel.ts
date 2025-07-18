@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { elements } from "../../elementsData/elementsData";
+
+import { elements } from "@/elementsData/elementsData";
 
 export const useAtomModel = () => {
   const [sliderValue, setSliderValue] = useState(50);

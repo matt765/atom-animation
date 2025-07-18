@@ -7,12 +7,40 @@ import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 import styles from "./AtomModel.module.css";
-import { useAppStore, deriveCurrentElement } from "../../store/appStore";
+import { useAppStore, deriveCurrentElement } from "../../../store/appStore";
+import { Nucleus } from "./atomParts/Nucleus";
+import { OrbitRing } from "./atomParts/OrbitRing";
+import { Electron } from "./atomParts/Electron";
 
 const DETAILED_VIEW_CONFIG = {
   ATOM_POSITION: new THREE.Vector3(-16, 0, 0),
   CAMERA_TARGET: new THREE.Vector3(-12, 0, 0),
   CAMERA_POSITION: new THREE.Vector3(-12, 2, 14),
+};
+export const CONFIG = {
+  modelScale: 1.35,
+  initialRotation: new THREE.Euler(Math.PI / 4, Math.PI / 0.6, 0),
+  cameraPosition: new THREE.Vector3(0, 5.6, 16.8),
+  cameraFov: 50,
+  ambientLightIntensity: 0.7,
+  directionalLightIntensity: 1,
+  directionalLightPosition: new THREE.Vector3(10, 10, 5),
+  protonColor: "#ff554d",
+  neutronColor: "#aaaaaa",
+  nucleonBaseRadius: 0.2,
+  nucleonDetail: 32,
+  nucleusScaleFactor: 0.9,
+  nucleonMaterial: { roughness: 0.4, metalness: 0.2 },
+  electronColor: "#33ccff",
+  electronBaseRadius: 0.1,
+  electronDetail: 16,
+  electronMaterial: { emissive: "#33ccff", emissiveIntensity: 0.5 },
+  orbitRingColor: "#ffffff",
+  orbitRingOpacity: 0.3,
+  orbitRingThickness: 0.01,
+  shellDistances: [2, 3.2, 4.4, 5.6, 6.8, 8.0, 9.2],
+  speedConstant: 1.5 * Math.PI,
+  sliderMidpoint: 50,
 };
 
 const ScenePhysics = ({
@@ -80,160 +108,6 @@ const ScenePhysics = ({
 
   return null;
 };
-
-export const CONFIG = {
-  modelScale: 1.35,
-  initialRotation: new THREE.Euler(Math.PI / 4, Math.PI / 0.6, 0),
-  cameraPosition: new THREE.Vector3(0, 5.6, 16.8),
-  cameraFov: 50,
-  ambientLightIntensity: 0.7,
-  directionalLightIntensity: 1,
-  directionalLightPosition: new THREE.Vector3(10, 10, 5),
-  protonColor: "#ff554d",
-  neutronColor: "#aaaaaa",
-  nucleonBaseRadius: 0.2,
-  nucleonDetail: 32,
-  nucleusScaleFactor: 0.9,
-  nucleonMaterial: { roughness: 0.4, metalness: 0.2 },
-  electronColor: "#33ccff",
-  electronBaseRadius: 0.1,
-  electronDetail: 16,
-  electronMaterial: { emissive: "#33ccff", emissiveIntensity: 0.5 },
-  orbitRingColor: "#ffffff",
-  orbitRingOpacity: 0.3,
-  orbitRingThickness: 0.01,
-  shellDistances: [2, 3.2, 4.4, 5.6, 6.8, 8.0, 9.2],
-  speedConstant: 1.5 * Math.PI,
-  sliderMidpoint: 50,
-};
-
-const Nucleus = ({
-  protons,
-  neutrons,
-}: {
-  protons: number;
-  neutrons: number;
-}) => {
-  const { protonPositions, neutronPositions } = useMemo(() => {
-    const total = protons + neutrons;
-    if (total === 0) return { protonPositions: [], neutronPositions: [] };
-    if (total === 1) {
-      const position = [new THREE.Vector3(0, 0, 0)];
-      return protons === 1
-        ? { protonPositions: position, neutronPositions: [] }
-        : { protonPositions: [], neutronPositions: position };
-    }
-    const points = [];
-    const phi = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < total; i++) {
-      const y = 1 - (i / (total - 1)) * 2;
-      const radiusAtY = Math.sqrt(1 - y * y);
-      const theta = phi * i;
-      const x = Math.cos(theta) * radiusAtY;
-      const z = Math.sin(theta) * radiusAtY;
-      const nucleonRadius = CONFIG.nucleonBaseRadius * CONFIG.modelScale;
-      const clusterRadius =
-        nucleonRadius * Math.cbrt(total) * CONFIG.nucleusScaleFactor;
-      points.push(new THREE.Vector3(x, y, z).multiplyScalar(clusterRadius));
-    }
-    const pPos: THREE.Vector3[] = [];
-    const nPos: THREE.Vector3[] = [];
-    const particleTypes: ("P" | "N")[] = [];
-    for (let i = 0; i < protons; i++) particleTypes.push("P");
-    for (let i = 0; i < neutrons; i++) particleTypes.push("N");
-    for (let i = particleTypes.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [particleTypes[i], particleTypes[j]] = [
-        particleTypes[j],
-        particleTypes[i],
-      ];
-    }
-    points.forEach((pos, i) => {
-      if (particleTypes[i] === "P") pPos.push(pos);
-      else nPos.push(pos);
-    });
-    return { protonPositions: pPos, neutronPositions: nPos };
-  }, [protons, neutrons]);
-
-  return (
-    <group>
-      {protonPositions.map((pos, i) => (
-        <mesh key={`p${i}`} position={pos}>
-          <sphereGeometry
-            args={[
-              CONFIG.nucleonBaseRadius * CONFIG.modelScale,
-              CONFIG.nucleonDetail,
-              CONFIG.nucleonDetail,
-            ]}
-          />
-          <meshStandardMaterial
-            color={CONFIG.protonColor}
-            {...CONFIG.nucleonMaterial}
-          />
-        </mesh>
-      ))}
-      {neutronPositions.map((pos, i) => (
-        <mesh key={`n${i}`} position={pos}>
-          <sphereGeometry
-            args={[
-              CONFIG.nucleonBaseRadius * CONFIG.modelScale,
-              CONFIG.nucleonDetail,
-              CONFIG.nucleonDetail,
-            ]}
-          />
-          <meshStandardMaterial
-            color={CONFIG.neutronColor}
-            {...CONFIG.nucleonMaterial}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-};
-
-const Electron = ({ radius, speed }: { radius: number; speed: number }) => {
-  const ref = useRef<THREE.Mesh>(null!);
-  const angle = useRef(Math.random() * Math.PI * 2);
-  useFrame((_, delta) => {
-    angle.current += delta * speed;
-    const x = Math.cos(angle.current) * radius;
-    const y = Math.sin(angle.current) * radius;
-    if (ref.current) ref.current.position.set(x, y, 0);
-  });
-  return (
-    <mesh ref={ref}>
-      <sphereGeometry
-        args={[
-          CONFIG.electronBaseRadius * CONFIG.modelScale,
-          CONFIG.electronDetail,
-          CONFIG.electronDetail,
-        ]}
-      />
-      <meshStandardMaterial
-        color={CONFIG.electronColor}
-        {...CONFIG.electronMaterial}
-      />
-    </mesh>
-  );
-};
-
-const OrbitRing = ({ radius }: { radius: number }) => (
-  <mesh>
-    <ringGeometry
-      args={[
-        radius - CONFIG.orbitRingThickness * CONFIG.modelScale,
-        radius + CONFIG.orbitRingThickness * CONFIG.modelScale,
-        64,
-      ]}
-    />
-    <meshBasicMaterial
-      color={CONFIG.orbitRingColor}
-      side={THREE.DoubleSide}
-      transparent
-      opacity={CONFIG.orbitRingOpacity}
-    />
-  </mesh>
-);
 
 export const AtomModel = () => {
   const {

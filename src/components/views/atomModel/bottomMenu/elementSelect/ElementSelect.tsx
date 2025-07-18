@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+
 import styles from "./ElementSelect.module.css";
-import { Select, SelectOption } from "../../common/Select/Select";
-import { useAppStore } from "../../../store/appStore";
-import { useLongPress } from "../../../hooks/useLongPress";
+
 import type { ElementConfig } from "@/elementsData/types";
+import { useAppStore } from "@/store/appStore";
+import { useLongPress } from "@/hooks/useLongPress";
+import { Select, SelectOption } from "@/components/common/Select/Select";
 
 interface ElementSelectProps {
   elements: ElementConfig[];

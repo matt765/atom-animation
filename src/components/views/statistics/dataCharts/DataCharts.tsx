@@ -25,7 +25,7 @@ import {
   ValueType,
   NameType,
 } from "recharts/types/component/DefaultTooltipContent";
-import { elements } from "../../../elementsData/elementsData";
+import { elements } from "../../../../elementsData/elementsData";
 import type { ElementConfig } from "@/elementsData/types";
 import styles from "./DataCharts.module.css";
 

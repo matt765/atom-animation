@@ -1,8 +1,9 @@
 // src/components/layout/BottomMenu/ParticleControl.tsx
 import React from "react";
-import styles from "./BottomMenu.module.css";
-import { useLongPress } from "../../../hooks/useLongPress";
-import { useAppStore } from "../../../store/appStore";
+import styles from "./ParticleControl.module.css";
+
+import { useAppStore } from "@/store/appStore";
+import { useLongPress } from "@/hooks/useLongPress";
 
 interface ParticleControlProps {
   name: string;
@@ -19,7 +20,7 @@ export const ParticleControl: React.FC<ParticleControlProps> = ({
   max,
   onCountChange,
 }) => {
-  const { setInputFocus } = useAppStore(); // Pobieramy akcję ze store
+  const { setInputFocus } = useAppStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);

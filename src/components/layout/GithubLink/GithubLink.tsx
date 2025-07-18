@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+
 import styles from "./GithubLink.module.css";
 import { GitHubIcon } from "@/assets/icons/GithubIcon";
 

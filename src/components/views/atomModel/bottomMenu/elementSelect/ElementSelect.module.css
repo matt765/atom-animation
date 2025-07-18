@@ -18,14 +18,9 @@
 }
 
 .selectWrapper {
-  flex-grow: 1; /* Pozwala selectowi zająć dostępną przestrzeń */
-  min-width: 150px; /* Minimalna szerokość, żeby nie był za mały */
+  flex-grow: 1;
+  min-width: 150px;
 }
-
-/* --- STYLE DLA NAKŁADKI WYSZUKIWANIA (USUNIĘTE Z TEGO PLIKU) --- */
-/* Te style zostały przeniesione do Select.module.css */
-
-/* --- ORYGINALNE STYLE --- */
 
 .navButtonGroup {
   display: flex;

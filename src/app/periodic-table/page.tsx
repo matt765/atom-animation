@@ -1,7 +1,6 @@
-// src/app/periodic-table/page.tsx
-
-import { PeriodicTable } from "@/components/periodicTable/PeriodicTable";
 import React from "react";
+
+import { PeriodicTable } from "@/components/views/periodicTable/PeriodicTable";
 
 const PeriodicTablePage = () => {
   return <PeriodicTable />;

@@ -13,12 +13,13 @@ import {
 import { createPortal } from "react-dom";
 
 import { useAppStore, deriveCurrentElement } from "../../store/appStore";
-import { BottomMenu } from "./BottomMenu/BottomMenu";
-import { BottomMenuMobile } from "./BottomMenu/BottomMenuMobile";
-import { SideMenu } from "./SideMenu/SideMenu";
-import { TopBarMobile } from "./TopBarMobile/TopBarMobile";
-import { GitHubLink } from "./GithubLink/GithubLink";
-import { InfoPanel } from "../AtomModel/InfoPanel/InfoPanel";
+
+import { SideMenu } from "./sideMenu/SideMenu";
+import { TopBarMobile } from "./topBarMobile/TopBarMobile";
+import { GitHubLink } from "./githubLink/GithubLink";
+import { InfoPanel } from "../views/atomModel/InfoPanel/InfoPanel";
+import { BottomMenuMobile } from "../views/atomModel/bottomMenu/BottomMenuMobile";
+import { BottomMenu } from "../views/atomModel/bottomMenu/BottomMenu";
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);

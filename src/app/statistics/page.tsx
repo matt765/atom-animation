@@ -1,7 +1,8 @@
 "use client";
 
-import { Statistics } from "@/components/statistics/Statistics";
 import React from "react";
+
+import { Statistics } from "@/components/views/statistics/Statistics";
 
 const StatisticsPage = () => {
   return <Statistics />;

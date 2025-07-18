@@ -10,6 +10,7 @@ import { useCallback, useRef, useEffect } from "react";
  * @param speed The interval (in ms) at which the callback fires during the hold.
  * @param delay The delay (in ms) after the initial press before continuous firing begins.
  */
+
 export const useLongPress = (
   callback: () => void,
   speed: number = 100,

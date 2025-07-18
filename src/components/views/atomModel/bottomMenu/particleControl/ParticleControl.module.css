@@ -1,0 +1,95 @@
+.colorIndicator {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  border: 0px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.3s ease;
+}
+
+.colorIndicator:hover {
+  transform: scale(1.15);
+}
+
+.particleControl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.particleName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.particleInput {
+  width: 45px;
+  height: 2.2rem;
+  text-align: center;
+  background-color: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-left: none;
+  border-right: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0;
+  -moz-appearance: textfield;
+  transition: 0.2s;
+}
+
+.particleInput:focus {
+  outline: none;
+  border-top-color: rgba(56, 210, 248, 0.4);
+  border-bottom-color: rgba(56, 210, 248, 0.4);
+}
+
+.particleInput::-webkit-outer-spin-button,
+.particleInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.particleButton {
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  background: rgb(255, 255, 255, 0.02);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  transition: 0.2s;
+}
+
+.particleButton:hover {
+  border-color: rgba(56, 210, 248, 0.4);
+  z-index: 1;
+}
+
+.particleButton:active {
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.particleButton:first-of-type {
+  border-radius: 7px 0 0 7px;
+}
+
+.particleButton:last-of-type {
+  border-radius: 0 7px 7px 0;
+}

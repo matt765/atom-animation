@@ -1,5 +1,5 @@
 import { ElementConfig } from "@/elementsData/types";
-import { elements } from "../../elementsData/elementsData";
+import { elements } from "../elementsData/elementsData";
 
 export const getElementByProtons = (protons: number): ElementConfig => {
   const element = elements.find((el) => el.protons === protons);
