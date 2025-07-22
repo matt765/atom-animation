@@ -1,0 +1,70 @@
+.contentPeriodic {
+  background-color: rgb(30, 35, 42);
+  padding: 1rem 2rem;
+}
+
+.description {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.description:last-of-type {
+  margin-bottom: 0;
+}
+
+.divider {
+  height: 1px;
+  background-color: rgba(148, 163, 184, 0.15);
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.listHeader {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0 0 0.75rem 0;
+}
+
+.elementGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.elementListItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.elementListItem:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.elementSymbol {
+  font-family: var(--font-geist-mono);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffffff;
+  width: 2em;
+  text-align: center;
+}
+
+.elementName {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

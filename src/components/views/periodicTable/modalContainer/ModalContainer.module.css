@@ -1,0 +1,38 @@
+.header {
+  padding: 1rem 3.5rem 1rem 2rem;
+  background-color: rgb(23, 27, 31);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.closeButton {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  color: #94a3b8;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: #ffffff;
+}

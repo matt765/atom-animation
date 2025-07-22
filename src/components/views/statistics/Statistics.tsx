@@ -29,9 +29,7 @@ export const Statistics = () => {
           Table
         </button>
       </div>
-
       {statisticsTab === "charts" && <DataCharts />}
-
       {statisticsTab === "table" && <SortingTable />}
     </div>
   );

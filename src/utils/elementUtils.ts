@@ -71,3 +71,21 @@ export const getElementByProtons = (protons: number): ElementConfig => {
     description: "A custom particle with a specified number of protons.",
   };
 };
+
+export const formatValueWithUnit = (
+  value: number | string | undefined | null,
+  unit: string = ""
+) => {
+  if (value === undefined || value === null) return "N/A";
+  if (typeof value === "number") {
+    return `${value.toLocaleString()} ${unit}`.trim();
+  }
+  return `${value} ${unit}`.trim();
+};
+
+export const formatIonCharge = (charge: number): string => {
+  if (charge === 0) return "Neutral";
+  const sign = charge > 0 ? "+" : "−";
+  const absCharge = Math.abs(charge);
+  return `${absCharge}${sign}`;
+};

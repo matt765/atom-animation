@@ -68,9 +68,6 @@ export const BottomMenu = () => {
   };
 
   const handleDisplayClick = () => {
-    // Ta akcja ma zawsze włączać widok szczegółowy.
-    // Zamykanie tego widoku odbywa się poprzez inne akcje (np. kliknięcie poza panelem).
-    // To uproszczenie eliminuje niespójne zachowanie przycisku.
     showDetailedView();
   };
 

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { elements } from "../elementsData/elementsData";
 import { getElementByProtons } from "../utils/elementUtils";
-import { GroupData } from "@/elementsData/groupsData";
+import { FullGroupData } from "@/elementsData/groupsData";
 import { ElementConfig } from "@/elementsData/types";
 
 export interface ExtendedElementConfig extends ElementConfig {
@@ -14,7 +14,7 @@ export interface ExtendedElementConfig extends ElementConfig {
 
 export type InfoPanelContent =
   | { type: "element"; data: ExtendedElementConfig }
-  | { type: "group"; data: GroupData };
+  | { type: "group"; data: FullGroupData };
 
 type PanelMode = "hidden" | "default" | "detailed" | "periodic-table";
 type StatisticsTab = "charts" | "table";
@@ -42,7 +42,7 @@ type AppActions = {
     content: InfoPanelContent,
     position?: { x: number; y: number }
   ) => void;
-  showGroupInfo: (group: GroupData) => void;
+  showGroupInfo: (group: FullGroupData) => void;
   hideInfoPanel: () => void;
   setPanelPosition: (position: { x: number; y: number }) => void;
   setPanelManuallyPositioned: (isManual: boolean) => void;
@@ -101,15 +101,19 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
     });
   },
 
-  showGroupInfo: (group: GroupData) => {
-    if (get().panelMode === "periodic-table") {
+  showGroupInfo: (group: FullGroupData) => {
+    const { panelMode, isPanelManuallyPositioned } = get();
+
+    if (panelMode === "periodic-table") {
       set({ infoPanelContent: { type: "group", data: group } });
     } else {
       set({
         panelMode: "periodic-table",
         infoPanelContent: { type: "group", data: group },
-        panelPosition: { x: 0, y: 0 },
-        isPanelManuallyPositioned: false,
+        ...(!isPanelManuallyPositioned && {
+          panelPosition: { x: 0, y: 0 },
+          isPanelManuallyPositioned: false,
+        }),
       });
     }
   },
@@ -118,8 +122,9 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
     set({
       panelMode: "hidden",
       infoPanelContent: null,
-      panelPosition: { x: 0, y: 0 },
-      isPanelManuallyPositioned: false,
+      // Nie resetujemy pozycji, jeśli była ręcznie ustawiona
+      // panelPosition: { x: 0, y: 0 },
+      // isPanelManuallyPositioned: false,
       isCameraAnimating: false,
     });
   },
@@ -171,37 +176,50 @@ export const useAppStore = create<AppState & AppActions>((set, get) => ({
 
   setSelectedElement: (name, position, showPanel = true) => {
     const element = elements.find((el) => el.name === name);
-    if (element) {
-      const newState = {
-        selectedElementName: element.name,
-        protons: element.protons,
-        neutrons: element.neutrons,
-        electrons: element.protons,
-      };
-      set(newState);
+    if (!element) return;
 
-      if (showPanel) {
-        const extendedElement = deriveCurrentElement({ ...get(), ...newState });
-        if (position) {
-          get().showInfoPanel(
-            { type: "element", data: extendedElement },
-            position
-          );
-        } else {
-          if (get().panelMode === "periodic-table") {
-            set({
-              infoPanelContent: { type: "element", data: extendedElement },
-            });
-          } else {
-            set({
+    const elementStateUpdate = {
+      selectedElementName: element.name,
+      protons: element.protons,
+      neutrons: element.neutrons,
+      electrons: element.protons,
+    };
+
+    if (!showPanel) {
+      set(elementStateUpdate);
+      return;
+    }
+
+    const extendedElement = deriveCurrentElement({
+      ...get(),
+      ...elementStateUpdate,
+      selectedElementName: element.name,
+    });
+
+    if (position) {
+      set({
+        ...elementStateUpdate,
+        panelMode: "default",
+        infoPanelContent: { type: "element", data: extendedElement },
+        panelPosition: position,
+        isPanelManuallyPositioned: true,
+      });
+    } else {
+      const { panelMode, isPanelManuallyPositioned } = get();
+      const isPanelAlreadyOpen = panelMode === "periodic-table";
+      set({
+        ...elementStateUpdate,
+        infoPanelContent: { type: "element", data: extendedElement },
+        ...(isPanelAlreadyOpen
+          ? {}
+          : {
               panelMode: "periodic-table",
-              infoPanelContent: { type: "element", data: extendedElement },
-              panelPosition: { x: 0, y: 0 },
-              isPanelManuallyPositioned: false,
-            });
-          }
-        }
-      }
+              ...(!isPanelManuallyPositioned && {
+                panelPosition: { x: 0, y: 0 },
+                isPanelManuallyPositioned: false,
+              }),
+            }),
+      });
     }
   },
 

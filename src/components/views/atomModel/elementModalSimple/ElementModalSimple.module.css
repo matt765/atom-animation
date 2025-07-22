@@ -1,0 +1,114 @@
+.header {
+  padding: 1rem 3.5rem 1rem 2rem;
+  background-color: rgb(23, 27, 31);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.content {
+  padding: 1rem 2rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.description {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #cbd5e1;
+  font-weight: 400;
+}
+
+.divider {
+  height: 1px;
+  background-color: rgba(148, 163, 184, 0.15);
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.propertiesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1.5rem;
+}
+
+.property {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.ionInfo,
+.stabilityInfo,
+.isotopeInfo {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.stabilityInfo .label,
+.isotopeInfo .label,
+.ionInfo .label {
+  margin-bottom: 0;
+}
+
+.stabilityInfo .value,
+.isotopeInfo .value,
+.ionInfo .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.isotopeInfo .value,
+.ionInfo .value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.detailValue {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.stable {
+  color: #4ade80;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.unstable {
+  color: #f87171;
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+}
