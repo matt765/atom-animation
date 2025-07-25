@@ -1,20 +1,4 @@
-.contentPeriodic {
-  background-color: rgb(30, 35, 42);
-}
-
-.contentWrapper {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow: hidden;
-}
-
-.content {
-  padding: 1rem 2rem;
-  overflow-y: auto;
-  flex-grow: 1;
-}
-
+/* src/components/views/periodicTable/elementModalExtended/ElementModalExtended.module.css */
 .description {
   margin: 0 0 1.25rem 0;
   font-size: 0.9rem;
@@ -64,6 +48,10 @@
   display: flex;
   justify-content: flex-end;
   flex-shrink: 0;
+  /* Poprawka, aby footer nie miał podwójnego tła */
+  margin: 0 -2rem -1rem; /* Negatywny margines dopasowany do paddingu rodzica */
+  padding-left: 4rem; /* 2rem z marginesu + 2rem oryginalnego paddingu */
+  padding-right: 4rem;
 }
 
 .footerPeriodic {

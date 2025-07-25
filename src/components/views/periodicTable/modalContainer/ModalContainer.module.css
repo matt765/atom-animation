@@ -1,3 +1,52 @@
+/* src/components/views/periodicTable/modalContainer/ModalContainer.module.css */
+.panel {
+  z-index: 100;
+  width: 30rem;
+  background: transparent;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px,
+    rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  color: #e2e8f0;
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.centered {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: max-content;
+}
+
+@media (max-width: 599px) {
+  .mobileFullScreen {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    top: 50px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    transform: none !important;
+  }
+}
+
 .header {
   padding: 1rem 3.5rem 1rem 2rem;
   background-color: rgb(23, 27, 31);
@@ -35,4 +84,13 @@
 
 .closeButton:hover {
   color: #ffffff;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+  background-color: rgb(30, 35, 42); /* Przeniesione tło */
+  padding: 1rem 2rem; /* Przeniesiony padding */
 }

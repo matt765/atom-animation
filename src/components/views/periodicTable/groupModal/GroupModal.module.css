@@ -1,8 +1,4 @@
-.contentPeriodic {
-  background-color: rgb(30, 35, 42);
-  padding: 1rem 2rem;
-}
-
+/* src/components/views/periodicTable/groupModal/GroupModal.module.css */
 .description {
   margin: 0 0 1.25rem 0;
   font-size: 0.9rem;

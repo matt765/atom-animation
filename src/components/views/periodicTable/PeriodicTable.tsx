@@ -7,7 +7,7 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import { useAppStore } from "@/store/appStore";
+import { useAppStore, ModalContent } from "@/store/appStore";
 import { elements } from "@/elementsData/elementsData";
 import type { ElementConfig } from "@/elementsData/types";
 import { allGroupsAndPeriodsData, legendData } from "@/elementsData/groupsData";
@@ -158,11 +158,11 @@ const columnHeaders = [
 
 export const PeriodicTable = () => {
   const {
-    protons,
+    bottomMenuProtons,
     setSelectedElement,
-    showGroupInfo,
-    hideInfoPanel,
-    isNavigating,
+    showPeriodicTableModal,
+    hidePeriodicTableModal,
+    isNavigatingBetweenPages,
   } = useAppStore();
 
   const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
@@ -210,38 +210,42 @@ export const PeriodicTable = () => {
     (type: "element" | "group", identifier: string | FullGroupData) => {
       if (actionStateRef.current.isDragging) return;
 
-      const { infoPanelContent } = useAppStore.getState();
+      const { periodicTableModal } = useAppStore.getState();
+      const { isVisible, content } = periodicTableModal;
 
       let isSameContent = false;
-      if (infoPanelContent) {
+      if (isVisible && content) {
         if (
           type === "element" &&
-          infoPanelContent.type === "element" &&
-          typeof identifier === "string" &&
-          infoPanelContent.data.name === identifier
+          content.type === "element" &&
+          content.data.name === identifier
         ) {
           isSameContent = true;
         } else if (
           type === "group" &&
-          infoPanelContent.type === "group" &&
+          content.type === "group" &&
           typeof identifier === "object" &&
-          infoPanelContent.data.name === identifier.name
+          content.data.name === identifier.name
         ) {
           isSameContent = true;
         }
       }
 
       if (isSameContent) {
-        hideInfoPanel();
+        hidePeriodicTableModal();
       } else {
         if (type === "element" && typeof identifier === "string") {
-          setSelectedElement(identifier, undefined, true);
+          setSelectedElement(identifier);
         } else if (type === "group" && typeof identifier === "object") {
-          showGroupInfo(identifier);
+          const groupContent: ModalContent = {
+            type: "group",
+            data: identifier,
+          };
+          showPeriodicTableModal(groupContent);
         }
       }
     },
-    [hideInfoPanel, setSelectedElement, showGroupInfo]
+    [hidePeriodicTableModal, showPeriodicTableModal, setSelectedElement]
   );
 
   const handleColumnClick = (groupNumber: number) => {
@@ -360,13 +364,15 @@ export const PeriodicTable = () => {
     e.preventDefault();
   };
 
-  const currentModelElement = elements.find((el) => el.protons === protons);
+  const currentModelElement = elements.find(
+    (el) => el.protons === bottomMenuProtons
+  );
 
   return (
     <div
       ref={containerRef}
       className={`${styles.tableViewport} ${
-        isNavigating ? styles.navigating : ""
+        isNavigatingBetweenPages ? styles.navigating : ""
       }`}
       onPointerDown={handlePointerDown}
       onWheel={handleWheel}

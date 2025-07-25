@@ -13,7 +13,7 @@ export const GroupModal = ({ group }: GroupModalProps) => {
   const { setSelectedElement } = useAppStore();
 
   return (
-    <div className={styles.contentPeriodic}>
+    <div>
       {group.description.map((paragraph, index) => (
         <p key={index} className={styles.description}>
           {paragraph}
@@ -29,7 +29,7 @@ export const GroupModal = ({ group }: GroupModalProps) => {
               <div
                 key={el.name}
                 className={styles.elementListItem}
-                onClick={() => setSelectedElement(el.name, undefined, true)}
+                onClick={() => setSelectedElement(el.name)}
               >
                 <span className={styles.elementSymbol}>{el.symbol}</span>
                 <span className={styles.elementName}>{el.name}</span>

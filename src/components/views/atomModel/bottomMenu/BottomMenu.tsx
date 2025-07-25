@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
-
 import styles from "./BottomMenu.module.css";
 import { ParticleControl } from "./particleControl/ParticleControl";
 import { ShakeIcon } from "@/assets/icons/ShakeIcon";
@@ -23,18 +22,17 @@ const formatCharge = (charge: number): string => {
 
 export const BottomMenu = () => {
   const {
-    sliderValue,
-    setSliderValue,
-    protons,
-    neutrons,
-    electrons,
-    setParticles,
+    bottomMenuSliderValue,
+    setBottomMenuSliderValue,
+    bottomMenuProtons,
+    bottomMenuNeutrons,
+    bottomMenuElectrons,
+    setBottomMenuParticles,
     setSelectedElement,
-    triggerShake,
-    triggerRefresh,
-    hideInfoPanel,
-    resetToDefaults,
-    showDetailedView,
+    triggerAtomModelShake,
+    resetAtomModelToDefaults,
+    showHomepageModal,
+    hideHomepageModal,
   } = useAppStore();
   const element = useAppStore(deriveCurrentElement);
   const speedSliderRef = useRef<HTMLInputElement>(null);
@@ -54,21 +52,20 @@ export const BottomMenu = () => {
     const slider = speedSliderRef.current;
     slider?.addEventListener("input", updateSliderFill);
     return () => slider?.removeEventListener("input", updateSliderFill);
-  }, [sliderValue]);
+  }, [bottomMenuSliderValue]);
 
   const handleRefreshClick = () => {
-    triggerRefresh();
-    resetToDefaults();
-    hideInfoPanel();
+    resetAtomModelToDefaults();
+    hideHomepageModal();
   };
 
   const handleElementSelection = (value: React.SetStateAction<string>) => {
     const newName = typeof value === "function" ? value(element.name) : value;
-    setSelectedElement(newName, undefined, false);
+    setSelectedElement(newName);
   };
 
   const handleDisplayClick = () => {
-    showDetailedView();
+    showHomepageModal("right-side");
   };
 
   const isLongConfig = element.electronConfiguration.split(" ").length >= 5;
@@ -115,13 +112,13 @@ export const BottomMenu = () => {
               ref={speedSliderRef}
               min={1}
               max={100}
-              value={sliderValue}
-              onChange={(e) => setSliderValue(Number(e.target.value))}
+              value={bottomMenuSliderValue}
+              onChange={(e) => setBottomMenuSliderValue(Number(e.target.value))}
             />
             <div className={styles.actionButtons}>
               <button
                 className={styles.actionButton}
-                onClick={triggerShake}
+                onClick={triggerAtomModelShake}
                 title="Shake Atom"
                 aria-label="Shake Atom"
               >
@@ -141,24 +138,30 @@ export const BottomMenu = () => {
         <div className={styles.legend}>
           <ParticleControl
             name="Protons"
-            count={protons}
+            count={bottomMenuProtons}
             color={CONFIG.protonColor}
             max={PARTICLE_LIMIT}
-            onCountChange={(newCount) => setParticles({ protons: newCount })}
+            onCountChange={(newCount) =>
+              setBottomMenuParticles({ protons: newCount })
+            }
           />
           <ParticleControl
             name="Neutrons"
-            count={neutrons}
+            count={bottomMenuNeutrons}
             color={CONFIG.neutronColor}
             max={PARTICLE_LIMIT}
-            onCountChange={(newCount) => setParticles({ neutrons: newCount })}
+            onCountChange={(newCount) =>
+              setBottomMenuParticles({ neutrons: newCount })
+            }
           />
           <ParticleControl
             name="Electrons"
-            count={electrons}
+            count={bottomMenuElectrons}
             color={CONFIG.electronColor}
             max={PARTICLE_LIMIT}
-            onCountChange={(newCount) => setParticles({ electrons: newCount })}
+            onCountChange={(newCount) =>
+              setBottomMenuParticles({ electrons: newCount })
+            }
           />
         </div>
       </div>

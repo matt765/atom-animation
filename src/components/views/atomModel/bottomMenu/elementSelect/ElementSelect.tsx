@@ -31,7 +31,7 @@ export const ElementSelect = ({
   selectedElementName,
   setSelectedElement,
 }: ElementSelectProps) => {
-  const { setInputFocus } = useAppStore();
+  const { setParticleControlInputFocus } = useAppStore();
   const [searchTerm, setSearchTerm] = useState("");
 
   const [isOpen, setIsOpen] = useState(false);
@@ -157,12 +157,12 @@ export const ElementSelect = ({
     const nextIsOpen = !isOpen;
     setIsOpen(nextIsOpen);
     if (nextIsOpen) {
-      setInputFocus(true);
+      setParticleControlInputFocus(true);
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 0);
     } else {
-      setInputFocus(false);
+      setParticleControlInputFocus(false);
       setSearchTerm("");
     }
   };
@@ -170,7 +170,7 @@ export const ElementSelect = ({
   const handleOptionClick = (value: string) => {
     setSelectedElement(value);
     setIsOpen(false);
-    setInputFocus(false);
+    setParticleControlInputFocus(false);
     setSearchTerm("");
   };
 
@@ -183,12 +183,12 @@ export const ElementSelect = ({
       if (filteredOptions.length > 0) {
         setSelectedElement(filteredOptions[0].value);
         setIsOpen(false);
-        setInputFocus(false);
+        setParticleControlInputFocus(false);
         setSearchTerm("");
       }
     } else if (e.key === "Escape") {
       setIsOpen(false);
-      setInputFocus(false);
+      setParticleControlInputFocus(false);
       setSearchTerm("");
     } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
@@ -207,7 +207,7 @@ export const ElementSelect = ({
           !searchInputRef.current.contains(event.target as Node))
       ) {
         setIsOpen(false);
-        setInputFocus(false);
+        setParticleControlInputFocus(false);
         setSearchTerm("");
       }
     };
@@ -216,7 +216,7 @@ export const ElementSelect = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, setInputFocus, setSearchTerm]);
+  }, [isOpen, setParticleControlInputFocus, setSearchTerm]);
 
   return (
     <div className={styles.controlGroup}>

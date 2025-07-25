@@ -1,29 +1,30 @@
-import { useEffect, RefObject, useRef } from "react";
+import { useEffect, RefObject } from "react";
 
 type Event = MouseEvent | TouchEvent;
 
 export const useClickOutside = <T extends HTMLElement = HTMLElement>(
-  ref: RefObject<T>,
+  ref: RefObject<T | null>,
   handler: (event: Event) => void,
   ignoredRefs: RefObject<HTMLElement | null>[] = []
 ) => {
-  const clickStartPos = useRef<{ x: number; y: number } | null>(null);
-
   useEffect(() => {
-    const handleMouseDown = (event: Event) => {
-      if ("button" in event && event.button !== 0) {
-        return; // Ignoruj wszystko oprócz lewego przycisku myszy
+    const listener = (event: Event) => {
+      const targetElement = event.target as Node;
+
+      // Ignore clicks on the periodic table to allow selecting other elements without closing the modal.
+      if (
+        (targetElement as HTMLElement).closest('[data-is-periodic-grid="true"]')
+      ) {
+        return;
       }
 
-      const targetElement = event.target as Node;
+      // Ignore clicks within the modal itself, as they are not "outside" clicks.
       const mainEl = ref?.current;
-
-      // Sprawdź, czy kliknięto wewnątrz głównego elementu
       if (!mainEl || mainEl.contains(targetElement)) {
         return;
       }
 
-      // Sprawdź, czy kliknięto wewnątrz któregokolwiek z ignorowanych elementów
+      // Ignore clicks on other designated elements (e.g., menus) to prevent them from closing the modal.
       for (const ignoredRef of ignoredRefs) {
         const ignoredEl = ignoredRef.current;
         if (ignoredEl && ignoredEl.contains(targetElement)) {
@@ -31,39 +32,16 @@ export const useClickOutside = <T extends HTMLElement = HTMLElement>(
         }
       }
 
-      const point = "touches" in event ? event.touches[0] : event;
-      clickStartPos.current = { x: point.clientX, y: point.clientY };
+      // Jeśli żaden z powyższych warunków nie jest spełniony, wywołaj handler
+      handler(event);
     };
 
-    const handleMouseUp = (event: Event) => {
-      if (!clickStartPos.current) {
-        return;
-      }
-
-      const point = "changedTouches" in event ? event.changedTouches[0] : event;
-      const dist = Math.hypot(
-        point.clientX - clickStartPos.current.x,
-        point.clientY - clickStartPos.current.y
-      );
-
-      if (dist < 10) {
-        // Tylko jeśli to było kliknięcie, a nie przeciągnięcie
-        handler(event);
-      }
-
-      clickStartPos.current = null;
-    };
-
-    document.addEventListener("mousedown", handleMouseDown);
-    document.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("touchstart", handleMouseDown);
-    document.addEventListener("touchend", handleMouseUp);
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
 
     return () => {
-      document.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchstart", handleMouseDown);
-      document.removeEventListener("touchend", handleMouseUp);
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
     };
   }, [ref, handler, ignoredRefs]);
 };

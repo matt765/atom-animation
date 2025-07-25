@@ -111,13 +111,12 @@ const ScenePhysics = ({
 
 export const AtomModel = () => {
   const {
-    sliderValue,
-    refreshCounter,
+    bottomMenuSliderValue,
+    bottomMenuRefreshCounter,
     setSelectedElement,
-    shakeCounter,
-    panelMode,
-    isCameraAnimating,
-    setIsCameraAnimating,
+    bottomMenuShakeCounter,
+    isAtomModelInFocusView,
+    setIsAtomModelInFocusView,
   } = useAppStore();
   const element = useAppStore(deriveCurrentElement);
 
@@ -139,46 +138,45 @@ export const AtomModel = () => {
   const targetControlsTarget = useRef(new THREE.Vector3(0, 0, 0));
 
   useEffect(() => {
-    if (panelMode === "detailed") {
+    if (isAtomModelInFocusView) {
       targetPosition.current.copy(DETAILED_VIEW_CONFIG.ATOM_POSITION);
       targetControlsTarget.current.copy(DETAILED_VIEW_CONFIG.CAMERA_TARGET);
       targetCameraPosition.current.copy(DETAILED_VIEW_CONFIG.CAMERA_POSITION);
-      setIsCameraAnimating(true);
+    } else {
+      // Wróć do pozycji domyślnej, jeśli nie jesteśmy w widoku skupienia
+      targetPosition.current.set(0, 0, 0);
+      targetControlsTarget.current.set(0, 0, 0);
+      targetCameraPosition.current.copy(CONFIG.cameraPosition);
     }
-  }, [panelMode, setIsCameraAnimating]);
+  }, [isAtomModelInFocusView]);
 
   useEffect(() => {
-    if (refreshCounter > 0) {
-      if (modelGroupRef.current) {
+    if (bottomMenuRefreshCounter > 0) {
+      if (modelGroupRef.current && controlsRef.current) {
+        modelGroupRef.current.position.set(0, 0, 0);
         modelGroupRef.current.rotation.set(
           CONFIG.initialRotation.x,
           CONFIG.initialRotation.y,
           CONFIG.initialRotation.z
         );
-        targetPosition.current.set(0, 0, 0);
-        targetControlsTarget.current.set(0, 0, 0);
-        targetCameraPosition.current.set(
-          CONFIG.cameraPosition.x,
-          CONFIG.cameraPosition.y,
-          CONFIG.cameraPosition.z
-        );
+
+        controlsRef.current.target.set(0, 0, 0);
+        controlsRef.current.object.position.copy(CONFIG.cameraPosition);
+        controlsRef.current.update();
+
         linearVelocity.current.set(0, 0, 0);
         rotationSpeed.current = 0;
-        setIsCameraAnimating(true);
       }
     }
-  }, [refreshCounter, setIsCameraAnimating]);
+  }, [bottomMenuRefreshCounter]);
 
-  const triggerShake = useCallback(() => {
-    // Anuluj inne animacje, aby uniknąć konfliktów
-    setIsCameraAnimating(false);
-    // Zresetuj prędkość liniową, aby zapobiec ruchowi w przestrzeni
+  const triggerAtomModelShake = useCallback(() => {
+    setIsAtomModelInFocusView(false);
     linearVelocity.current.set(0, 0, 0);
 
     const angularMinStrength = 10;
     const angularMaxStrength = 18;
 
-    // Ustaw tylko losową oś i prędkość obrotu
     const newAxis = new THREE.Vector3();
     do {
       newAxis.set(
@@ -194,13 +192,13 @@ export const AtomModel = () => {
       angularMinStrength +
       Math.random() * (angularMaxStrength - angularMinStrength);
     rotationSpeed.current = speed;
-  }, [setIsCameraAnimating]);
+  }, [setIsAtomModelInFocusView]);
 
   useEffect(() => {
-    if (shakeCounter > 0) {
-      triggerShake();
+    if (bottomMenuShakeCounter > 0) {
+      triggerAtomModelShake();
     }
-  }, [shakeCounter, triggerShake]);
+  }, [bottomMenuShakeCounter, triggerAtomModelShake]);
 
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -210,7 +208,7 @@ export const AtomModel = () => {
           (e.clientY - clickStartPos.current.y) ** 2
       );
       if (dist < 5) {
-        setSelectedElement(element.name, { x: e.clientX, y: e.clientY }, true);
+        setSelectedElement(element.name, { x: e.clientX, y: e.clientY });
       }
     }
     clickStartPos.current = null;
@@ -222,7 +220,7 @@ export const AtomModel = () => {
     }
   };
 
-  const speedMultiplier = (sliderValue / CONFIG.sliderMidpoint) ** 2;
+  const speedMultiplier = (bottomMenuSliderValue / CONFIG.sliderMidpoint) ** 2;
   const shellDistances = useMemo(
     () => CONFIG.shellDistances.map((d) => d * CONFIG.modelScale),
     []
@@ -239,10 +237,10 @@ export const AtomModel = () => {
   }, [element]);
 
   const handleControlsStart = useCallback(() => {
-    if (isCameraAnimating) {
-      setIsCameraAnimating(false);
+    if (isAtomModelInFocusView) {
+      setIsAtomModelInFocusView(false);
     }
-  }, [isCameraAnimating, setIsCameraAnimating]);
+  }, [isAtomModelInFocusView, setIsAtomModelInFocusView]);
 
   return (
     <div className={styles.animationContainer}>
@@ -292,8 +290,8 @@ export const AtomModel = () => {
           targetPosition={targetPosition}
           targetCameraPosition={targetCameraPosition}
           targetControlsTarget={targetControlsTarget}
-          isCameraAnimating={isCameraAnimating}
-          setIsCameraAnimating={setIsCameraAnimating}
+          isCameraAnimating={isAtomModelInFocusView}
+          setIsCameraAnimating={setIsAtomModelInFocusView}
         />
       </Canvas>
     </div>

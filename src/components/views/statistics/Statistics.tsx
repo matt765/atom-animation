@@ -7,30 +7,30 @@ import { SortingTable } from "./sortingTable/SortingTable";
 import { DataCharts } from "./dataCharts/DataCharts";
 
 export const Statistics = () => {
-  const { statisticsTab, setStatisticsTab } = useAppStore();
+  const { statisticsActiveTab, setStatisticsActiveTab } = useAppStore();
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.tabsContainer}>
         <button
           className={`${styles.tabButton} ${
-            statisticsTab === "charts" ? styles.activeTab : ""
+            statisticsActiveTab === "charts" ? styles.activeTab : ""
           }`}
-          onClick={() => setStatisticsTab("charts")}
+          onClick={() => setStatisticsActiveTab("charts")}
         >
           Charts
         </button>
         <button
           className={`${styles.tabButton} ${
-            statisticsTab === "table" ? styles.activeTab : ""
+            statisticsActiveTab === "table" ? styles.activeTab : ""
           }`}
-          onClick={() => setStatisticsTab("table")}
+          onClick={() => setStatisticsActiveTab("table")}
         >
           Table
         </button>
       </div>
-      {statisticsTab === "charts" && <DataCharts />}
-      {statisticsTab === "table" && <SortingTable />}
+      {statisticsActiveTab === "charts" && <DataCharts />}
+      {statisticsActiveTab === "table" && <SortingTable />}
     </div>
   );
 };

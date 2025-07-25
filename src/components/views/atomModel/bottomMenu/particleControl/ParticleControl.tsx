@@ -20,7 +20,7 @@ export const ParticleControl: React.FC<ParticleControlProps> = ({
   max,
   onCountChange,
 }) => {
-  const { setInputFocus } = useAppStore();
+  const { setParticleControlInputFocus } = useAppStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -60,8 +60,8 @@ export const ParticleControl: React.FC<ParticleControlProps> = ({
           className={styles.particleInput}
           min="0"
           max={max}
-          onFocus={() => setInputFocus(true)} // Ustawiamy focus na true
-          onBlur={() => setInputFocus(false)} // Ustawiamy focus na false
+          onFocus={() => setParticleControlInputFocus(true)}
+          onBlur={() => setParticleControlInputFocus(false)}
         />
         <button {...incrementProps} className={styles.particleButton}>
           +

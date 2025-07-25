@@ -18,8 +18,8 @@ import { TopBarMobile } from "./topBarMobile/TopBarMobile";
 import { GitHubLink } from "./githubLink/GithubLink";
 import { BottomMenuMobile } from "@/components/views/atomModel/bottomMenu/BottomMenuMobile";
 import { BottomMenu } from "@/components/views/atomModel/bottomMenu/BottomMenu";
-import { ModalContainer } from "@/components/views/periodicTable/modalContainer/ModalContainer";
 import { ElementModalSimple } from "@/components/views/atomModel/elementModalSimple/ElementModalSimple";
+import { ModalContainer } from "../views/periodicTable/modalContainer/ModalContainer";
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -36,17 +36,17 @@ const useIsMobile = () => {
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
-    panelMode,
-    panelPosition,
-    hideInfoPanel,
-    setPanelPosition,
-    setPanelManuallyPositioned,
+    homepageModal,
+    hideHomepageModal,
+    hidePeriodicTableModal,
+    setModalPosition,
+    setModalManuallyPositioned,
     resetActionCounters,
-    isNavigating,
-    isPanelManuallyPositioned,
+    isNavigatingBetweenPages,
   } = useAppStore();
 
-  const current3DElement = useAppStore(deriveCurrentElement);
+  const liveElement = useAppStore(deriveCurrentElement);
+
   const pathname = usePathname();
   const isMobile = useIsMobile();
 
@@ -62,9 +62,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const showMobileTopBar = isMobile;
 
   useEffect(() => {
-    hideInfoPanel();
+    hideHomepageModal();
+    hidePeriodicTableModal();
     resetActionCounters();
-  }, [pathname, hideInfoPanel, resetActionCounters]);
+  }, [
+    pathname,
+    hideHomepageModal,
+    hidePeriodicTableModal,
+    resetActionCounters,
+  ]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -73,37 +79,32 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { delta } = event;
-    const currentPosition = useAppStore.getState().panelPosition;
-    setPanelPosition({
+    const { delta, active } = event;
+    const modalId = active.id as string;
+
+    let modalType: "homepage" | "periodicTable" | null = null;
+
+    if (modalId.startsWith("homepage-")) {
+      modalType = "homepage";
+    } else if (modalId.startsWith("periodic-table")) {
+      modalType = "periodicTable";
+    }
+
+    if (!modalType) return;
+
+    const currentPosition =
+      useAppStore.getState()[`${modalType}Modal`].currentPosition;
+
+    setModalPosition(modalType, {
       x: currentPosition.x + delta.x,
       y: currentPosition.y + delta.y,
     });
-    setPanelManuallyPositioned(true);
-  };
-
-  const renderActiveModal = () => {
-    const isPanelVisible = panelMode !== "hidden";
-    if (!isPanelVisible) return null;
-
-    if (pathname === "/") {
-      return (
-        <ElementModalSimple
-          element={current3DElement}
-          position={panelPosition}
-          isSmallScreen={isMobile}
-          isManuallyPositioned={isPanelManuallyPositioned}
-          ignoredRefs={ignoredRefs}
-        />
-      );
-    }
-
-    return null;
+    setModalManuallyPositioned(modalType, true);
   };
 
   return (
     <div className={styles.mainContainer}>
-      {isNavigating &&
+      {isNavigatingBetweenPages &&
         createPortal(
           <div className={styles.fullScreenLoader}>
             <div className={styles.loaderSpinner}></div>
@@ -137,7 +138,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        {renderActiveModal()}
+        {/* Modal for Homepage */}
+        {homepageModal.isVisible &&
+          homepageModal.content?.type === "element" && (
+            <ElementModalSimple
+              element={liveElement}
+              currentPosition={homepageModal.currentPosition}
+              isManuallyPositioned={homepageModal.isManuallyPositioned}
+              isSmallScreen={isMobile}
+              onClose={hideHomepageModal}
+              ignoredRefs={ignoredRefs}
+            />
+          )}
+
+        {/* Modal for Periodic Table */}
         {pathname === "/periodic-table" && (
           <ModalContainer ignoredRefs={ignoredRefs} />
         )}
